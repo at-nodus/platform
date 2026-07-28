@@ -2,11 +2,12 @@
 
 > Arquivo: `.ai/WORK/2026-07-28-00013-product-enablement.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md` + `module.md`  
-> Status: **Pronto para implementação** — D-00013-1..6 aceitas (todas A)  
+> Status: **Implementado** — D-00013-1..6 aceitas (todas A)  
 > Data: 2026-07-28  
 > Depende de: 00001 (Organization/Product), 00002 (AuthZ admin), 00011 (portal Admin)  
 > Relaciona: ADR-003 (switch-context), ADR-005 (permissions no JWT), F00001-D10 (Product ≠ AuthClient), 00012 (FKs explícitas)
 > Decisões: **A / A / A / A / A / A** (D-00013-1..6)
+> Migration: `Phase15ProductEnablement`
 
 ## Objetivo
 
@@ -185,16 +186,16 @@ Consumido por: switch_context handler + TokenClaimsFactory (quando org + product
 
 ## Critérios de aceite
 
-- [ ] Platform Admin habilita Product P na Organization O via API/UI.
-- [ ] Unicidade: segundo enable O×P rejeitado.
-- [ ] `switch_context` (ou emissão com org) para client bound a P **falha** se O não tem enablement ativo.
-- [ ] Com enablement + membership + assignment, token sai com permissions efetivas como hoje.
-- [ ] Disable (soft-delete) faz novas emissões falharem; comportamento de tokens antigos conforme D-00013-6 aceito.
-- [ ] Platform admin / product `sso-platform` sem org não quebra.
-- [ ] Client Credentials sem org continua operacional (MVP).
-- [ ] Seed/dev: org de desenvolvimento já habilitada nos products usados pelos testes.
-- [ ] FKs explícitas Organization/Product (padrão 00012).
-- [ ] CONTEXT atualizado.
+- [x] Platform Admin habilita Product P na Organization O via API/UI.
+- [x] Unicidade: segundo enable O×P rejeitado.
+- [x] `switch_context` (ou emissão com org) para client bound a P **falha** se O não tem enablement ativo.
+- [x] Com enablement + membership + assignment, token sai com permissions efetivas como hoje.
+- [x] Disable (soft-delete) faz novas emissões falharem; comportamento de tokens antigos conforme D-00013-6 aceito.
+- [x] Platform admin / product `sso-platform` sem org não quebra.
+- [x] Client Credentials sem org continua operacional (MVP).
+- [x] Seed/dev: org de desenvolvimento já habilitada nos products usados pelos testes.
+- [x] FKs explícitas Organization/Product (padrão 00012).
+- [x] CONTEXT atualizado.
 
 ## Arquivos impactados (previsto)
 
@@ -246,12 +247,12 @@ Não é compromisso de prazo em dias — serve para priorizar no backlog comerci
 ## Checklist
 
 - [x] D-00013-1..6 aceitas (todas A)
-- [ ] Alinhado a PLAYBOOK/architecture.md + domain-rules-in-domain-services
-- [ ] Naming HTTP verbs nos Commands
-- [ ] Migration + soft-delete + FKs Restrict
-- [ ] AuthZ `sso.admin.*`
-- [ ] CONTEXT + backlog atualizados
-- [ ] Pronto para implementação
+- [x] Alinhado a PLAYBOOK/architecture.md + domain-rules-in-domain-services
+- [x] Naming HTTP verbs nos Commands
+- [x] Migration + soft-delete + FKs Restrict
+- [x] AuthZ `sso.admin.*`
+- [x] CONTEXT + backlog atualizados
+- [x] Implementado
 
 ## Decisões abertas (bloqueiam código se não fechadas)
 

@@ -4,6 +4,7 @@ using SSO.Core.Domain.Identity.ClaimDefinitions.Entity;
 using SSO.Core.Domain.Identity.ClientProductBindings.Entity;
 using SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity;
 using SSO.Core.Domain.Identity.MenuItems.Entity;
+using SSO.Core.Domain.Identity.ProductEnablements.Entity;
 using SSO.Core.Domain.Identity.Products.Resources;
 using SSO.Core.Domain.Identity.UserClaimAssignments.Entity;
 using SSO.Core.Domain.Identity.UserRoleAssignments.Entity;
@@ -22,6 +23,7 @@ namespace SSO.Core.Domain.Identity.Products.Entity
 		public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 		public ICollection<ClaimDefinition> ClaimDefinitions { get; set; } = new List<ClaimDefinition>();
 		public ICollection<ClientProductBinding> ClientProductBindings { get; set; } = new List<ClientProductBinding>();
+		public ICollection<ProductEnablement> ProductEnablements { get; set; } = new List<ProductEnablement>();
 		public ICollection<UserRoleAssignment> UserRoleAssignments { get; set; } = new List<UserRoleAssignment>();
 		public ICollection<UserClaimAssignment> UserClaimAssignments { get; set; } = new List<UserClaimAssignment>();
 		public ICollection<LdapGroupRoleMap> LdapGroupRoleMaps { get; set; } = new List<LdapGroupRoleMap>();

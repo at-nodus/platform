@@ -22,6 +22,7 @@
 | **Organization** | Tenant; isolamento lógico de identidade e autorização |
 | **Branch** | Filial / unidade dentro de uma Organization |
 | **Product** | Sistema do ecossistema que consome o SSO (conceito de negócio) |
+| **ProductEnablement** | Habilitação comercial Organization × Product (pré-condição de token com org; ≠ permission de usuário) |
 | **AuthClient** | Cliente OAuth/OIDC registrado, ligado a um Product (≠ Product) |
 | **Membership** | Vínculo usuário ↔ organização (e opcionalmente branch) |
 | **Permission** | Capacidade autorizável dinâmica |

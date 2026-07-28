@@ -99,6 +99,47 @@ namespace SSO.Tests.IntegrationTests.Identity
 		}
 
 		[TestMethod]
+		public async Task TokenClaimsFactory_Should_Reject_When_Product_Not_Enabled_For_Organization()
+		{
+			using var server = ServerHelper.Create();
+			using var scope = server.Services.CreateScope();
+
+			var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+			var claimsFactory = scope.ServiceProvider.GetRequiredService<TokenClaimsFactory>();
+			var writer = scope.ServiceProvider.GetRequiredService<SSO.Core.Domain.Identity._Context.Interfaces.Infrastructures.Data.IIdentityDbContextWriter>();
+
+			var user = await userManager.FindByIdAsync(IdentitySeed.DevUserId.ToString());
+			Assert.IsNotNull(user);
+
+			var enablements = writer.Query<SSO.Core.Domain.Identity.ProductEnablements.Entity.ProductEnablement>()
+				.Where(x => !x.IsDeleted
+					&& x.OrganizationId == IdentitySeed.DevOrganizationId
+					&& x.ProductId == IdentitySeed.DevProductId)
+				.ToList();
+			Assert.IsTrue(enablements.Count > 0, "Seed should create DevOrg×DevProduct enablement.");
+			foreach (var row in enablements)
+			{
+				row.MarkDeleted();
+			}
+			await writer.CommitAsync();
+
+			try
+			{
+				await claimsFactory.CreateUserPrincipalAsync(
+					user!,
+					new[] { OpenIddictConstants.Scopes.OpenId },
+					SsoClients.DevSpaClientId,
+					IdentitySeed.DevOrganizationId,
+					branchId: null);
+				Assert.Fail("Expected product enablement gate to reject issuance.");
+			}
+			catch (SSO.Core.Domain.Identity.ProductEnablements.ProductNotEnabledForOrganizationException)
+			{
+				// expected
+			}
+		}
+
+		[TestMethod]
 		public async Task SwitchContext_Grant_Should_Reject_Missing_AccessToken()
 		{
 			using var client = ServerHelper.Create().CreateClient();

@@ -13,6 +13,7 @@ using SSO.Core.Domain.Identity.MenuItems.Entity;
 using SSO.Core.Domain.Identity.OrganizationInvites.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Identity.Permissions.Entity;
+using SSO.Core.Domain.Identity.ProductEnablements.Entity;
 using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity;
 using SSO.Core.Domain.Identity.RevokedSessions.Entity;
@@ -41,6 +42,7 @@ namespace SSO.Infrastructures.Data.Identity
 		public DbSet<RolePermission> RolePermissions { get; set; }
 		public DbSet<UserRoleAssignment> UserRoleAssignments { get; set; }
 		public DbSet<ClientProductBinding> ClientProductBindings { get; set; }
+		public DbSet<ProductEnablement> ProductEnablements { get; set; }
 		public DbSet<AuthAuditEvent> AuthAuditEvents { get; set; }
 		public DbSet<MenuItem> MenuItems { get; set; }
 		public DbSet<ExternalIdentityProvider> ExternalIdentityProviders { get; set; }
@@ -88,6 +90,7 @@ namespace SSO.Infrastructures.Data.Identity
 			builder.ApplyConfiguration(new RolePermissionMap());
 			builder.ApplyConfiguration(new UserRoleAssignmentMap());
 			builder.ApplyConfiguration(new ClientProductBindingMap());
+			builder.ApplyConfiguration(new ProductEnablementMap());
 			builder.ApplyConfiguration(new AuthAuditEventMap());
 			builder.ApplyConfiguration(new MenuItemMap());
 			builder.ApplyConfiguration(new ExternalIdentityProviderMap());

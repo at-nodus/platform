@@ -984,6 +984,44 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.ToTable("Permissions", "IdentityDb");
                 });
 
+            modelBuilder.Entity("SSO.Core.Domain.Identity.ProductEnablements.Entity.ProductEnablement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("UNIQUEIDENTIFIER")
+                        .HasColumnName("Id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("UNIQUEIDENTIFIER")
+                        .HasColumnName("OrganizationId");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("UNIQUEIDENTIFIER")
+                        .HasColumnName("ProductId");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("OrganizationId", "ProductId")
+                        .IsUnique()
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ProductEnablements", "IdentityDb");
+                });
+
             modelBuilder.Entity("SSO.Core.Domain.Identity.Products.Entity.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1682,6 +1720,25 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Navigation("Organization");
                 });
 
+            modelBuilder.Entity("SSO.Core.Domain.Identity.ProductEnablements.Entity.ProductEnablement", b =>
+                {
+                    b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
+                        .WithMany("ProductEnablements")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SSO.Core.Domain.Identity.Products.Entity.Product", "Product")
+                        .WithMany("ProductEnablements")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("SSO.Core.Domain.Identity.RoleClaims.Entity.RoleClaim", b =>
                 {
                     b.HasOne("SSO.Core.Domain.Identity.ClaimDefinitions.Entity.ClaimDefinition", "ClaimDefinition")
@@ -1871,6 +1928,8 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.Navigation("OrganizationInvites");
 
+                    b.Navigation("ProductEnablements");
+
                     b.Navigation("UserClaimAssignments");
 
                     b.Navigation("UserRoleAssignments");
@@ -1892,6 +1951,8 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Navigation("LdapGroupRoleMaps");
 
                     b.Navigation("MenuItems");
+
+                    b.Navigation("ProductEnablements");
 
                     b.Navigation("UserClaimAssignments");
 

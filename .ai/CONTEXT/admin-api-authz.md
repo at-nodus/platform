@@ -13,8 +13,8 @@ Products continue to authorize **their own** APIs from JWT permission codes. Adm
 
 | Code | Scope | Typical use |
 |------|-------|-------------|
-| `sso.admin.platform` | Platform | Organizations, products, permission/role catalog, client bindings |
-| `sso.admin.org` | Tenant | Branches, memberships, user-role assignments (token org) |
+| `sso.admin.platform` | Platform | Organizations, products, permission/role catalog, client bindings, product enablements (CRUD) |
+| `sso.admin.org` | Tenant | Branches, memberships, user-role assignments (token org); product enablements (GET própria org) |
 | `sso.admin.audit.read` | Platform | `GET /api/identity/auth-audit-events` |
 | `sso.admin.sessions.revoke` | Tenant (+ platform) | `POST .../account/sessions/{userId}/revoke` |
 | `sso.admin.menus` | Platform | MenuItem CRUD + `GET /api/identity/menus/effective` |

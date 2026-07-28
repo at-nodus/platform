@@ -13,6 +13,7 @@ using SSO.Core.Domain.Identity.Memberships.Entity;
 using SSO.Core.Domain.Identity.MenuItems.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Identity.Permissions.Entity;
+using SSO.Core.Domain.Identity.ProductEnablements.Entity;
 using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Core.Domain.Identity.RoleClaims.Entity;
 using SSO.Core.Domain.Identity.RolePermissions.Entity;
@@ -222,6 +223,9 @@ namespace SSO.Infrastructures.Data.Identity
 			await EnsureClientBindingAsync(context, SsoClients.DevSpaClientId, DevProductId);
 			await EnsureClientBindingAsync(context, SsoClients.DevServiceClientId, DevProductId);
 			await EnsureClientBindingAsync(context, AdminClientId, DevPlatformProductId);
+
+			await EnsureProductEnablementAsync(context, DevOrganizationId, DevProductId);
+			await EnsureProductEnablementAsync(context, DevOrganizationId, DevPlatformProductId);
 
 			await EnsureMenuAsync(context, DevMenuHomeId, DevProductId, "home", "Home", "/app", PermissionAccess, 10);
 			await EnsureMenuAsync(context, DevMenuHqReportsId, DevProductId, "hq-reports", "HQ Reports", "/app/hq/reports", PermissionHqReports, 20);
@@ -480,6 +484,19 @@ namespace SSO.Infrastructures.Data.Identity
 			var binding = new ClientProductBinding { ClientId = clientId, ProductId = productId };
 			binding.MarkCreated();
 			context.ClientProductBindings.Add(binding);
+		}
+
+		private static async Task EnsureProductEnablementAsync(IdentityDbContext context, Guid organizationId, Guid productId)
+		{
+			if (await context.ProductEnablements.AnyAsync(x =>
+				!x.IsDeleted && x.OrganizationId == organizationId && x.ProductId == productId))
+			{
+				return;
+			}
+
+			var row = new ProductEnablement { OrganizationId = organizationId, ProductId = productId };
+			row.MarkCreated();
+			context.ProductEnablements.Add(row);
 		}
 
 		private static async Task EnsureMenuAsync(

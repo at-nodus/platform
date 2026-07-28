@@ -11,6 +11,7 @@ using SSO.Core.Domain.Identity.MenuItems.Entity;
 using SSO.Core.Domain.Identity.OrganizationInvites.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Identity.Permissions.Entity;
+using SSO.Core.Domain.Identity.ProductEnablements.Entity;
 using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Core.Domain.Identity.RevokedSessions.Entity;
 using SSO.Core.Domain.Identity.RoleClaims.Entity;
@@ -63,6 +64,8 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 			AssertHasFk<LdapGroupRoleMap>(model, nameof(LdapGroupRoleMap.BranchId));
 			AssertHasFk<ExternalIdentityProvider>(model, nameof(ExternalIdentityProvider.OrganizationId));
 			AssertHasFk<ClientProductBinding>(model, nameof(ClientProductBinding.ProductId));
+			AssertHasFk<ProductEnablement>(model, nameof(ProductEnablement.OrganizationId));
+			AssertHasFk<ProductEnablement>(model, nameof(ProductEnablement.ProductId));
 			AssertHasFk<UserSession>(model, nameof(UserSession.UserId));
 			AssertHasFk<UserSession>(model, nameof(UserSession.OrganizationId));
 			AssertHasFk<UserSession>(model, nameof(UserSession.BranchId));
@@ -110,6 +113,8 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 			AssertInverse<MenuItem>(model, nameof(MenuItem.ProductId), nameof(Product.MenuItems));
 			AssertInverse<ClaimDefinition>(model, nameof(ClaimDefinition.ProductId), nameof(Product.ClaimDefinitions));
 			AssertInverse<ClientProductBinding>(model, nameof(ClientProductBinding.ProductId), nameof(Product.ClientProductBindings));
+			AssertInverse<ProductEnablement>(model, nameof(ProductEnablement.OrganizationId), nameof(Organization.ProductEnablements));
+			AssertInverse<ProductEnablement>(model, nameof(ProductEnablement.ProductId), nameof(Product.ProductEnablements));
 			AssertInverse<LdapGroupRoleMap>(model, nameof(LdapGroupRoleMap.OrganizationId), nameof(Organization.LdapGroupRoleMaps));
 			AssertInverse<ExternalIdentityProvider>(model, nameof(ExternalIdentityProvider.OrganizationId), nameof(Organization.ExternalIdentityProviders));
 			AssertInverse<UserSession>(model, nameof(UserSession.UserId), nameof(User.UserSessions));

@@ -1,0 +1,59 @@
+@page
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.ProductEnablementsModel
+@{
+	ViewData["Title"] = "Habilitações de produto";
+}
+<h1>Habilitações Organization ↔ Product</h1>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="flash">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="flash error">@Model.Error</div> }
+
+@if (Model.CanWrite)
+{
+	<div class="card">
+		<h2>Habilitar produto</h2>
+		<form method="post">
+			<label>Organização</label>
+			<select asp-for="OrganizationId">
+				@foreach (var o in Model.Organizations)
+				{
+					<option value="@o.Id">@o.Name (@o.Code)</option>
+				}
+			</select>
+			<label>Produto</label>
+			<select asp-for="ProductId">
+				@foreach (var p in Model.Products)
+				{
+					<option value="@p.Id">@p.Name (@p.Code)</option>
+				}
+			</select>
+			<p style="margin-top:1rem"><button type="submit">Habilitar</button></p>
+		</form>
+	</div>
+}
+
+<div class="card">
+	<table>
+		<thead><tr><th>Organização</th><th>Produto</th><th></th></tr></thead>
+		<tbody>
+		@foreach (var e in Model.Items)
+		{
+			var org = Model.Organizations.FirstOrDefault(x => x.Id == e.OrganizationId);
+			var product = Model.Products.FirstOrDefault(x => x.Id == e.ProductId);
+			<tr>
+				<td>@(org?.Name ?? e.OrganizationId.ToString())</td>
+				<td>@(product?.Name ?? e.ProductId.ToString())</td>
+				<td>
+					@if (Model.CanWrite)
+					{
+						<form method="post" asp-page-handler="Delete" style="display:inline">
+							<input type="hidden" name="id" value="@e.Id" />
+							<button type="submit" class="btn-secondary">Desabilitar</button>
+						</form>
+					}
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+</div>

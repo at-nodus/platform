@@ -23,6 +23,7 @@ namespace SSO.Middleware.Identity
 		private readonly IEffectiveClaimsResolver _claimsResolver;
 		private readonly IClaimPolicyVersionProvider _claimVersionProvider;
 		private readonly IUserSessionService _sessionService;
+		private readonly IProductEnablementGuard _productEnablementGuard;
 
 		public TokenClaimsFactory(
 			UserManager<User> userManager,
@@ -30,7 +31,8 @@ namespace SSO.Middleware.Identity
 			IPermissionPolicyVersionProvider policyVersionProvider,
 			IEffectiveClaimsResolver claimsResolver,
 			IClaimPolicyVersionProvider claimVersionProvider,
-			IUserSessionService sessionService)
+			IUserSessionService sessionService,
+			IProductEnablementGuard productEnablementGuard)
 		{
 			_userManager = userManager;
 			_permissionsResolver = permissionsResolver;
@@ -38,6 +40,7 @@ namespace SSO.Middleware.Identity
 			_claimsResolver = claimsResolver;
 			_claimVersionProvider = claimVersionProvider;
 			_sessionService = sessionService;
+			_productEnablementGuard = productEnablementGuard;
 		}
 
 		public async Task<ClaimsPrincipal> CreateUserPrincipalAsync(
@@ -49,6 +52,11 @@ namespace SSO.Middleware.Identity
 			Guid? existingSessionId = null,
 			CancellationToken cancellationToken = default)
 		{
+			if (organizationId is Guid orgId)
+			{
+				await _productEnablementGuard.EnsureEnabledForClientAsync(orgId, clientId, cancellationToken);
+			}
+
 			var identity = new ClaimsIdentity(
 				authenticationType: TokenValidationParameters.DefaultAuthenticationType,
 				nameType: Claims.Name,
@@ -59,9 +67,9 @@ namespace SSO.Middleware.Identity
 			identity.SetClaim(Claims.Name, await _userManager.GetUserNameAsync(user));
 			identity.SetClaim(Claims.PreferredUsername, await _userManager.GetUserNameAsync(user));
 
-			if (organizationId is Guid orgId)
+			if (organizationId is Guid organizationClaim)
 			{
-				identity.SetClaim(SsoClaimTypes.OrganizationId, orgId.ToString("D"));
+				identity.SetClaim(SsoClaimTypes.OrganizationId, organizationClaim.ToString("D"));
 			}
 
 			if (branchId is Guid branch)

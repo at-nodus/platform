@@ -74,6 +74,7 @@ A maioria das entidades de domínio herda `IdentityAuditableEntity`: `Id`, `Crea
 | `OpenIddictTokens` | *(OpenIddict)* | Tokens emitidos (access, refresh, etc.). |
 | `AuthClientMetadata` | `AuthClientMetadataEntity` | **Metadados admin** do AuthClient (display name, first-party, enablement, política de consent Always/First/Never). Sidecar por `ClientId`; não substitui o store OpenIddict. |
 | `ClientProductBindings` | `ClientProductBinding` | **Liga `client_id` OAuth → Product.** Garante que a authz efetiva seja resolvida para o produto correto do cliente. |
+| `ProductEnablements` | `ProductEnablement` | **Habilitação comercial Organization × Product.** Pré-condição fail-closed para emitir token com `organization_id` no product do client (exceto `sso-platform` / M2M). |
 
 ---
 

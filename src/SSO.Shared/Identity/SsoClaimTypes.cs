@@ -25,4 +25,15 @@ namespace SSO.Shared.Identity
 		public const string AdminApiClientId = "sso-admin-api";
 		public const string AdminApiClientSecret = "sso-admin-secret-change-me";
 	}
+
+	public static class SsoProductCodes
+	{
+		/// <summary>Platform admin product — exempt from org ProductEnablement gate (D-00013-3).</summary>
+		public const string Platform = "sso-platform";
+	}
+
+	public static class SsoAuthErrors
+	{
+		public const string ProductNotEnabledForOrganization = "product_not_enabled_for_organization";
+	}
 }

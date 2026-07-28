@@ -17,8 +17,8 @@ Páginas orquestram Application (MediatR / `AdminWrap`) ou serviços equivalente
 
 | Papel | Páginas |
 |-------|---------|
-| Org (+ Platform) | Branches, Invites (+ resend/cancel), Memberships (list/remove), UserRoleAssignments, UserClaimAssignments, Sessions (`sessions.revoke`) |
-| Platform | Organizations, Products, Permissions, Roles, RolePermissions, ClientProductBindings, AuthClients, ExternalIdPs, ClaimDefinitions, RoleClaims, Users, LdapMaps, MenuItems (`menus`) |
+| Org (+ Platform) | Branches, Invites (+ resend/cancel), Memberships (list/remove), UserRoleAssignments, UserClaimAssignments, ProductEnablements (**GET** / read-only), Sessions (`sessions.revoke`) |
+| Platform | Organizations, Products, Permissions, Roles, RolePermissions, ClientProductBindings, ProductEnablements (CRUD), AuthClients, ExternalIdPs, ClaimDefinitions, RoleClaims, Users, LdapMaps, MenuItems (`menus`) |
 | Audit | Audit (`audit.read`) |
 
 ## Convites (F00003-D2)

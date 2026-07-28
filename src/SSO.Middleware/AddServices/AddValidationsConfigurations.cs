@@ -8,6 +8,9 @@ using SSO.Core.Domain.Identity.Branches.Validations.EntityValidations;
 using SSO.Core.Domain.Identity.ClientProductBindings.Specifications;
 using SSO.Core.Domain.Identity.ClientProductBindings.Validations.DomainValidations;
 using SSO.Core.Domain.Identity.ClientProductBindings.Validations.EntityValidations;
+using SSO.Core.Domain.Identity.ProductEnablements.Specifications;
+using SSO.Core.Domain.Identity.ProductEnablements.Validations.DomainValidations;
+using SSO.Core.Domain.Identity.ProductEnablements.Validations.EntityValidations;
 using SSO.Core.Domain.Identity.Memberships.Specifications;
 using SSO.Core.Domain.Identity.Memberships.Validations.DomainValidations;
 using SSO.Core.Domain.Identity.Memberships.Validations.EntityValidations;
@@ -53,6 +56,7 @@ namespace SSO.Middleware.AddServices
 			services.AddTransient<PermissionCodeAlreadyExistsSpecification>();
 			services.AddTransient<RoleCodeAlreadyExistsSpecification>();
 			services.AddTransient<ClientProductBindingClientIdAlreadyExistsSpecification>();
+			services.AddTransient<ProductEnablementOrganizationProductAlreadyExistsSpecification>();
 
 			services.AddTransient<OrganizationInviteIsNotPendingSpecification>();
 			services.AddTransient<OrganizationInviteIsExpiredSpecification>();
@@ -76,6 +80,7 @@ namespace SSO.Middleware.AddServices
 			services.AddTransient<RolePermissionValidator>();
 			services.AddTransient<UserRoleAssignmentValidator>();
 			services.AddTransient<ClientProductBindingValidator>();
+			services.AddTransient<ProductEnablementValidator>();
 			services.AddTransient<MenuItemValidator>();
 			services.AddTransient<OrganizationInviteValidator>();
 
@@ -125,6 +130,9 @@ namespace SSO.Middleware.AddServices
 			services.AddTransient<CreateClientProductBindingSpecificationsValidator>();
 			services.AddTransient<UpdateClientProductBindingSpecificationsValidator>();
 			services.AddTransient<DeleteClientProductBindingSpecificationsValidator>();
+
+			services.AddTransient<CreateProductEnablementSpecificationsValidator>();
+			services.AddTransient<DeleteProductEnablementSpecificationsValidator>();
 
 			services.AddTransient<CreateMenuItemSpecificationsValidator>();
 			services.AddTransient<UpdateMenuItemSpecificationsValidator>();

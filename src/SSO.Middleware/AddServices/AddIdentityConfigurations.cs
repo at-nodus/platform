@@ -75,6 +75,7 @@ namespace SSO.Middleware.AddServices
 			services.AddScoped<IEffectiveClaimsResolver, EffectiveClaimsResolver>();
 			services.AddScoped<IClaimPolicyVersionProvider, ClaimPolicyVersionProvider>();
 			services.AddScoped<IEffectiveMenusResolver, EffectiveMenusResolver>();
+			services.AddScoped<IProductEnablementGuard, ProductEnablementGuard>();
 			services.AddScoped<TokenClaimsFactory>();
 
 			services.AddOpenIddict()

@@ -133,6 +133,19 @@ Plano: `.ai/WORK/2026-07-16-00010-observabilidade-cicd.md` (**implementado**).
 
 Plano: `.ai/WORK/2026-07-27-00012-bug-foreign-keys-fracas.md`.
 
+## Decisões feature 00013 (Product Enablement)
+
+| ID | Decisão | Status |
+|----|---------|--------|
+| D-00013-1 | Aggregate `ProductEnablement` = **Organization × Product** (não Branch) | **Aceito** (A) |
+| D-00013-2 | Fail-closed: sem linha ativa ⇒ nega; backfill/seed antes do gate | **Aceito** (A) |
+| D-00013-3 | Gate em emissão com `organization_id`; M2M sem org e product `sso-platform` isentos | **Aceito** (A) |
+| D-00013-4 | Campos mínimos: OrganizationId + ProductId; enable=POST, disable=soft-delete | **Aceito** (A) |
+| D-00013-5 | CRUD Platform (`sso.admin.platform`); GET Org Admin (`sso.admin.org`) | **Aceito** (A) |
+| D-00013-6 | Disable corta no próximo token (TTL); sem revoke em massa | **Aceito** (A) |
+
+Plano: `.ai/WORK/2026-07-28-00013-product-enablement.md` (**implementado**).
+
 ## Decisões feature 00001 (D1–D12)
 
 | ID | Decisão | Status |

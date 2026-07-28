@@ -14,6 +14,7 @@ using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using OpenIddict.Validation.AspNetCore;
 using SSO.Core.Domain.Identity.Memberships.Entity;
+using SSO.Core.Domain.Identity.ProductEnablements;
 using SSO.Core.Domain.Identity.Users.Entity;
 using SSO.Core.Domain.Identity._Context.Interfaces.Services;
 using SSO.Core.Domain.Identity.AuthAuditEvents.Entity;
@@ -157,13 +158,21 @@ namespace SSO.Web.Api.Controllers
 			}
 
 			var organizationId = await ResolveDefaultOrganizationIdAsync(user.Id);
-			var principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
-				user,
-				request.GetScopes(),
-				request.ClientId,
-				organizationId,
-				branchId: null,
-				existingSessionId: null);
+			ClaimsPrincipal principal;
+			try
+			{
+				principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
+					user,
+					request.GetScopes(),
+					request.ClientId,
+					organizationId,
+					branchId: null,
+					existingSessionId: null);
+			}
+			catch (ProductNotEnabledForOrganizationException)
+			{
+				return ForbidProductNotEnabled();
+			}
 
 			var resources = new List<string>();
 			await foreach (var resource in _scopeManager.ListResourcesAsync(principal.GetScopes()))
@@ -270,13 +279,21 @@ namespace SSO.Web.Api.Controllers
 						}));
 				}
 
-				var principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
-					user,
-					request.GetScopes().Any() ? request.GetScopes() : result.Principal!.GetScopes(),
-					request.ClientId,
-					organizationId,
-					branchId,
-					existingSessionId);
+				ClaimsPrincipal principal;
+				try
+				{
+					principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
+						user,
+						request.GetScopes().Any() ? request.GetScopes() : result.Principal!.GetScopes(),
+						request.ClientId,
+						organizationId,
+						branchId,
+						existingSessionId);
+				}
+				catch (ProductNotEnabledForOrganizationException)
+				{
+					return ForbidProductNotEnabled();
+				}
 
 				principal.SetDestinations(GetDestinations);
 				SsoAuthMetrics.RecordTokenIssued(
@@ -500,19 +517,38 @@ namespace SSO.Web.Api.Controllers
 					}));
 			}
 
-			var principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
-				user,
-				scopes,
-				request.ClientId ?? result.Principal!.GetClaim(Claims.ClientId) ?? result.Principal.GetClaim("client_id"),
-				organizationId,
-				branchId,
-				existingSessionId);
+			ClaimsPrincipal principal;
+			try
+			{
+				principal = await _tokenClaimsFactory.CreateUserPrincipalAsync(
+					user,
+					scopes,
+					request.ClientId ?? result.Principal!.GetClaim(Claims.ClientId) ?? result.Principal.GetClaim("client_id"),
+					organizationId,
+					branchId,
+					existingSessionId);
+			}
+			catch (ProductNotEnabledForOrganizationException)
+			{
+				SsoAuthMetrics.RecordSwitchContextFailure(SsoAuthErrors.ProductNotEnabledForOrganization);
+				return ForbidProductNotEnabled();
+			}
 
 			principal.SetDestinations(GetDestinations);
 			SsoAuthMetrics.RecordSwitchContextSuccess();
 			SsoAuthMetrics.RecordTokenIssued(SsoGrantTypes.SwitchContext);
 			return SignIn(principal, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
 		}
+
+		private IActionResult ForbidProductNotEnabled()
+			=> Forbid(
+				authenticationSchemes: OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+				properties: new AuthenticationProperties(new Dictionary<string, string?>
+				{
+					[OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.AccessDenied,
+					[OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+						SsoAuthErrors.ProductNotEnabledForOrganization
+				}));
 
 		private async Task<Guid?> ResolveDefaultOrganizationIdAsync(Guid userId)
 		{

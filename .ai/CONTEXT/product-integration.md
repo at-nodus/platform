@@ -54,6 +54,8 @@ Session APIs: `GET /api/identity/sessions/me`, `POST .../me/{id}/revoke`, admin 
 
 Client → Product mapping: OpenIddict `client_id` → `ClientProductBindings` → `ProductId` on assignments.
 
+**Commercial prerequisite (00013):** when the token includes `organization_id`, the Organization must have an active `ProductEnablement` for that Product (fail-closed). Error code: `product_not_enabled_for_organization`. Platform product `sso-platform` and client-credentials (no org) are exempt. User fine-grained access remains Roles/Permissions.
+
 ## Authz pattern in product apps
 
 ```text

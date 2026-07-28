@@ -48,6 +48,7 @@ Fonte: `.ai/WORK/2026-07-14-00001-plataforma-sso.md` e `.ai/CONTEXT/adr/`.
 | Branch hierárquica | Estrutura opcional; default **sem** herança authz (ADR-004); opt-in pai→filho via ADR-008 / 00009 |
 | Herança Role → Permission | Permitida |
 | Product ≠ AuthClient | Conceitos distintos |
+| ProductEnablement Org×Product | Fail-closed: sem habilitação ativa, emissão com `organization_id` nega (00013); product `sso-platform` isento; M2M sem org isento |
 | Admin UI rica | Fora do MVP (API-only + Razor login/consent) |
 
 ### Composition de autorização

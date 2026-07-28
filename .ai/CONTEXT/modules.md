@@ -44,6 +44,7 @@
 | RolePermission | `RolePermissions` | `api/identity/rolepermissions` | Role→Permission |
 | UserRoleAssignment | `UserRoleAssignments` | `api/identity/userroleassignments` | Contexto Org/Branch/Product |
 | ClientProductBinding | `ClientProductBindings` | `api/identity/clientproductbindings` | client_id → Product |
+| ProductEnablement | `ProductEnablements` | `api/identity/productenablements` | Org × Product (comercial; 00013) |
 | AuthAuditEvent | `AuthAuditEvents` | `api/identity/auth-audit-events` | Append-only |
 | MenuItem | `MenuItems` | `api/identity/menuitems` + `api/identity/menus/effective` | PermissionCode → UI |
 | ExternalIdentityProvider | `ExternalIdentityProviders` | `api/identity/external-identity-providers` | Catálogo; só `IsEnabled` |
@@ -66,7 +67,7 @@ Area `/Admin` — cadastros completos por papel. Ver [admin-portal.md](admin-por
 
 ### Pendente (pós-épico)
 
-SMTP real, ProductEnablement avançado.
+SMTP real; ProductEnablement com vigência/Status / billing ref (evolutiva D-00013-4 B/C).
 
 ## Serviços de infraestrutura transversais
 
@@ -75,6 +76,7 @@ SMTP real, ProductEnablement avançado.
 | Mail | `IMailService` | `MailService` (+ `CapturingMailService` em testes) | Ativo (logger MVP) |
 | Permissions efetivas | `IEffectivePermissionsResolver` | `EffectivePermissionsResolver` | Ativo (Fase 3) |
 | Claims tipadas | `IEffectiveClaimsResolver` / `IClaimPolicyVersionProvider` | `EffectiveClaimsResolver` / `ClaimPolicyVersionProvider` | Ativo (00008) |
+| Product enablement | `IProductEnablementGuard` | `ProductEnablementGuard` | Ativo (00013) |
 | Auditoria | `IAuthAuditService` | `AuthAuditService` | Ativo (Fase 4) |
 | Sessões | `IUserSessionService` | `UserSessionService` | Ativo (Fase 4) |
 
