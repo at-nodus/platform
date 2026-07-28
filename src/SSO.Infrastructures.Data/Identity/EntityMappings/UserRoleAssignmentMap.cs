@@ -52,27 +52,27 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.User)
-				.WithMany()
+				.WithMany(u => u.UserRoleAssignments)
 				.HasForeignKey(e => e.UserId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Role)
-				.WithMany()
+				.WithMany(r => r.UserRoleAssignments)
 				.HasForeignKey(e => e.RoleId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.UserRoleAssignments)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Branch)
-				.WithMany()
+				.WithMany(b => b.UserRoleAssignments)
 				.HasForeignKey(e => e.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Product)
-				.WithMany()
+				.WithMany(p => p.UserRoleAssignments)
 				.HasForeignKey(e => e.ProductId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

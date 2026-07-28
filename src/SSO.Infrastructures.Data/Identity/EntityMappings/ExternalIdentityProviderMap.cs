@@ -34,7 +34,7 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasIndex(e => e.Code).IsUnique().HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.ExternalIdentityProviders)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

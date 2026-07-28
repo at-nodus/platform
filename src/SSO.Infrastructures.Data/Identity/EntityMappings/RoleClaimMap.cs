@@ -31,12 +31,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.Role)
-				.WithMany()
+				.WithMany(r => r.RoleClaims)
 				.HasForeignKey(e => e.RoleId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.ClaimDefinition)
-				.WithMany()
+				.WithMany(c => c.RoleClaims)
 				.HasForeignKey(e => e.ClaimDefinitionId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

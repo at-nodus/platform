@@ -6,7 +6,7 @@
 > Data: 2026-07-27  
 > Relaciona: 00001 (aggregates Identity), soft-delete F00001-D12  
 > Decisões: **B / A / A / A** (D-00012-1..4)  
-> Migration: `Phase14ExplicitIdentityForeignKeys`
+> Migration: `Phase14ExplicitIdentityForeignKeys` + `Phase14bInverseCollectionNavigations` (snapshot only)
 
 ## Sintoma
 
@@ -128,7 +128,7 @@ Snapshot: `src/SSO.Infrastructures.Data/Identity/Migrations/IdentityDbContextMod
 ## Correção proposta
 
 1. **FKs Guid** entre aggregates Identity + `AspNetUsers` / `AuthRoles` / `Organizations` / `Products` / `Branches` / `Permissions` / `ClaimDefinitions` (e `UserSession` Guid FKs).
-2. **Domain com navigation properties** (D-00012-1 = B) + nos `*Map`: `HasOne(e => e.X).WithMany().HasForeignKey(...).OnDelete(DeleteBehavior.Restrict)`.
+2. **Domain com navigation properties** (D-00012-1 = B): FK side (`Organization`, `User`, …) **e** collections inversas nos pais (`Organization.Branches`, `User.Memberships`, …) + nos `*Map`: `HasOne(e => e.X).WithMany(p => p.Xs).HasForeignKey(...).OnDelete(DeleteBehavior.Restrict)`.
 3. Migration única adicionando FKs; **pré-check** de órfãos antes do `AddForeignKey`.
 4. Soft-delete: Restrict evita cascade físico; limpeza de filhos continua a cargo de Domain Services / specs.
 5. **`ClientId` string, Audit, Outbox, RevokedSession:** fracos intencionais (D-00012-2..4) — fora desta correção.
@@ -158,6 +158,7 @@ Snapshot: `src/SSO.Infrastructures.Data/Identity/Migrations/IdentityDbContextMod
 
 - [x] Pré-check SQL de órfãos na migration `Phase14ExplicitIdentityForeignKeys`
 - [x] Modelo EF: FKs Guid com `DeleteBehavior.Restrict` (`IdentityForeignKeyModelScenarios`)
+- [x] Modelo EF: collections inversas (`WithMany` nomeadas)
 - [x] Modelo EF: Audit / Outbox / RevokedSession / `ClientId` string permanecem sem FK
 - [x] Regressão MembershipIsolation + CreateOrganization verdes
 - [ ] Suíte Identity completa (opcional / CI)

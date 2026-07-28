@@ -35,27 +35,27 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.User)
-				.WithMany()
+				.WithMany(u => u.UserClaimAssignments)
 				.HasForeignKey(e => e.UserId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.ClaimDefinition)
-				.WithMany()
+				.WithMany(c => c.UserClaimAssignments)
 				.HasForeignKey(e => e.ClaimDefinitionId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.UserClaimAssignments)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Branch)
-				.WithMany()
+				.WithMany(b => b.UserClaimAssignments)
 				.HasForeignKey(e => e.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Product)
-				.WithMany()
+				.WithMany(p => p.UserClaimAssignments)
 				.HasForeignKey(e => e.ProductId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

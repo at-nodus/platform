@@ -33,22 +33,22 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.LdapGroupRoleMaps)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Role)
-				.WithMany()
+				.WithMany(r => r.LdapGroupRoleMaps)
 				.HasForeignKey(e => e.RoleId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Product)
-				.WithMany()
+				.WithMany(p => p.LdapGroupRoleMaps)
 				.HasForeignKey(e => e.ProductId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Branch)
-				.WithMany()
+				.WithMany(b => b.LdapGroupRoleMaps)
 				.HasForeignKey(e => e.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

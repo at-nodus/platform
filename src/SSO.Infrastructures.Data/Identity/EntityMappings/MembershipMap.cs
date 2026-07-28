@@ -37,12 +37,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.User)
-				.WithMany()
+				.WithMany(u => u.Memberships)
 				.HasForeignKey(e => e.UserId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.Memberships)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

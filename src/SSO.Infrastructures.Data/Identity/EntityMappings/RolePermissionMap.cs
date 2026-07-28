@@ -36,12 +36,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.Role)
-				.WithMany()
+				.WithMany(r => r.RolePermissions)
 				.HasForeignKey(e => e.RoleId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Permission)
-				.WithMany()
+				.WithMany(p => p.RolePermissions)
 				.HasForeignKey(e => e.PermissionId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

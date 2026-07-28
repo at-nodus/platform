@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Products.Entity;
+using SSO.Core.Domain.Identity.RoleClaims.Entity;
+using SSO.Core.Domain.Identity.UserClaimAssignments.Entity;
 using SSO.Shared.Identity;
 
 namespace SSO.Core.Domain.Identity.ClaimDefinitions.Entity
@@ -18,6 +21,8 @@ namespace SSO.Core.Domain.Identity.ClaimDefinitions.Entity
 		public bool IsEnabled { get; set; } = true;
 
 		public Product Product { get; set; }
+		public ICollection<RoleClaim> RoleClaims { get; set; } = new List<RoleClaim>();
+		public ICollection<UserClaimAssignment> UserClaimAssignments { get; set; } = new List<UserClaimAssignment>();
 
 		public ClaimDefinition()
 		{

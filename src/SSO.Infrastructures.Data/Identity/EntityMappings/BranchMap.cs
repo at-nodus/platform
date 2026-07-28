@@ -44,12 +44,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.HasFilter("[IsDeleted] = 0");
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.Branches)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.ParentBranch)
-				.WithMany()
+				.WithMany(b => b.ChildBranches)
 				.HasForeignKey(e => e.ParentBranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}

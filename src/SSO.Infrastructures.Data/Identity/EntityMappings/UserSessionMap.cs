@@ -34,17 +34,17 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasIndex(e => new { e.UserId, e.RevokedAt });
 
 			builder.HasOne(e => e.User)
-				.WithMany()
+				.WithMany(u => u.UserSessions)
 				.HasForeignKey(e => e.UserId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Organization)
-				.WithMany()
+				.WithMany(o => o.UserSessions)
 				.HasForeignKey(e => e.OrganizationId)
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Branch)
-				.WithMany()
+				.WithMany(b => b.UserSessions)
 				.HasForeignKey(e => e.BranchId)
 				.OnDelete(DeleteBehavior.Restrict);
 		}
