@@ -122,6 +122,17 @@ Plano: `.ai/WORK/2026-07-16-00009-heranca-branch-opt-in.md` (**implementado**). 
 
 Plano: `.ai/WORK/2026-07-16-00010-observabilidade-cicd.md` (**implementado**).
 
+## Decisões bug 00012 (Foreign keys Identity)
+
+| ID | Decisão | Status |
+|----|---------|--------|
+| D-00012-1 | Navigation properties no Domain + `HasOne`/`WithMany`/`HasForeignKey` nos maps (`DeleteBehavior.Restrict`) | **Aceito** (B) |
+| D-00012-2 | `AuthAuditEvent` e `WebhookOutbox` permanecem **sem FK** (retenção histórica) | **Aceito** (A) |
+| D-00012-3 | `ClientId` string **sem FK SQL** para OpenIddict; validação na aplicação | **Aceito** (A) |
+| D-00012-4 | `RevokedSession.SessionId` / `UserId` **fracos** (deny-list / snapshot) | **Aceito** (A) |
+
+Plano: `.ai/WORK/2026-07-27-00012-bug-foreign-keys-fracas.md`.
+
 ## Decisões feature 00001 (D1–D12)
 
 | ID | Decisão | Status |

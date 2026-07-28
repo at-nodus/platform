@@ -2,9 +2,11 @@
 
 > Arquivo: `.ai/WORK/2026-07-27-00012-bug-foreign-keys-fracas.md`  
 > Template: `.ai/TEMPLATES/bugfix.md`  
-> Status: **Aberto** (levantamento)  
+> Status: **Implementado**  
 > Data: 2026-07-27  
-> Relaciona: 00001 (aggregates Identity), soft-delete F00001-D12
+> Relaciona: 00001 (aggregates Identity), soft-delete F00001-D12  
+> Decisões: **B / A / A / A** (D-00012-1..4)  
+> Migration: `Phase14ExplicitIdentityForeignKeys`
 
 ## Sintoma
 
@@ -118,50 +120,47 @@ OpenIddict usa PK `Guid` em `OpenIddictApplications`; o domínio guarda o **`cli
 |--------|--------|
 | `ExternalIdentityProvider.ClientId` | Client OAuth do IdP externo (Google/Entra), não AuthClient local |
 | `MenuItem.PermissionCode` | Código de permissão (string), não `Permission.Id` |
-| `AuthAuditEvent.UserId` | Preferível manter fraca (trilha histórica após exclusão/soft-delete) — **decisão aberta** |
+| `AuthAuditEvent.UserId` | Fraco intencional (D-00012-2) — trilha histórica após exclusão/soft-delete |
 
 Arquivos de map: `src/SSO.Infrastructures.Data/Identity/EntityMappings/*.cs`  
 Snapshot: `src/SSO.Infrastructures.Data/Identity/Migrations/IdentityDbContextModelSnapshot.cs`
 
 ## Correção proposta
 
-Abordagem mínima (sem mudar API/domínio público):
-
-1. **Prioridade P0 — FKs Guid obrigatórias** entre aggregates Identity + `AspNetUsers` / `AuthRoles` / `Organizations` / `Products` / `Branches` / `Permissions` / `ClaimDefinitions` / `UserSessions`.
-2. Em cada `*Map`: `HasOne<T>().WithMany().HasForeignKey(...).OnDelete(DeleteBehavior.Restrict)` (ou `NoAction`), **sem** navigation properties no Domain (relação só no Infrastructure), salvo decisão contrária.
-3. Migration única (ou por lote) adicionando FKs; **pré-check** de órfãos antes do `AddForeignKey`.
+1. **FKs Guid** entre aggregates Identity + `AspNetUsers` / `AuthRoles` / `Organizations` / `Products` / `Branches` / `Permissions` / `ClaimDefinitions` (e `UserSession` Guid FKs).
+2. **Domain com navigation properties** (D-00012-1 = B) + nos `*Map`: `HasOne(e => e.X).WithMany().HasForeignKey(...).OnDelete(DeleteBehavior.Restrict)`.
+3. Migration única adicionando FKs; **pré-check** de órfãos antes do `AddForeignKey`.
 4. Soft-delete: Restrict evita cascade físico; limpeza de filhos continua a cargo de Domain Services / specs.
-5. **`ClientId` string:** documentar como referência fraca intencional **ou** (follow-up) FK via índice único em `OpenIddictApplications.ClientId` se a versão do OpenIddict permitir.
-6. **Audit / Outbox:** manter fracos por padrão (retenção histórica), salvo decisão explícita.
+5. **`ClientId` string, Audit, Outbox, RevokedSession:** fracos intencionais (D-00012-2..4) — fora desta correção.
 
-### Ordem sugerida de implementação
+### Ordem de implementação
 
 | Lote | Entidades | Motivo |
 |------|-----------|--------|
 | A | Branch, Membership, RolePermission, OrganizationInvite | Núcleo multi-tenant |
 | B | UserRoleAssignment, UserClaimAssignment, RoleClaim, MenuItem, ClaimDefinition | AuthZ / menus |
 | C | LdapGroupRoleMap, ExternalIdentityProvider (`OrganizationId`), ClientProductBinding (`ProductId`) | Federação / bindings |
-| D | UserSession, RevokedSession (`SessionId`/`UserId`) | Sessão (cuidado com histórico) |
-| E | `ClientId` string / Audit / Outbox | Decisão + possível ADR |
+| D | UserSession (`UserId` / `OrganizationId` / `BranchId` only) | Sessão Guid; **sem** RevokedSession |
+| — | `ClientId` / Audit / Outbox / RevokedSession | **Fora** (fracos intencionais) |
 
 ## Arquivos impactados
 
 | Camada | Caminhos previstos |
 |--------|--------------------|
+| Domain | Entidades com nav props (`*Id` + navegação) |
 | Data (maps) | `src/SSO.Infrastructures.Data/Identity/EntityMappings/*Map.cs` |
 | Data (migration) | `src/SSO.Infrastructures.Data/Identity/Migrations/` (nova) |
-| Domain | Nenhum (preferência: sem nav props) |
-| Application / API | Nenhum (comportamento de escrita já valida existência em vários fluxos) |
+| Application / API | Nenhum (payloads já usam Ids) |
 | Tests | Integração: insert órfão deve falhar; regressão CRUD existentes |
-| Docs (.ai) | Este bugfix; opcional ADR se `ClientId`/audit permanecerem fracos |
+| Docs (.ai) | Este bugfix; Decisions.md |
 
 ## Testes
 
-- [ ] Script/query de órfãos atuais (pré-migration) — zero ou limpeza documentada
-- [ ] Após migration: insert com FK inválida falha no SQL/EF
-- [ ] Soft-delete do pai não cascadeia delete físico dos filhos (Restrict)
-- [ ] Suíte de integração Identity existente permanece verde
-- [ ] (Se lote E) testes documentando ausência intencional de FK em audit/outbox
+- [x] Pré-check SQL de órfãos na migration `Phase14ExplicitIdentityForeignKeys`
+- [x] Modelo EF: FKs Guid com `DeleteBehavior.Restrict` (`IdentityForeignKeyModelScenarios`)
+- [x] Modelo EF: Audit / Outbox / RevokedSession / `ClientId` string permanecem sem FK
+- [x] Regressão MembershipIsolation + CreateOrganization verdes
+- [ ] Suíte Identity completa (opcional / CI)
 
 ## Riscos / side effects
 
@@ -173,19 +172,23 @@ Abordagem mínima (sem mudar API/domínio público):
 | Performance em inserts (checks FK) | Negligível vs ganho de integridade; índices já existem em várias colunas |
 | RevokedSession/Audit com retenção após sessão/user sumir | Manter fracos ou `SetNull` só onde nullable |
 
-## Decisões abertas
+## Decisões aceitas (2026-07-27)
 
-- D-00012-1 — Navigation properties no Domain vs relação só no Infrastructure?
-- D-00012-2 — `AuthAuditEvent.UserId` / `WebhookOutbox.ClientId`: fracos intencionais?
-- D-00012-3 — Como (ou se) amarrar `ClientId` string a `OpenIddictApplications`?
-- D-00012-4 — `RevokedSession.SessionId`: FK rígida ou snapshot histórico após purge de sessão?
+| ID | Escolha | Significado |
+|----|---------|-------------|
+| **D-00012-1** | **B** | Navigation properties no Domain + `HasOne`/`WithMany`/`HasForeignKey` nos maps |
+| **D-00012-2** | **A** | `AuthAuditEvent` e `WebhookOutbox` **sem FK** (fracos intencionais) |
+| **D-00012-3** | **A** | `ClientId` string **sem FK SQL** para OpenIddict; validação na app |
+| **D-00012-4** | **A** | `RevokedSession.SessionId` / `UserId` **fracos** (snapshot / deny-list) |
 
 ## Checklist
 
-- [ ] Causa confirmada (não só sintoma) — **sim** (maps + snapshot)
-- [ ] Fix na camada correta — **Data / migration** (planejado)
-- [ ] Sem mudança de comportamento colateral não intencional
-- [ ] Docs atualizados se a regra ficou explícita
-- [ ] Lotes A–D implementados
-- [ ] Lote E decidido (ADR ou nota em Decisions.md)
-- [ ] Pronto para implementação — **após** alinhamento das decisões abertas e inventário de órfãos no banco alvo
+- [x] Causa confirmada (não só sintoma) — maps + snapshot
+- [x] Decisões D-00012-1..4 fechadas (B/A/A/A)
+- [x] Fix na camada Domain + Data / migration
+- [x] Sem mudança de comportamento colateral não intencional
+- [x] Lotes A–C + UserSession Guid FKs implementados
+- [x] Fracos intencionais documentados (Audit / Outbox / ClientId / RevokedSession)
+- [x] Docs CONTEXT/Decisions atualizados
+- [x] Testes de modelo FK Restrict + fracos intencionais
+- [x] Pré-check SQL de órfãos na migration
