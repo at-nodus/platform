@@ -2,10 +2,11 @@
 
 > Arquivo: `.ai/WORK/2026-07-28-00013-product-enablement.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md` + `module.md`  
-> Status: **Planejamento** — aguarda aceite das decisões D-00013-*  
+> Status: **Pronto para implementação** — D-00013-1..6 aceitas (todas A)  
 > Data: 2026-07-28  
 > Depende de: 00001 (Organization/Product), 00002 (AuthZ admin), 00011 (portal Admin)  
 > Relaciona: ADR-003 (switch-context), ADR-005 (permissions no JWT), F00001-D10 (Product ≠ AuthClient), 00012 (FKs explícitas)
+> Decisões: **A / A / A / A / A / A** (D-00013-1..6)
 
 ## Objetivo
 
@@ -28,30 +29,33 @@ Camada operacional (já existe)
   User × Org × Branch? × Product → Roles → Permissions (JWT)
 ```
 
-## Decisões (propostas — aguardam aceite)
+## Decisões (D-00013-1..6 — todas Aceito: A)
 
-### D-00013-1 — Aggregate `ProductEnablement` — **Proposto: A**
+### D-00013-1 — Aggregate `ProductEnablement` — **Aceito: A** (2026-07-28)
+
+Vínculo comercial **Organization × Product** (não Branch). Branch×Product / escopo por filial fica fora deste MVP; pode evoluir depois se licença por unidade for necessária.
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (recomendada)** | Aggregate Identity: `OrganizationId` + `ProductId`, unicidade, soft-delete, FKs Restrict (padrão 00012) |
+| **A (aceita)** | Aggregate Identity: `OrganizationId` + `ProductId`, unicidade, soft-delete, FKs Restrict (padrão 00012) |
 | B | Flag/coleção embutida em Organization | Polui tenant; pior para auditoria/cobrança |
 | C | Só config externa (billing) | SSO não enforce; risco de vazamento de acesso |
+| D | Branch × Product como habilitação | Descartada por agora — cobrança/contrato no tenant; authz fina por filial continua em assignments |
 
-### D-00013-2 — Semântica fail-closed — **Proposto: A**
+### D-00013-2 — Semântica fail-closed — **Aceito: A** (2026-07-28)
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (recomendada)** | Sem linha ativa Org×Product ⇒ **nega** uso do product no contexto da org |
+| **A (aceita)** | Sem linha ativa Org×Product ⇒ **nega** uso do product no contexto da org |
 | B | Fail-open (só nega se “explicitamente desabilitado”) | Frágil para cobrança |
 
 **Migração de dados:** seed/script habilita products já usados pelas orgs existentes (dev + qualquer org em homolog) antes de ligar o gate.
 
-### D-00013-3 — Onde enforce — **Proposto: A**
+### D-00013-3 — Onde enforce — **Aceito: A** (2026-07-28)
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (recomendada)** | Gate em emissão de token com `organization_id` presente: `switch_context`, refresh com org, e `TokenClaimsFactory` quando org + product do `client_id` estão definidos |
+| **A (aceita)** | Gate em emissão de token com `organization_id` presente: `switch_context`, refresh com org, e `TokenClaimsFactory` quando org + product do `client_id` estão definidos |
 | B | Só `switch_context` | Refresh/login com org residual pode burlar |
 | C | Só nas APIs de produto | SSO não é fonte de verdade comercial |
 
@@ -59,31 +63,33 @@ Camada operacional (já existe)
 
 **Platform-scoped** (`OrganizationId == null` em admin assignments / product `sso-platform`): **isento** do check de enablement de tenant (admin da plataforma não é “produto contratado pela org”).
 
-### D-00013-4 — Modelo de campos — **Proposto: A (mínimo cobrável)**
+### D-00013-4 — Modelo de campos — **Aceito: A** (2026-07-28) (mínimo cobrável)
 
 | Opção | Campos |
 |-------|--------|
-| **A (recomendada)** | `OrganizationId`, `ProductId` (+ auditoria/soft-delete). Enable = POST; Disable = soft-delete (ou Delete command) |
+| **A (aceita)** | `OrganizationId`, `ProductId` (+ auditoria/soft-delete). Enable = POST; Disable = soft-delete (ou Delete command) |
 | B | + `StartsAt` / `EndsAt` / `Status` (Trial/Active/Suspended) | Útil p/ cobrança; +escopo |
 | C | + referência externa `SubscriptionId` | Integra billing; fora do SSO MVP |
 
-Orçamento pode fatiar: **MVP = A**; evolutiva B/C em feature seguinte se produto comercial exigir.
+Vigência/Status (B) e ref de billing (C) ficam para feature evolutiva se o produto comercial exigir.
 
-### D-00013-5 — Admin / permissions — **Proposto: A**
+### D-00013-5 — Admin / permissions — **Aceito: A** (2026-07-28)
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (recomendada)** | CRUD Platform Admin (`sso.admin.platform`); Org Admin **GET** só da própria org (`sso.admin.org`) — transparência do que a empresa contratou, sem poder habilitar |
+| **A (aceita)** | CRUD Platform Admin (`sso.admin.platform`); Org Admin **GET** só da própria org (`sso.admin.org`) — transparência do que a empresa contratou, sem poder habilitar |
 | B | Só Platform Admin (CRUD + list) | Mais simples; org não vê catálogo contratado na UI |
 | C | Org Admin também POST/DELETE | Org “se auto-contrata” — indesejado p/ cobrança |
 
-### D-00013-6 — Efeito ao desabilitar — **Proposto: A**
+### D-00013-6 — Efeito ao desabilitar — **Aceito: A** (2026-07-28)
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (recomendada)** | Próximos tokens com aquela org+product falham o gate; tokens já emitidos expiram pelo TTL (sem revoke em massa obrigatório) |
+| **A (aceita)** | Próximos tokens com aquela org+product falham o gate; tokens já emitidos expiram pelo TTL (sem revoke em massa obrigatório) |
 | B | Revogar sessões da org×client/product no disable | Mais correto comercialmente; +trabalho (00005) |
 | C | Manter tokens até logout | Fraco p/ “cortar acesso” |
+
+Revoke em massa no disable (B) fica como evolutiva se o negócio exigir corte imediato.
 
 ## Escopo
 
@@ -239,7 +245,7 @@ Não é compromisso de prazo em dias — serve para priorizar no backlog comerci
 
 ## Checklist
 
-- [ ] D-00013-1..6 aceitas (ou desvios registrados em Decisions)
+- [x] D-00013-1..6 aceitas (todas A)
 - [ ] Alinhado a PLAYBOOK/architecture.md + domain-rules-in-domain-services
 - [ ] Naming HTTP verbs nos Commands
 - [ ] Migration + soft-delete + FKs Restrict
@@ -249,7 +255,4 @@ Não é compromisso de prazo em dias — serve para priorizar no backlog comerci
 
 ## Decisões abertas (bloqueiam código se não fechadas)
 
-1. Aceitar D-00013-1..6 conforme proposto?
-2. D4: MVP só enable/disable ou já `StartsAt`/`EndsAt`/`Status`?
-3. D6: TTL suficiente ou revoke de sessões no disable?
-4. Org Admin vê lista read-only (D5-A) na primeira entrega?
+Nenhuma — D-00013-1..6 aceitas (todas **A**, 2026-07-28).
