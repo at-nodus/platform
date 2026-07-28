@@ -18,6 +18,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00009 | Herança Branch opt-in | [2026-07-16-00009-heranca-branch-opt-in.md](2026-07-16-00009-heranca-branch-opt-in.md) — **implementado** | P3 | P2 |
 | 00010 | Observabilidade + CI/CD | [2026-07-16-00010-observabilidade-cicd.md](2026-07-16-00010-observabilidade-cicd.md) — **implementado** | P0 (ops) | P0 (ops) |
 | 00011 | Expansão cadastros Admin | [2026-07-20-00011-expansao-cadastros-admin.md](2026-07-20-00011-expansao-cadastros-admin.md) — **implementado** | P1 | P0 |
+| 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **aberto** | P1 (dados) | P0 (integridade) |
 
 ## Dependências entre features
 
