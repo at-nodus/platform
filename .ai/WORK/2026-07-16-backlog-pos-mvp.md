@@ -19,6 +19,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00010 | Observabilidade + CI/CD | [2026-07-16-00010-observabilidade-cicd.md](2026-07-16-00010-observabilidade-cicd.md) — **implementado** | P0 (ops) | P0 (ops) |
 | 00011 | Expansão cadastros Admin | [2026-07-20-00011-expansao-cadastros-admin.md](2026-07-20-00011-expansao-cadastros-admin.md) — **implementado** | P1 | P0 |
 | 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **implementado** | P1 (dados) | P0 (integridade) |
+| 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **planejamento** | P0 (comercial) | P0 (multi-produto) |
 
 ## Dependências entre features
 
@@ -38,6 +39,10 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 00009 Herança Branch ◄── ADR-004 (revisão / ADR novo)
 
 00010 P-002/P-003 ── transversal (não bloqueia features de domínio)
+
+00013 ProductEnablement ◄── 00001 Org/Product + 00002 AuthZ + 00011 Admin
+        │
+        └──► gate switch-context / TokenClaimsFactory (comercial)
 ```
 
 ## Ordem recomendada (primeiro produto em produção)
@@ -46,6 +51,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 2. 00004 → 00005  
 3. 00003 (MVP do portal) → **00011** (portal completo / cadastros)  
 4. 00006 / 00007 conforme demanda de clientes (APIs já entregues; UI em 00011)  
-5. 00008 / 00009 quando o modelo de authz exigir
+5. 00008 / 00009 quando o modelo de authz exigir  
+6. **00013** Product Enablement antes de cobrar / restringir products por empresa
 
 Épico base: [2026-07-14-00001-plataforma-sso.md](2026-07-14-00001-plataforma-sso.md).
