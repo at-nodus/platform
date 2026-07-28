@@ -1,0 +1,70 @@
+# Local stack: SQL Server + SSO.Web.Api (Dockerfile host-agnóstico, F00010-D3).
+# Usage:
+#   cp .env.example .env   # adjust secrets if needed
+#   docker compose up --build
+#   curl http://localhost:8080/health/live
+#
+# SQL only (app via `dotnet run`):
+#   docker compose up -d sqlserver
+
+name: sso
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sso-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Your_strong_Password123}
+    ports:
+      - "${MSSQL_PORT:-1433}:1433"
+    volumes:
+      - sso-sqlserver-data:/var/opt/mssql
+    healthcheck:
+      # TCP probe — mssql-tools may be absent from the image.
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/127.0.0.1/1433' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 40s
+    networks:
+      - sso-net
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sso-web-api:local
+    container_name: sso-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      # Local compose overrides Dockerfile Production defaults.
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: >-
+        Server=sqlserver,1433;Database=SSO_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Your_strong_Password123};TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=True
+      ConnectionStrings__IdentityConnection: >-
+        Server=sqlserver,1433;Database=SSO_DB;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Your_strong_Password123};TrustServerCertificate=True;MultipleActiveResultSets=true;Encrypt=True
+      Sso__Database__AutoMigrate: "true"
+      Sso__Database__SeedOnStartup: "true"
+      Sso__Signing__UseDevelopmentCertificates: "true"
+      Sso__Observability__Enabled: "true"
+      Sso__Observability__Exporter: Console
+      Sso__Cors__AllowedOrigins__0: http://localhost:8080
+      Sso__Cors__AllowedOrigins__1: http://localhost:3000
+      Sso__Cors__AllowedOrigins__2: https://localhost:5001
+    ports:
+      - "${SSO_API_PORT:-8080}:8080"
+    networks:
+      - sso-net
+    restart: unless-stopped
+
+networks:
+  sso-net:
+    driver: bridge
+
+volumes:
+  sso-sqlserver-data:
