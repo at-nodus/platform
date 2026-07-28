@@ -50,6 +50,7 @@ Missão, processo, prioridade de fontes, regras de planejamento/documentação/i
 | `stack.md` | Tecnologias |
 | `architecture.md` | Camadas e fluxos atuais |
 | `modules.md` | Aggregates e arquivos |
+| `data-dictionary.md` | Tabelas/entidades e função no domínio |
 | `business.md` | Regras observáveis / lacunas |
 | `integrations.md` | Sistemas externos |
 | `glossary.md` | Termos do repo |

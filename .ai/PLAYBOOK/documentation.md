@@ -28,7 +28,7 @@ Manter a base `.ai/` e docs alinhadas ao código.
 ## Exemplos
 
 ```text
-Novo aggregate → atualizar CONTEXT/modules.md + eventualmente glossary.md
+Novo aggregate → atualizar CONTEXT/modules.md + data-dictionary.md + eventualmente glossary.md
 Nova integração HTTP → CONTEXT/integrations.md + template integration.md
 Mudança de stack → CONTEXT/stack.md + dependencies.md
 ```
