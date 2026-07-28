@@ -1,7 +1,7 @@
-using BAYSOFT.Abstractions.Core.Domain.Entities;
 using BAYSOFT.Abstractions.Crosscutting.InheritStringLocalization;
 using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Resources;
+using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Resources;
 using System;
 
@@ -15,6 +15,9 @@ namespace SSO.Core.Domain.Identity.Branches.Entity
 		public Guid? ParentBranchId { get; set; }
 		public string Name { get; set; }
 		public string Code { get; set; }
+
+		public Organization Organization { get; set; }
+		public Branch ParentBranch { get; set; }
 
 		public Branch()
 		{

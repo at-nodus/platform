@@ -32,6 +32,11 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.Property(e => e.IsDeleted).HasColumnType("bit").IsRequired(true);
 
 			builder.HasIndex(e => e.Code).IsUnique().HasFilter("[IsDeleted] = 0");
+
+			builder.HasOne(e => e.Organization)
+				.WithMany()
+				.HasForeignKey(e => e.OrganizationId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

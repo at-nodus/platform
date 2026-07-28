@@ -1,4 +1,6 @@
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Organizations.Entity;
+using SSO.Core.Domain.Identity.Users.Entity;
 using System;
 
 namespace SSO.Core.Domain.Identity.OrganizationInvites.Entity
@@ -13,6 +15,10 @@ namespace SSO.Core.Domain.Identity.OrganizationInvites.Entity
 		public Guid InvitedByUserId { get; set; }
 		public DateTime? RespondedAt { get; set; }
 		public Guid? AcceptedUserId { get; set; }
+
+		public Organization Organization { get; set; }
+		public User InvitedByUser { get; set; }
+		public User AcceptedUser { get; set; }
 
 		public bool IsPending() =>
 			Status == OrganizationInviteStatuses.Pending && ExpiresAt > DateTime.UtcNow;

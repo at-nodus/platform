@@ -1,5 +1,10 @@
 using System;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Branches.Entity;
+using SSO.Core.Domain.Identity.ClaimDefinitions.Entity;
+using SSO.Core.Domain.Identity.Organizations.Entity;
+using SSO.Core.Domain.Identity.Products.Entity;
+using SSO.Core.Domain.Identity.Users.Entity;
 using SSO.Shared.Identity;
 
 namespace SSO.Core.Domain.Identity.UserClaimAssignments.Entity
@@ -17,6 +22,12 @@ namespace SSO.Core.Domain.Identity.UserClaimAssignments.Entity
 		public Guid ProductId { get; set; }
 		/// <summary>When Org inheritance is On, fill missing claim codes on descendant branches (F00009-D1/D3).</summary>
 		public bool Inheritable { get; set; }
+
+		public User User { get; set; }
+		public ClaimDefinition ClaimDefinition { get; set; }
+		public Organization Organization { get; set; }
+		public Branch Branch { get; set; }
+		public Product Product { get; set; }
 
 		public UserClaimAssignment()
 		{

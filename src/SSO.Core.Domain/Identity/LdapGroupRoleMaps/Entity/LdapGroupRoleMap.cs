@@ -1,5 +1,9 @@
 using System;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Branches.Entity;
+using SSO.Core.Domain.Identity.Organizations.Entity;
+using SSO.Core.Domain.Identity.Products.Entity;
+using SSO.Core.Domain.Identity.Roles.Entity;
 
 namespace SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity
 {
@@ -12,6 +16,11 @@ namespace SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity
 		public Guid RoleId { get; set; }
 		public Guid ProductId { get; set; }
 		public Guid? BranchId { get; set; }
+
+		public Organization Organization { get; set; }
+		public Role Role { get; set; }
+		public Product Product { get; set; }
+		public Branch Branch { get; set; }
 
 		public LdapGroupRoleMap()
 		{

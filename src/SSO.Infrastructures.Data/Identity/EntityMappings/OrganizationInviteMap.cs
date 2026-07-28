@@ -33,6 +33,21 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasIndex(e => e.TokenHash).IsUnique().HasFilter("[IsDeleted] = 0");
 			builder.HasIndex(e => new { e.OrganizationId, e.Email, e.Status });
+
+			builder.HasOne(e => e.Organization)
+				.WithMany()
+				.HasForeignKey(e => e.OrganizationId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.InvitedByUser)
+				.WithMany()
+				.HasForeignKey(e => e.InvitedByUserId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.AcceptedUser)
+				.WithMany()
+				.HasForeignKey(e => e.AcceptedUserId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

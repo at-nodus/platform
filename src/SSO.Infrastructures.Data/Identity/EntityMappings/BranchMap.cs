@@ -42,6 +42,16 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasIndex(e => new { e.OrganizationId, e.Code })
 				.IsUnique()
 				.HasFilter("[IsDeleted] = 0");
+
+			builder.HasOne(e => e.Organization)
+				.WithMany()
+				.HasForeignKey(e => e.OrganizationId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.ParentBranch)
+				.WithMany()
+				.HasForeignKey(e => e.ParentBranchId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

@@ -1,7 +1,11 @@
-using BAYSOFT.Abstractions.Core.Domain.Entities;
 using BAYSOFT.Abstractions.Crosscutting.InheritStringLocalization;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Branches.Entity;
+using SSO.Core.Domain.Identity.Organizations.Entity;
+using SSO.Core.Domain.Identity.Products.Entity;
+using SSO.Core.Domain.Identity.Roles.Entity;
 using SSO.Core.Domain.Identity.UserRoleAssignments.Resources;
+using SSO.Core.Domain.Identity.Users.Entity;
 using SSO.Core.Domain.Resources;
 using System;
 
@@ -20,6 +24,12 @@ namespace SSO.Core.Domain.Identity.UserRoleAssignments.Entity
 		public Guid ProductId { get; set; }
 		/// <summary>When Org inheritance is On, propagate this branch assignment to descendant branches (F00009-D1).</summary>
 		public bool Inheritable { get; set; }
+
+		public User User { get; set; }
+		public Role Role { get; set; }
+		public Organization Organization { get; set; }
+		public Branch Branch { get; set; }
+		public Product Product { get; set; }
 
 		public UserRoleAssignment()
 		{

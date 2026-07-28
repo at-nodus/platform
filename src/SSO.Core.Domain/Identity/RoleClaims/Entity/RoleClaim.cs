@@ -1,5 +1,7 @@
 using System;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.ClaimDefinitions.Entity;
+using SSO.Core.Domain.Identity.Roles.Entity;
 
 namespace SSO.Core.Domain.Identity.RoleClaims.Entity
 {
@@ -9,6 +11,9 @@ namespace SSO.Core.Domain.Identity.RoleClaims.Entity
 		public Guid RoleId { get; set; }
 		public Guid ClaimDefinitionId { get; set; }
 		public string Value { get; set; } = string.Empty;
+
+		public Role Role { get; set; }
+		public ClaimDefinition ClaimDefinition { get; set; }
 
 		public RoleClaim()
 		{

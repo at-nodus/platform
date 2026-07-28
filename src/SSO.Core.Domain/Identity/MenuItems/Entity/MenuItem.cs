@@ -1,7 +1,7 @@
-using BAYSOFT.Abstractions.Core.Domain.Entities;
 using BAYSOFT.Abstractions.Crosscutting.InheritStringLocalization;
 using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.MenuItems.Resources;
+using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Core.Domain.Resources;
 using System;
 
@@ -18,6 +18,8 @@ namespace SSO.Core.Domain.Identity.MenuItems.Entity
 		/// <summary>Permission code that unlocks this menu entry in product UIs.</summary>
 		public string PermissionCode { get; set; }
 		public int SortOrder { get; set; }
+
+		public Product Product { get; set; }
 
 		public MenuItem()
 		{

@@ -1,5 +1,6 @@
 using System;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Shared.Identity;
 
 namespace SSO.Core.Domain.Identity.ClaimDefinitions.Entity
@@ -15,6 +16,8 @@ namespace SSO.Core.Domain.Identity.ClaimDefinitions.Entity
 		/// <summary>Null = global; set = only that product.</summary>
 		public Guid? ProductId { get; set; }
 		public bool IsEnabled { get; set; } = true;
+
+		public Product Product { get; set; }
 
 		public ClaimDefinition()
 		{

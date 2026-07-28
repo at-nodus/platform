@@ -1,6 +1,6 @@
-using BAYSOFT.Abstractions.Core.Domain.Entities;
 using BAYSOFT.Abstractions.Crosscutting.InheritStringLocalization;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Resources;
 using System;
 
@@ -20,6 +20,8 @@ namespace SSO.Core.Domain.Identity.ExternalIdentityProviders.Entity
 		public bool AllowJitProvisioning { get; set; }
 		public string Authority { get; set; }
 		public string ClientId { get; set; }
+
+		public Organization Organization { get; set; }
 
 		public ExternalIdentityProvider()
 		{

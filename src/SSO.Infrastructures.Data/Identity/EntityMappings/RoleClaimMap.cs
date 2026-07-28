@@ -29,6 +29,16 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasIndex(e => new { e.RoleId, e.ClaimDefinitionId })
 				.IsUnique()
 				.HasFilter("[IsDeleted] = 0");
+
+			builder.HasOne(e => e.Role)
+				.WithMany()
+				.HasForeignKey(e => e.RoleId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.ClaimDefinition)
+				.WithMany()
+				.HasForeignKey(e => e.ClaimDefinitionId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

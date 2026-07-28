@@ -32,6 +32,21 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasIndex(e => e.UserId);
 			builder.HasIndex(e => new { e.UserId, e.RevokedAt });
+
+			builder.HasOne(e => e.User)
+				.WithMany()
+				.HasForeignKey(e => e.UserId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Organization)
+				.WithMany()
+				.HasForeignKey(e => e.OrganizationId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Branch)
+				.WithMany()
+				.HasForeignKey(e => e.BranchId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }

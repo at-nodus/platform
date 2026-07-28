@@ -1,5 +1,8 @@
 using System;
 using SSO.Core.Domain.Identity._Shared;
+using SSO.Core.Domain.Identity.Branches.Entity;
+using SSO.Core.Domain.Identity.Organizations.Entity;
+using SSO.Core.Domain.Identity.Users.Entity;
 
 namespace SSO.Core.Domain.Identity.UserSessions.Entity
 {
@@ -13,6 +16,10 @@ namespace SSO.Core.Domain.Identity.UserSessions.Entity
 		public DateTime LastSeenAt { get; set; }
 		public DateTime? RevokedAt { get; set; }
 		public string? RevokeReason { get; set; }
+
+		public User User { get; set; }
+		public Organization Organization { get; set; }
+		public Branch Branch { get; set; }
 
 		public bool IsActive => RevokedAt is null && !IsDeleted;
 

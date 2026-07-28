@@ -50,6 +50,31 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasIndex(e => new { e.UserId, e.RoleId, e.OrganizationId, e.BranchId, e.ProductId })
 				.IsUnique()
 				.HasFilter("[IsDeleted] = 0");
+
+			builder.HasOne(e => e.User)
+				.WithMany()
+				.HasForeignKey(e => e.UserId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Role)
+				.WithMany()
+				.HasForeignKey(e => e.RoleId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Organization)
+				.WithMany()
+				.HasForeignKey(e => e.OrganizationId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Branch)
+				.WithMany()
+				.HasForeignKey(e => e.BranchId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(e => e.Product)
+				.WithMany()
+				.HasForeignKey(e => e.ProductId)
+				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}
 }
