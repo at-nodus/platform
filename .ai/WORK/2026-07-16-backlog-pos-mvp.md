@@ -20,6 +20,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00011 | Expansão cadastros Admin | [2026-07-20-00011-expansao-cadastros-admin.md](2026-07-20-00011-expansao-cadastros-admin.md) — **implementado** | P1 | P0 |
 | 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **implementado** | P1 (dados) | P0 (integridade) |
 | 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **implementado** (D1–D6 = A) | P0 (comercial) | P0 (multi-produto) |
+| 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **planejamento** | P1 (UX) | P0 (marca / self-service) |
 
 ## Dependências entre features
 
@@ -43,6 +44,10 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 00013 ProductEnablement ◄── 00001 Org/Product + 00002 AuthZ + 00011 Admin
         │
         └──► gate switch-context / TokenClaimsFactory (comercial)
+
+00014 Layout + Perfil ◄── 00003 shell/convites + 00011 cadastros + templates visual-identity
+        │                 (+ 00013 para aba Produtos da empresa)
+        └──► brand kit atNodus no Razor + self-service Meu perfil (Dados / Empresas / Acessos / Convites)
 ```
 
 ## Ordem recomendada (primeiro produto em produção)
@@ -52,6 +57,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 3. 00003 (MVP do portal) → **00011** (portal completo / cadastros)  
 4. 00006 / 00007 conforme demanda de clientes (APIs já entregues; UI em 00011)  
 5. 00008 / 00009 quando o modelo de authz exigir  
-6. **00013** Product Enablement antes de cobrar / restringir products por empresa
+6. **00013** Product Enablement antes de cobrar / restringir products por empresa  
+7. **00014** Layout atNodus + Perfil do Usuário (UX/marca e self-service)
 
 Épico base: [2026-07-14-00001-plataforma-sso.md](2026-07-14-00001-plataforma-sso.md).
