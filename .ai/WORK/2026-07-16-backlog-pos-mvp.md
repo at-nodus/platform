@@ -20,7 +20,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00011 | Expansão cadastros Admin | [2026-07-20-00011-expansao-cadastros-admin.md](2026-07-20-00011-expansao-cadastros-admin.md) — **implementado** | P1 | P0 |
 | 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **implementado** | P1 (dados) | P0 (integridade) |
 | 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **implementado** (D1–D6 = A) | P0 (comercial) | P0 (multi-produto) |
-| 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **planejamento** | P1 (UX) | P0 (marca / self-service) |
+| 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **pronto p/ implementação** (D1–D6) | P1 (UX) | P0 (marca / self-service) |
 
 ## Dependências entre features
 

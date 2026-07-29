@@ -2,11 +2,12 @@
 
 > Arquivo: `.ai/WORK/2026-07-29-00014-layout-perfil-usuario.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md`  
-> Status: **Planejamento** — decisões a fechar antes da implementação  
+> Status: **Pronto para implementação** — D-00014-1..6 aceitas  
 > Data: 2026-07-29  
 > Depende de: 00003 (shell `/Admin` + convites), 00011 (cadastros Admin / orgs-branches), 00013 (ProductEnablement na visão de empresa)  
 > Relaciona: 00001 (User/Membership/Invite), identidade visual `visual-identity/brands/at-nodus`  
-> Fonte de UI: `F:/DEV/cursor/at-nodus/visual-identity/brands/at-nodus/templates/`
+> Fonte de UI: `F:/DEV/cursor/at-nodus/visual-identity/brands/at-nodus/templates/`  
+> Decisões: **A / A (/Me) / A (2 rotas) / B / A (sem e-mail) / A** (D-00014-1..6)
 
 ## Objetivo
 
@@ -43,66 +44,68 @@ SSO.Web.Api
   Páginas: Login, shell, listing, company, form, profile (user)
 ```
 
-## Decisões abertas (bloquear código se não fechadas)
+## Decisões (D-00014-1..6)
 
-### D-00014-1 — Escopo de superfícies a reestilizar
+### D-00014-1 — Escopo de superfícies a reestilizar — **Aceito: A** (2026-07-29)
 
-| Opção | Descrição |
-|-------|-----------|
-| **A (sugerida)** | Account (login/consent/2FA/sessions) + shell autenticado do portal + páginas já existentes `/Admin` + novas páginas de perfil/empresa no padrão template |
-| B | Só Account + Perfil do Usuário; Admin fica no layout atual |
-| C | White-label multi-tenant (temas por org) | Fora — brand kit é atNodus único neste MVP |
-
-### D-00014-2 — Onde vive o “app shell” do usuário final
+Account (login/consent/2FA/sessions) + shell autenticado do portal + páginas já existentes `/Admin` + novas páginas de perfil/empresa no padrão template. White-label por org fora do MVP.
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (sugerida)** | Area Razor dedicada (ex.: `/App` ou `/Portal`) com shell dos templates; `/Admin` continua para operação admin, mas **compartilha** CSS/partials de marca |
-| B | Reusar só `/Admin` e embutir “Meu perfil” lá | Mistura papéis admin × self-service |
-| C | SPA front separado | Fora — stack do produto é Razor (D-00003-1 / D-00011-6) |
+| **A (aceita)** | Account + shell + `/Admin` + perfil/empresa no padrão template |
+| B | Só Account + Perfil; Admin no layout atual |
+| C | White-label multi-tenant | Fora — brand kit atNodus único |
 
-### D-00014-3 — Navegação Empresa a partir do Perfil
+### D-00014-2 — Onde vive o “app shell” do usuário final — **Aceito: A (`/Me`)** (2026-07-29)
 
-Ao abrir uma empresa na aba **Empresas**, reutilizar a **mesma tela** de visualização da empresa (`company.html` → página Razor equivalente), com abas:
-
-- Dados Básicos  
-- Branches (Filiais)  
-- Contatos  
-- Produtos Associados  
-- Usuários  
-
-Ações (criar/editar branch, editar empresa, etc.) **somente** se o usuário tiver as permissions `sso.admin.*` (ou equivalentes) no contexto daquela org — senão, somente leitura.
+Area Razor dedicada **`/Me`** com o shell dos templates (sidebar Plataforma + Conta). `/Admin` continua para operação admin e **compartilha** CSS/partials de marca. Sem SPA.
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (sugerida)** | Uma página `Organization/Details` (ou `Companies/Details`) compartilhada entre listagem e deep-link do perfil; botões gated por permission |
-| B | Duplicar UI read-only no perfil vs CRUD no Admin | Drift visual e de comportamento |
+| **A (aceita)** | Area `/Me` — self-service (perfil, empresas, acessos, convites); Admin separado, mesma marca |
+| B | Reusar só `/Admin` e embutir “Meu perfil” | Mistura papéis |
+| C | SPA front separado | Fora — stack Razor |
 
-### D-00014-4 — Contatos da empresa
+### D-00014-3 — Navegação Empresa a partir do Perfil — **Aceito: A (duas rotas)** (2026-07-29)
 
-Templates mostram aba Contato; modelo Identity atual pode não ter aggregate `OrganizationContact` dedicado.
+Uma **página/PageModel única** (detalhe da empresa no padrão `company.html`) acessível por **duas rotas** (ex.: `/Me/Organizations/{id}` e `/Admin/Organizations/{id}` via `AddPageRoute` ou equivalente). Conteúdo e abas compartilhados; breadcrumb/voltar e authorize podem variar conforme a rota de origem. Botões de escrita gated por permission.
 
-| Opção | Descrição |
-|-------|-----------|
-| **A (sugerida)** | MVP: exibir campos de contato já existentes na Organization (e-mail/telefone/endereço se houver) ou seção read-only “em breve” se não existirem — **sem** novo aggregate nesta feature |
-| B | Criar aggregate Contatos nesta feature | Aumenta escopo (Domain/API/migration) |
-| C | Omite a aba Contatos até feature de cadastro | Divergência do `company.html` |
-
-### D-00014-5 — Edição de dados pessoais
+Abas: Dados Básicos · Branches · Contatos · Produtos Associados · Usuários.
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (sugerida)** | Usuário autenticado edita **somente o próprio** User (nome, telefone, preferências de idioma/fuso se existirem no modelo); e-mail com fluxo de confirmação se alteração for permitida; senha via fluxo Account já existente |
-| B | Qualquer campo Identity sem restrição de e-mail | Risco de account takeover |
-| C | Só leitura dos dados + “Alterar senha” | Não atende o requisito de edição |
+| **A (aceita)** | Página única + **duas rotas** (Me e Admin) → mesmo PageModel; CTAs por permission |
+| B | UI read-only duplicada no perfil vs CRUD no Admin | Drift |
 
-### D-00014-6 — Assets (CDN vs self-host)
+### D-00014-4 — Contatos da empresa — **Aceito: B** (2026-07-29)
+
+Criar aggregate de **Contatos** da Organization nesta feature (Domain + Application + API + migration + aba Contatos na UI). Escopo Domain/Data aumenta em relação ao MVP só-UI.
 
 | Opção | Descrição |
 |-------|-----------|
-| **A (sugerida)** | Self-host fontes Play/Ubuntu + logos SVG no `wwwroot`; Bootstrap/FA via libman/npm ou CDN com SRI (como nos templates) |
-| B | Tudo CDN | Dependência de rede em runtime |
-| C | Bundle custom sem Bootstrap | Reescrever templates — custo alto |
+| A | Campos existentes / placeholder — sem aggregate | Descartada |
+| **B (aceita)** | Aggregate Contatos (CRUD + UI na aba Contatos) |
+| C | Omitir aba Contatos | Divergência do template |
+
+### D-00014-5 — Edição de dados pessoais — **Aceito: A (sem e-mail)** (2026-07-29)
+
+Usuário autenticado edita **somente o próprio** User (nome, telefone, preferências de idioma/fuso se existirem no modelo). **E-mail é somente leitura** nesta tela (sem alteração). Senha via fluxo Account já existente.
+
+| Opção | Descrição |
+|-------|-----------|
+| **A (aceita)** | Self-edit dos próprios dados; **e-mail imutável** no perfil; senha via Account |
+| B | Qualquer campo sem restrição de e-mail | Risco takeover |
+| C | Só leitura + alterar senha | Não atende edição |
+
+### D-00014-6 — Assets (CDN vs self-host) — **Aceito: A** (2026-07-29)
+
+Self-host fontes Play/Ubuntu + logos SVG no `wwwroot`. Bootstrap/FA via libman/npm **ou** CDN com SRI (como nos templates de referência).
+
+| Opção | Descrição |
+|-------|-----------|
+| **A (aceita)** | Self-host fontes/logos; Bootstrap/FA libman/npm ou CDN+SRI |
+| B | Tudo CDN | Dependência de rede |
+| C | Bundle sem Bootstrap | Reescrever templates |
 
 ## Escopo
 
@@ -139,7 +142,7 @@ Tela **Meu perfil** com cabeçalho (avatar/iniciais, nome, e-mail, status, resum
   - **Dados da empresa:** editar se houver permission de edição da org; senão read-only.
   - **Produtos Associados:** read conforme ProductEnablement + permissions de visualização.
   - **Usuários:** listagem conforme permissions de membership/users da org.
-  - **Contatos:** conforme D-00014-4.
+  - **Contatos:** CRUD do aggregate Contatos (D-00014-4 = B), gated por permission.
 
 ##### 3. Acessos
 
@@ -163,7 +166,6 @@ Todas as ações e CTAs ocultos/desabilitados quando a permission ou o estado do
 - Novo motor de billing ou marketplace.
 - Workflows joiner/mover/leaver avançados além de accept/decline de convite.
 - Admin de terceiros editando o perfil “como se fosse o usuário” nesta tela (isso permanece em `/Admin/Users`).
-- Aggregate completo de Contatos (salvo se D-00014-4 = B for aceito).
 - Dark mode completo além do previsto no brand kit (pode ficar evolutiva).
 
 ## Abordagem — fases
@@ -174,11 +176,12 @@ Todas as ações e CTAs ocultos/desabilitados quando a permission ou o estado do
 2. Layouts compartilhados: `_BrandLayout` / partials sidebar + topbar + mobile offcanvas.
 3. Aplicar ao Login e ao shell autenticado (smoke visual).
 
-### Fase B — Páginas de shell e cadastro visual
+### Fase B — Páginas de shell, cadastro visual e Contatos
 
 1. Listagem de empresas no padrão `listing.html`.
-2. Detalhe de empresa (`company.html`) com abas e gating de botões.
+2. Detalhe de empresa (`company.html`) com abas e gating de botões; **duas rotas** Me/Admin (D-00014-3).
 3. Formulário branch/empresa (`form.html`) ligado aos Commands/APIs existentes.
+4. Aggregate **Contatos** (Domain/Application/Data/API) + aba Contatos (D-00014-4 = B).
 
 ### Fase C — Perfil do Usuário
 
@@ -212,7 +215,7 @@ Sem novas regras de domínio nos PageModels: orquestração via MediatR/API (pad
 - [ ] Login e shell autenticado usam tipografia/cores/logos do brand kit atNodus (tokens alinhados ao README da marca).
 - [ ] Páginas listagem, empresa, formulário e perfil correspondem estruturalmente aos templates (`listing` / `company` / `form` / `user`).
 - [ ] Usuário acessa **Meu perfil** e vê as 4 abas: Dados, Empresas, Acessos, Convites.
-- [ ] Edita apenas os próprios dados pessoais; não edita dados de outro usuário por essa tela.
+- [ ] Edita apenas os próprios dados pessoais (e-mail **somente leitura**); não edita dados de outro usuário por essa tela.
 - [ ] Aba Empresas lista só orgs com vínculo; abrir empresa mostra a mesma UX de `company.html`.
 - [ ] Branches: criar/editar só com permission; sem permission, view (ou oculto) conforme regra.
 - [ ] Com permission de edição da org, editar dados da empresa funciona como na tela de empresa.
@@ -242,7 +245,7 @@ Sem novas regras de domínio nos PageModels: orquestração via MediatR/API (pad
 |-------|-----------|
 | Escopo visual explode (todas páginas Admin de uma vez) | Fase A–B com checklist de páginas; polish Admin incremental após shell |
 | Drift template HTML × Razor | Partials reutilizáveis; comparar abas/campos com `user.html` / `company.html` no aceite |
-| Contatos sem modelo | Fechar D-00014-4 antes da Fase B |
+| Contatos (novo aggregate) | Modelar mínimo alinhado à aba Contato do template; FKs Restrict (00012) |
 | Vazamento de dados de outras orgs no perfil | Queries sempre escopadas ao `userId`/e-mail autenticado |
 | CTAs sem permission aparentes | Gate UI + AuthZ API (00002) |
 | CDN fora do ar | Preferir self-host fontes/logos (D-00014-6 A) |
@@ -261,23 +264,27 @@ Sem novas regras de domínio nos PageModels: orquestração via MediatR/API (pad
 | Fatia | Conteúdo | Complexidade relativa |
 |-------|----------|----------------------|
 | A | CSS/fonts/logos + layouts Account/shell | M |
-| B | Listing + company + form no padrão | M/L |
+| B | Listing + company + form + Contatos (aggregate) | L |
 | C | Perfil 4 abas + wire APIs me/invites | M |
 | D | Gating + docs + polish | S |
-| **MVP (D1–D6 sugeridos A)** | A+B+C+D | **~1 feature média/grande (UI-heavy)** |
-| Evolutiva | Contatos aggregate, dark mode completo, white-label | Feature(s) separada(s) |
+| **MVP (D1–D6 aceitas)** | A+B+C+D | **~1 feature grande (UI + Contatos)** |
+| Evolutiva | Dark mode completo, white-label | Feature(s) separada(s) |
 
 Não é compromisso de prazo em dias — serve para priorizar no backlog.
 
 ## Checklist
 
-- [ ] D-00014-1..6 fechadas
+- [x] D-00014-1..6 fechadas
 - [ ] Alinhado a PLAYBOOK/architecture.md + domain-rules (UI só orquestra)
-- [ ] Naming HTTP verbs nos Commands novos (`Patch`/`Put` self-profile)
+- [ ] Naming HTTP verbs nos Commands novos (`Patch`/`Put` self-profile; Contatos)
 - [ ] AuthZ self vs admin considerado
-- [ ] Migrations só se D-00014-4 = B
+- [ ] Migrations para Contatos (D-00014-4 = B)
 - [ ] CONTEXT + backlog atualizados
-- [ ] Pronto para implementação
+- [x] Pronto para implementação
+
+## Decisões abertas
+
+Nenhuma — D-00014-1..6 aceitas (2026-07-29).
 
 ## Referências rápidas
 
