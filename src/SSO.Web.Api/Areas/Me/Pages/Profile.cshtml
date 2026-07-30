@@ -1,0 +1,227 @@
+@page
+@model SSO.Web.Api.Areas.Me.Pages.ProfileModel
+@{
+	ViewData["Title"] = "Meu perfil";
+	var u = Model.CurrentUser;
+	var name = !string.IsNullOrWhiteSpace(u?.DisplayName) ? u!.DisplayName : (u?.UserName ?? "Usuário");
+	var initials = string.Concat(name.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpperInvariant(p[0])));
+	if (string.IsNullOrEmpty(initials)) { initials = "U"; }
+}
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+	<div class="alert alert-success">@Model.Message</div>
+}
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+	<div class="alert alert-danger">@Model.Error</div>
+}
+
+<p class="text-uppercase text-secondary small fw-medium mb-3" style="letter-spacing: 0.06em">Conta · Perfil do usuário</p>
+
+<div class="card border shadow-sm mb-3">
+	<div class="card-body d-flex flex-wrap gap-4 align-items-start">
+		<div class="avatar avatar-lg">@initials</div>
+		<div class="flex-grow-1">
+			<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+				<h1 class="h2 fw-bold mb-0">@name</h1>
+				<span class="badge text-bg-success">Ativo</span>
+			</div>
+			<p class="text-secondary mb-2">@(u?.Email)</p>
+			<div class="d-flex flex-wrap gap-3 small text-secondary">
+				<span>Vínculos <strong class="text-body">@Model.Organizations.Count empresas</strong></span>
+				<span>Convites <strong class="text-body">@Model.Invites.Count(i => i.CanRespond) pendentes</strong></span>
+				<span>Acessos <strong class="text-body">@Model.Accesses.Count perfis</strong></span>
+			</div>
+		</div>
+		<div class="d-flex flex-wrap gap-2 ms-lg-auto">
+			<a class="btn btn-outline-secondary" href="/Account/ForgotPassword">Alterar senha</a>
+			<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#profileEdit" aria-expanded="false">Editar dados</button>
+		</div>
+	</div>
+</div>
+
+<div class="card border shadow-sm">
+	<div class="card-header px-0 pb-0 border-bottom-0">
+		<ul class="nav nav-tabs px-3" role="tablist">
+			<li class="nav-item" role="presentation">
+				<button class="nav-link active" id="tab-dados" data-bs-toggle="tab" data-bs-target="#dados" type="button" role="tab">Dados</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="tab-empresas" data-bs-toggle="tab" data-bs-target="#empresas" type="button" role="tab">Empresas</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="tab-acessos" data-bs-toggle="tab" data-bs-target="#acessos" type="button" role="tab">Acessos</button>
+			</li>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link" id="tab-convites" data-bs-toggle="tab" data-bs-target="#convites" type="button" role="tab">Convites</button>
+			</li>
+		</ul>
+	</div>
+	<div class="card-body tab-content">
+		<div class="tab-pane fade show active" id="dados" role="tabpanel" tabindex="0">
+			<h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing: 0.04em">Dados pessoais</h2>
+			<dl class="row mb-0">
+				<dt class="col-sm-3 text-secondary small">Nome completo</dt><dd class="col-sm-9">@name</dd>
+				<dt class="col-sm-3 text-secondary small">E-mail</dt><dd class="col-sm-9">@(u?.Email)</dd>
+				<dt class="col-sm-3 text-secondary small">Telefone</dt><dd class="col-sm-9">@(string.IsNullOrWhiteSpace(u?.PhoneNumber) ? "—" : u.PhoneNumber)</dd>
+				<dt class="col-sm-3 text-secondary small">Status</dt><dd class="col-sm-9"><span class="badge text-bg-success">Ativo</span></dd>
+			</dl>
+			<div class="collapse mt-4" id="profileEdit">
+				<div class="card border bg-body-tertiary">
+					<div class="card-body">
+						<h3 class="h6 fw-bold mb-3">Editar dados pessoais</h3>
+						<form method="post" asp-page-handler="UpdateProfile" class="row g-3" style="max-width: 36rem">
+							<div class="col-12">
+								<label class="form-label" asp-for="DisplayName">Nome completo</label>
+								<input class="form-control" asp-for="DisplayName" maxlength="200" />
+							</div>
+							<div class="col-12">
+								<label class="form-label">E-mail</label>
+								<input class="form-control" value="@(u?.Email)" readonly disabled />
+								<div class="form-text">O e-mail não pode ser alterado nesta tela.</div>
+							</div>
+							<div class="col-12">
+								<label class="form-label" asp-for="PhoneNumber">Telefone</label>
+								<input class="form-control" asp-for="PhoneNumber" maxlength="64" />
+							</div>
+							<div class="col-12 d-flex gap-2">
+								<button class="btn btn-primary" type="submit">Salvar dados</button>
+								<button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#profileEdit">Cancelar</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="tab-pane fade" id="empresas" role="tabpanel" tabindex="0">
+			<h2 class="h5 fw-bold mb-1">Empresas vinculadas</h2>
+			<p class="small text-secondary mb-3">Somente visualização. Abra uma empresa para ver detalhes conforme suas permissões.</p>
+			@if (Model.Organizations.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhuma empresa vinculada.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+					@foreach (var org in Model.Organizations)
+					{
+						<div class="card border">
+							<div class="card-body d-flex flex-wrap gap-3 align-items-start">
+								<div class="profile-logo profile-logo-sm"><img src="~/img/brand/atnodus-icon.svg" alt="" /></div>
+								<div class="flex-grow-1">
+									<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+										<a class="fw-bold text-decoration-none" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.OrganizationId">@org.Name</a>
+										<span class="badge text-bg-info">Empresa</span>
+									</div>
+									<p class="small text-secondary mb-2">Código @org.Code</p>
+									<div class="d-flex flex-wrap gap-1">
+										@foreach (var access in Model.Accesses.Where(a => a.OrganizationName == org.Name).Take(4))
+										{
+											<span class="badge rounded-pill tag-role">@access.RoleName</span>
+											<span class="badge rounded-pill tag-product">@access.ProductName</span>
+										}
+									</div>
+								</div>
+								<a class="btn btn-link btn-sm" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.OrganizationId">Abrir</a>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="acessos" role="tabpanel" tabindex="0">
+			<h2 class="h5 fw-bold mb-1">Produtos e perfis</h2>
+			<p class="small text-secondary mb-3">Roles associadas a você por produto e empresa.</p>
+			@if (Model.Accesses.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhum acesso atribuído.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+					@foreach (var group in Model.Accesses.GroupBy(a => new { a.OrganizationName, a.BranchName }))
+					{
+						<div class="card border">
+							<div class="card-body">
+								<div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-2">
+									<div>
+										<strong>@(group.Key.OrganizationName ?? "Plataforma")@(group.Key.BranchName is null ? "" : $" · {group.Key.BranchName}")</strong>
+										<div class="small text-secondary">@(group.Key.BranchName is null ? "Escopo da empresa" : "Branch")</div>
+									</div>
+									<div class="d-flex flex-wrap gap-1">
+										@foreach (var role in group.Select(x => x.RoleName).Distinct())
+										{
+											<span class="badge rounded-pill tag-role">@role</span>
+										}
+									</div>
+								</div>
+								<div class="d-flex flex-wrap gap-1">
+									@foreach (var product in group.Select(x => x.ProductName).Distinct())
+									{
+										<span class="badge rounded-pill tag-product">@product</span>
+									}
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="convites" role="tabpanel" tabindex="0">
+			<h2 class="h5 fw-bold mb-1">Convites recebidos</h2>
+			<p class="small text-secondary mb-3">Aceite ou recuse convites pendentes.</p>
+			@if (Model.Invites.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhum convite.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+					@foreach (var inv in Model.Invites)
+					{
+						var statusClass = inv.Status switch
+						{
+							"Pending" => "text-bg-warning",
+							"Accepted" => "text-bg-success",
+							"Declined" => "text-bg-secondary",
+							"Cancelled" => "text-bg-secondary",
+							"Expired" => "text-bg-dark",
+							_ => "text-bg-secondary"
+						};
+						<div class="card invite-card @(inv.CanRespond ? "is-pending" : "") border">
+							<div class="card-body d-flex flex-wrap gap-3 align-items-start">
+								<div class="flex-grow-1">
+									<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+										<strong>@inv.OrganizationName</strong>
+										<span class="badge @statusClass">@inv.StatusLabel</span>
+									</div>
+									<p class="small text-secondary mb-0">Enviado em @inv.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy 'às' HH:mm")</p>
+								</div>
+								@if (inv.CanRespond)
+								{
+									<div class="d-flex gap-2">
+										<form method="post" asp-page-handler="DeclineInvite">
+											<input type="hidden" name="inviteId" value="@inv.Id" />
+											<button class="btn btn-outline-secondary btn-sm" type="submit">Recusar</button>
+										</form>
+										<form method="post" asp-page-handler="AcceptInvite">
+											<input type="hidden" name="inviteId" value="@inv.Id" />
+											<button class="btn btn-primary btn-sm" type="submit">Aceitar</button>
+										</form>
+									</div>
+								}
+								else
+								{
+									<button class="btn btn-link btn-sm" type="button" disabled>Indisponível</button>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+	</div>
+</div>

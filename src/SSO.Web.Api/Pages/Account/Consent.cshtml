@@ -2,50 +2,59 @@
 @model SSO.Web.Api.Pages.Account.ConsentModel
 @{
 	Layout = null;
-	ViewData["Title"] = "Consent";
+	ViewData["Title"] = "Consentimento";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>SSO Consent</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; margin: 2rem auto; max-width: 480px; color: #1a1a1a; }
-		h1 { font-size: 1.5rem; }
-		ul { padding-left: 1.25rem; }
-		button { margin-top: 1rem; margin-right: 0.5rem; padding: 0.6rem 1rem; }
-		.error { color: #a40000; }
-		label { display: block; margin-top: 1rem; }
-	</style>
+	<title>Consentimento — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
-<body>
-	<h1>Authorize application</h1>
-	<p><strong>@Model.ClientDisplayName</strong> (<code>@Model.ClientId</code>) requests access on your behalf.</p>
-	@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-	{
-		<p class="error">@Model.ErrorMessage</p>
-	}
-	<p>Requested scopes:</p>
-	<ul>
-		@foreach (var scope in Model.Scopes)
-		{
-			<li><code>@scope</code></li>
-		}
-	</ul>
-	<form method="post">
-		<input type="hidden" asp-for="ReturnUrl" />
-		<input type="hidden" asp-for="ClientId" />
-		<input type="hidden" asp-for="Scope" />
-		@if (Model.AllowRemember)
-		{
-			<label>
-				<input asp-for="Remember" type="checkbox" />
-				Remember this consent
-			</label>
-		}
-		<button type="submit" asp-page-handler="Accept">Allow</button>
-		<button type="submit" asp-page-handler="Deny" formnovalidate>Deny</button>
-	</form>
+<body class="bg-body-tertiary">
+	<main class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-4">
+		<div class="card shadow-sm border w-100" style="max-width: 28rem">
+			<div class="card-body p-4">
+				<img class="mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+				<h1 class="h4 fw-bold mb-1">Autorizar aplicativo</h1>
+				<p class="text-secondary small mb-4">
+					<strong>@Model.ClientDisplayName</strong>
+					(<code>@Model.ClientId</code>) solicita acesso em seu nome.
+				</p>
+
+				@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+				{
+					<div class="alert alert-danger py-2">@Model.ErrorMessage</div>
+				}
+
+				<p class="mb-2 small fw-semibold">Escopos solicitados:</p>
+				<ul class="list-unstyled mb-4">
+					@foreach (var scope in Model.Scopes)
+					{
+						<li class="mb-1"><code>@scope</code></li>
+					}
+				</ul>
+
+				<form method="post">
+					<input type="hidden" asp-for="ReturnUrl" />
+					<input type="hidden" asp-for="ClientId" />
+					<input type="hidden" asp-for="Scope" />
+					@if (Model.AllowRemember)
+					{
+						<div class="form-check mb-4">
+							<input class="form-check-input" asp-for="Remember" type="checkbox" />
+							<label class="form-check-label" asp-for="Remember">Lembrar este consentimento</label>
+						</div>
+					}
+					<div class="d-grid gap-2">
+						<button class="btn btn-primary btn-lg" type="submit" asp-page-handler="Accept">Permitir</button>
+						<button class="btn btn-outline-secondary" type="submit" asp-page-handler="Deny" formnovalidate>Negar</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</main>
+	<partial name="_BrandScripts" />
 </body>
 </html>

@@ -60,6 +60,8 @@ else
 				<td>@o.BranchAuthzInheritance</td>
 				<td><code>@o.Id</code></td>
 				<td>
+					<a href="/Admin/Organizations/Details/@o.Id">Abrir</a>
+					|
 					<a asp-page="Organizations" asp-route-EditId="@o.Id">Editar</a>
 					<form method="post" asp-page-handler="Delete" style="display:inline; margin-left:.5rem">
 						<input type="hidden" name="id" value="@o.Id" />

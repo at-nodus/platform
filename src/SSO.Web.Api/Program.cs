@@ -66,6 +66,15 @@ try
 			"Admin",
 			"/",
 			model => model.Filters.Add(new ServiceFilterAttribute(typeof(AdminPortalPageFilter))));
+		options.Conventions.AddAreaFolderApplicationModelConvention(
+			"Me",
+			"/",
+			model => model.Filters.Add(new ServiceFilterAttribute(typeof(MePortalPageFilter))));
+		// D-00014-3: same Organization Details page under Admin and Me routes.
+		options.Conventions.AddAreaPageRoute(
+			"Me",
+			"/Organizations/Details",
+			"/Admin/Organizations/Details/{id}");
 	});
 	builder.Services.AddEndpointsApiExplorer();
 	builder.Services.AddSwaggerGen(options =>
@@ -78,7 +87,7 @@ try
 	builder.Services.ConfigureApplicationCookie(options =>
 	{
 		options.LoginPath = "/Account/Login";
-		options.LogoutPath = "/Account/Login";
+		options.LogoutPath = "/Account/Logout";
 		options.AccessDeniedPath = "/Account/Login";
 	});
 

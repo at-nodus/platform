@@ -32,6 +32,7 @@ A maioria das entidades de domínio herda `IdentityAuditableEntity`: `Id`, `Crea
 | `Products` | `Product` | **Sistema de negócio** do ecossistema que consome o SSO (≠ AuthClient OAuth). Escopo de menus, roles, claims tipadas e bindings de clientes. |
 | `Memberships` | `Membership` | **Vínculo usuário ↔ organização.** Indica que o usuário pertence ao tenant; criado tipicamente ao aceitar um convite. |
 | `OrganizationInvites` | `OrganizationInvite` | **Convite para entrar na organização.** Fluxo pending → accept / decline / cancel / expire; guarda e-mail, hash do token, expiração e quem convidou. Aceite cria `Membership`. |
+| `OrganizationContacts` | `OrganizationContact` | **Contato da organização** (nome, e-mail, telefone, cargo, flag principal). CRUD na aba Contatos do detalhe da empresa (00014). |
 
 ---
 
@@ -39,7 +40,7 @@ A maioria das entidades de domínio herda `IdentityAuditableEntity`: `Id`, `Crea
 
 | Tabela | Entidade | Função no projeto |
 |--------|----------|-------------------|
-| `AspNetUsers` | `User` | **Conta SSO.** Extende `IdentityUser<Guid>` (login, senha, lockout, 2FA, e-mail). Base para memberships, convites, roles, claims e sessões. |
+| `AspNetUsers` | `User` | **Conta SSO.** Extende `IdentityUser<Guid>` (login, senha, lockout, 2FA, e-mail) + `DisplayName` opcional (perfil 00014). Base para memberships, convites, roles, claims e sessões. |
 | `AspNetUserClaims` | *(ASP.NET Identity)* | Claims de framework do usuário (não confundir com claims tipadas de domínio). |
 | `AspNetUserLogins` | *(ASP.NET Identity)* | Vínculos de login externo (provider key) — ex.: Entra / Google. |
 | `AspNetUserRoles` | *(ASP.NET Identity)* | Associação usuário ↔ role **de framework** (`AspNetRoles`). Separada das roles de domínio (`AuthRoles`). |

@@ -4,6 +4,7 @@ using SSO.Core.Domain.Identity.Branches.Entity;
 using SSO.Core.Domain.Identity.ExternalIdentityProviders.Entity;
 using SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity;
 using SSO.Core.Domain.Identity.Memberships.Entity;
+using SSO.Core.Domain.Identity.OrganizationContacts.Entity;
 using SSO.Core.Domain.Identity.OrganizationInvites.Entity;
 using SSO.Core.Domain.Identity.Organizations.Resources;
 using SSO.Core.Domain.Identity.ProductEnablements.Entity;
@@ -28,6 +29,7 @@ namespace SSO.Core.Domain.Identity.Organizations.Entity
 		public ICollection<Membership> Memberships { get; set; } = new List<Membership>();
 		public ICollection<OrganizationInvite> OrganizationInvites { get; set; } = new List<OrganizationInvite>();
 		public ICollection<ProductEnablement> ProductEnablements { get; set; } = new List<ProductEnablement>();
+		public ICollection<OrganizationContact> OrganizationContacts { get; set; } = new List<OrganizationContact>();
 		public ICollection<UserRoleAssignment> UserRoleAssignments { get; set; } = new List<UserRoleAssignment>();
 		public ICollection<UserClaimAssignment> UserClaimAssignments { get; set; } = new List<UserClaimAssignment>();
 		public ICollection<ExternalIdentityProvider> ExternalIdentityProviders { get; set; } = new List<ExternalIdentityProvider>();

@@ -39,6 +39,7 @@ namespace SSO.Middleware.AddServices
 			services.AddScoped<ICurrentAdminContext, CurrentAdminContext>();
 			services.AddScoped<IAdminPortalContextService, AdminPortalContextService>();
 			services.AddScoped<AdminPortalPageFilter>();
+			services.AddScoped<MePortalPageFilter>();
 			services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 			services.AddAuthorization();
 			services.AddDistributedMemoryCache();

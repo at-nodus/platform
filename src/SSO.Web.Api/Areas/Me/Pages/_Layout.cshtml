@@ -1,0 +1,100 @@
+@using SSO.Middleware.Identity
+@inject IAdminPortalContextService Portal
+@{
+	var display = User.Identity?.Name ?? "Usuário";
+	var initials = string.Concat(display.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpperInvariant(p[0])));
+	if (string.IsNullOrEmpty(initials)) { initials = "U"; }
+	var isAdmin = Portal.Permissions.Any(p => p.StartsWith("sso.admin.", StringComparison.OrdinalIgnoreCase));
+	var page = ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty;
+	var isHome = page.EndsWith("/Index", StringComparison.OrdinalIgnoreCase) && !page.Contains("Organizations", StringComparison.OrdinalIgnoreCase);
+	var isOrganizations = page.Contains("/Organizations/", StringComparison.OrdinalIgnoreCase);
+	var isProfile = page.EndsWith("/Profile", StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>@ViewData["Title"] — atNodus</title>
+	<partial name="_BrandHead" />
+</head>
+<body>
+	<div class="app-shell d-flex">
+		<aside class="app-sidebar d-none d-lg-flex flex-column p-3 sticky-top vh-100">
+			<a class="app-sidebar-brand d-flex align-items-center mb-4 px-2" asp-area="Me" asp-page="/Index">
+				<img src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+			</a>
+			<p class="text-uppercase text-secondary small fw-medium px-2 mb-2" style="letter-spacing: 0.06em; font-size: 0.7rem">Plataforma</p>
+			<nav class="nav nav-pills flex-column gap-1 mb-auto">
+				<a class="nav-link @(isHome ? "active" : "")" asp-area="Me" asp-page="/Index" aria-current="@(isHome ? "page" : null)">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5" /><path d="M5 9.5V20h14V9.5" /></svg>Início
+				</a>
+				<a class="nav-link @(isOrganizations ? "active" : "")" asp-area="Me" asp-page="/Organizations/Index" aria-current="@(isOrganizations ? "page" : null)">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="2.5" /><circle cx="16" cy="8" r="2.5" /><circle cx="12" cy="16" r="2.5" /><path d="M10 9.5 11 14M14 9.5 13 14M10 8h4" /></svg>Empresas
+				</a>
+				@if (isAdmin)
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Index">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg>Admin
+					</a>
+				}
+			</nav>
+			<p class="text-uppercase text-secondary small fw-medium px-2 mb-2 mt-4" style="letter-spacing: 0.06em; font-size: 0.7rem">Conta</p>
+			<nav class="nav nav-pills flex-column gap-1">
+				<a class="nav-link @(isProfile ? "active" : "")" asp-area="Me" asp-page="/Profile" aria-current="@(isProfile ? "page" : null)">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5" /><path d="M5 19c1.8-3.2 4.2-4.8 7-4.8s5.2 1.6 7 4.8" /></svg>Meu perfil
+				</a>
+				<a class="nav-link" href="/Account/Logout">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 12h9" /><path d="M15 8l4 4-4 4" /><path d="M13 5H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7" /></svg>Sair
+				</a>
+			</nav>
+		</aside>
+
+		<div class="app-main flex-grow-1 d-flex flex-column min-vh-100">
+			<header class="app-topbar d-flex align-items-center gap-3 px-3 px-lg-4">
+				<button class="btn btn-outline-secondary btn-icon d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#meMobileNav" aria-label="Menu">
+					<i class="fa-solid fa-bars" aria-hidden="true"></i>
+				</button>
+				<form class="flex-grow-1" style="max-width: 22rem" role="search" method="get" asp-area="Me" asp-page="/Organizations/Index">
+					<input class="form-control form-control-sm bg-body-tertiary" type="search" name="search" placeholder="Buscar…" aria-label="Buscar" />
+				</form>
+				<a class="avatar ms-auto" asp-area="Me" asp-page="/Profile" title="@display">@initials</a>
+			</header>
+			<main class="flex-grow-1">
+				<div class="container-fluid px-3 px-lg-4 py-3 py-lg-4">
+					@if (!string.IsNullOrWhiteSpace(ViewBag.Message as string))
+					{
+						<div class="alert alert-success">@ViewBag.Message</div>
+					}
+					@if (!string.IsNullOrWhiteSpace(ViewBag.Error as string))
+					{
+						<div class="alert alert-danger">@ViewBag.Error</div>
+					}
+					@RenderBody()
+				</div>
+			</main>
+		</div>
+	</div>
+
+	<div class="offcanvas offcanvas-start app-nav-offcanvas" tabindex="-1" id="meMobileNav">
+		<div class="offcanvas-header">
+			<img src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" style="height:1.75rem" />
+			<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+		</div>
+		<div class="offcanvas-body">
+			<nav class="nav nav-pills flex-column gap-1">
+			<a class="nav-link @(isHome ? "active" : "")" asp-area="Me" asp-page="/Index">Início</a>
+			<a class="nav-link @(isOrganizations ? "active" : "")" asp-area="Me" asp-page="/Organizations/Index">Empresas</a>
+			<a class="nav-link @(isProfile ? "active" : "")" asp-area="Me" asp-page="/Profile">Meu perfil</a>
+			@if (isAdmin)
+			{
+				<a class="nav-link" asp-area="Admin" asp-page="/Index">Admin</a>
+			}
+			<a class="nav-link" href="/Account/Logout">Sair</a>
+			</nav>
+		</div>
+	</div>
+
+	<partial name="_BrandScripts" />
+</body>
+</html>

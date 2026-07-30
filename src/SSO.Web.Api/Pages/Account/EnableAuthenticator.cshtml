@@ -2,41 +2,47 @@
 @model SSO.Web.Api.Pages.Account.EnableAuthenticatorModel
 @{
 	Layout = null;
+	ViewData["Title"] = "Ativar autenticador";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
-	<title>Enable authenticator</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; margin: 2rem auto; max-width: 480px; }
-		code { word-break: break-all; }
-		label { display: block; margin-top: 1rem; font-weight: 600; }
-		input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
-		button { margin-top: 1.25rem; padding: 0.6rem 1rem; width: 100%; }
-		.error { color: #a40000; }
-		.ok { color: #0a5; }
-	</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Ativar autenticador — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
-<body>
-	<h1>Enable authenticator</h1>
-	@if (Model.Enabled)
-	{
-		<p class="ok">Two-factor authentication is enabled.</p>
-	}
-	else
-	{
-		<p>Shared key:</p>
-		<p><code>@Model.SharedKey</code></p>
-		<form method="post">
-			<label asp-for="Input.Code">Verification code</label>
-			<input asp-for="Input.Code" />
-			@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-			{
-				<p class="error">@Model.ErrorMessage</p>
-			}
-			<button type="submit">Enable</button>
-		</form>
-	}
+<body class="bg-body-tertiary">
+	<main class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-4">
+		<div class="card shadow-sm border w-100" style="max-width: 28rem">
+			<div class="card-body p-4">
+				<img class="mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+				<h1 class="h4 fw-bold mb-1">Ativar autenticador</h1>
+				<p class="text-secondary small mb-4">Configure a autenticação em dois fatores na sua conta.</p>
+
+				@if (Model.Enabled)
+				{
+					<div class="alert alert-success py-2 mb-0">A autenticação em dois fatores está ativada.</div>
+				}
+				else
+				{
+					<p class="mb-1 small text-secondary">Chave compartilhada:</p>
+					<p class="mb-3"><code class="user-select-all">@Model.SharedKey</code></p>
+					<form method="post">
+						<div class="mb-3">
+							<label class="form-label" asp-for="Input.Code">Código de verificação</label>
+							<input class="form-control" asp-for="Input.Code" autocomplete="one-time-code" />
+						</div>
+						@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+						{
+							<div class="alert alert-danger py-2">@Model.ErrorMessage</div>
+						}
+						<button class="btn btn-primary btn-lg w-100" type="submit">Ativar</button>
+					</form>
+				}
+			</div>
+		</div>
+	</main>
+	<partial name="_BrandScripts" />
 </body>
 </html>

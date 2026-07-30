@@ -11,6 +11,8 @@ using SSO.Core.Domain.Identity.ClientProductBindings.Validations.EntityValidatio
 using SSO.Core.Domain.Identity.ProductEnablements.Specifications;
 using SSO.Core.Domain.Identity.ProductEnablements.Validations.DomainValidations;
 using SSO.Core.Domain.Identity.ProductEnablements.Validations.EntityValidations;
+using SSO.Core.Domain.Identity.OrganizationContacts.Validations.DomainValidations;
+using SSO.Core.Domain.Identity.OrganizationContacts.Validations.EntityValidations;
 using SSO.Core.Domain.Identity.Memberships.Specifications;
 using SSO.Core.Domain.Identity.Memberships.Validations.DomainValidations;
 using SSO.Core.Domain.Identity.Memberships.Validations.EntityValidations;
@@ -81,6 +83,7 @@ namespace SSO.Middleware.AddServices
 			services.AddTransient<UserRoleAssignmentValidator>();
 			services.AddTransient<ClientProductBindingValidator>();
 			services.AddTransient<ProductEnablementValidator>();
+			services.AddTransient<OrganizationContactValidator>();
 			services.AddTransient<MenuItemValidator>();
 			services.AddTransient<OrganizationInviteValidator>();
 
@@ -106,6 +109,7 @@ namespace SSO.Middleware.AddServices
 			services.AddTransient<DeleteMembershipSpecificationsValidator>();
 
 			services.AddTransient<CreateUserSpecificationsValidator>();
+			services.AddTransient<UpdateUserProfileSpecificationsValidator>();
 
 			services.AddTransient<CreateBranchSpecificationsValidator>();
 			services.AddTransient<UpdateBranchSpecificationsValidator>();
@@ -133,6 +137,10 @@ namespace SSO.Middleware.AddServices
 
 			services.AddTransient<CreateProductEnablementSpecificationsValidator>();
 			services.AddTransient<DeleteProductEnablementSpecificationsValidator>();
+
+			services.AddTransient<CreateOrganizationContactSpecificationsValidator>();
+			services.AddTransient<UpdateOrganizationContactSpecificationsValidator>();
+			services.AddTransient<DeleteOrganizationContactSpecificationsValidator>();
 
 			services.AddTransient<CreateMenuItemSpecificationsValidator>();
 			services.AddTransient<UpdateMenuItemSpecificationsValidator>();

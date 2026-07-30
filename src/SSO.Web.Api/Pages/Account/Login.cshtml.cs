@@ -59,6 +59,8 @@ namespace SSO.Web.Api.Pages.Account
 			[Required]
 			[DataType(DataType.Password)]
 			public string Password { get; set; } = string.Empty;
+
+			public bool RememberMe { get; set; }
 		}
 
 		public async Task OnGetAsync(string? returnUrl = null)
@@ -94,7 +96,7 @@ namespace SSO.Web.Api.Pages.Account
 			var result = await _signInManager.PasswordSignInAsync(
 				user,
 				Input.Password,
-				isPersistent: false,
+				isPersistent: Input.RememberMe,
 				lockoutOnFailure: true);
 
 			if (result.Succeeded)

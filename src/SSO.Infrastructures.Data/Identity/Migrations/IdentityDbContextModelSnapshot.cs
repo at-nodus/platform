@@ -842,6 +842,57 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.ToTable("MenuItems", "IdentityDb");
                 });
 
+            modelBuilder.Entity("SSO.Core.Domain.Identity.OrganizationContacts.Entity.OrganizationContact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("UNIQUEIDENTIFIER")
+                        .HasColumnName("Id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("NVARCHAR(256)")
+                        .HasColumnName("Email");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsPrimary");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(200)")
+                        .HasColumnName("Name");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("UNIQUEIDENTIFIER")
+                        .HasColumnName("OrganizationId");
+
+                    b.Property<string>("Phone")
+                        .HasColumnType("NVARCHAR(64)")
+                        .HasColumnName("Phone");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("NVARCHAR(128)")
+                        .HasColumnName("Title");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizationId");
+
+                    b.ToTable("OrganizationContacts", "IdentityDb");
+                });
+
             modelBuilder.Entity("SSO.Core.Domain.Identity.OrganizationInvites.Entity.OrganizationInvite", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1402,6 +1453,10 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -1694,6 +1749,17 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("SSO.Core.Domain.Identity.OrganizationContacts.Entity.OrganizationContact", b =>
+                {
+                    b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
+                        .WithMany("OrganizationContacts")
+                        .HasForeignKey("OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organization");
+                });
+
             modelBuilder.Entity("SSO.Core.Domain.Identity.OrganizationInvites.Entity.OrganizationInvite", b =>
                 {
                     b.HasOne("SSO.Core.Domain.Identity.Users.Entity.User", "AcceptedUser")
@@ -1925,6 +1991,8 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Navigation("LdapGroupRoleMaps");
 
                     b.Navigation("Memberships");
+
+                    b.Navigation("OrganizationContacts");
 
                     b.Navigation("OrganizationInvites");
 

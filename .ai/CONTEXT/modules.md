@@ -37,7 +37,7 @@
 | Organization | `Organizations` | `api/identity/organizations` | Code único |
 | Product | `Products` | `api/identity/products` | Code único |
 | Membership | `Memberships` | `api/identity/memberships` | User×Org |
-| User | AspNetUsers | `api/identity/users` | IdentityUser; GET filter + GET id + POST |
+| User | AspNetUsers | `api/identity/users` | IdentityUser; GET/PATCH `me`; GET filter + GET id + POST; `DisplayName` |
 | Branch | `Branches` | `api/identity/branches` | `ParentBranchId` estrutural |
 | Permission | `Permissions` | `api/identity/permissions` | Code único |
 | Role | `AuthRoles` | `api/identity/roles` | Domain role |
@@ -45,25 +45,27 @@
 | UserRoleAssignment | `UserRoleAssignments` | `api/identity/userroleassignments` | Contexto Org/Branch/Product |
 | ClientProductBinding | `ClientProductBindings` | `api/identity/clientproductbindings` | client_id → Product |
 | ProductEnablement | `ProductEnablements` | `api/identity/productenablements` | Org × Product (comercial; 00013) |
+| OrganizationContact | `OrganizationContacts` | `api/identity/organization-contacts` | Contatos da org (00014) |
 | AuthAuditEvent | `AuthAuditEvents` | `api/identity/auth-audit-events` | Append-only |
 | MenuItem | `MenuItems` | `api/identity/menuitems` + `api/identity/menus/effective` | PermissionCode → UI |
 | ExternalIdentityProvider | `ExternalIdentityProviders` | `api/identity/external-identity-providers` | Catálogo; só `IsEnabled` |
 | OrganizationInvite | `OrganizationInvites` | `api/identity/organization-invites` | POST + cancel/resend; accept via Account |
 
-### Portal Admin (00011)
+### Portal Admin (00011) + Me (00014)
 
-Area `/Admin` — cadastros completos por papel. Ver [admin-portal.md](admin-portal.md).
+Area `/Admin` — cadastros completos por papel. Area `/Me` — self-service (perfil, empresas). Ver [admin-portal.md](admin-portal.md), [ui-brand.md](ui-brand.md).
 
 ### Páginas de conta
 
 | Página | Função |
 |--------|--------|
-| `/Account/Login` | Senha + lockout + providers externos + redirect 2FA |
+| `/Account/Login` | Senha + lockout + providers externos + redirect 2FA (layout atNodus) |
 | `/Account/ExternalLogin` | Challenge/Callback OIDC (Entra/Google) |
 | `/Account/LoginWith2fa` | TOTP |
 | `/Account/EnableAuthenticator` | Ativar TOTP (autenticado) |
 | `/Account/ForgotPassword` / `ResetPassword` | Reset |
 | `/Account/ConfirmEmail` | Confirmação |
+| `/Me/Profile` | Perfil self-service (00014) |
 
 ### Pendente (pós-épico)
 

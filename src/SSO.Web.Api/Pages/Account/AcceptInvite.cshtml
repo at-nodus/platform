@@ -2,62 +2,104 @@
 @model SSO.Web.Api.Pages.Account.AcceptInviteModel
 @{
 	Layout = null;
+	ViewData["Title"] = "Aceitar convite";
 }
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
-	<title>Aceitar convite — SSO</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; color: #1a1a1a; }
-		.card { border: 1px solid #ddd; border-radius: 8px; padding: 1.25rem; }
-		.error { color: #b00020; }
-		.ok { color: #0a7a3e; }
-		label { display:block; margin-top: .75rem; }
-		input, button { width: 100%; padding: .5rem; margin-top: .25rem; }
-		button { margin-top: 1rem; cursor: pointer; }
-	</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Aceitar convite — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<h1>Convite para organização</h1>
-	@if (!string.IsNullOrEmpty(Model.Message))
-	{
-		<p class="ok">@Model.Message</p>
-		<p><a href="/Admin">Ir para o portal admin</a> · <a href="/">Início</a></p>
-	}
-	else if (Model.Invite is not null)
-	{
-		<div class="card">
-			<p>Organização: <strong>@(Model.OrganizationName ?? Model.Invite.OrganizationId.ToString("D"))</strong></p>
-			<p>E-mail convidado: <strong>@Model.Invite.Email</strong></p>
-			@if (!string.IsNullOrEmpty(Model.Error)) { <p class="error">@Model.Error</p> }
-			@if (Model.NeedsLogin)
-			{
-				<p>Faça <a href="/Account/Login?returnUrl=@Uri.EscapeDataString(Request.Path + Request.QueryString)">login</a> com este e-mail para aceitar.</p>
-			}
-			else
-			{
-				<form method="post" asp-page-handler="Accept">
-					<input type="hidden" asp-for="Token" />
-					@if (Model.NeedsRegistration)
-					{
-						<label>Crie uma senha</label>
-						<input asp-for="Input.Password" type="password" required />
-						<label>Confirme a senha</label>
-						<input asp-for="Input.ConfirmPassword" type="password" required />
-					}
-					<button type="submit">Aceitar convite</button>
-				</form>
-				<form method="post" asp-page-handler="Decline" style="margin-top:.5rem">
-					<input type="hidden" asp-for="Token" />
-					<button type="submit">Recusar</button>
-				</form>
-			}
+	<div class="container-fluid min-vh-100 p-0">
+		<div class="row g-0 min-vh-100">
+			<aside class="col-lg-6 d-none d-lg-flex flex-column justify-content-between login-brand p-5">
+				<div>
+					<img class="login-brand-logo" src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+				</div>
+				<div style="max-width: 26rem">
+					<p class="brand-slogan mb-3">Conecta. Integra. Evolui.</p>
+					<h1 class="font-brand display-6 fw-bold text-white mb-3">
+						O núcleo que conecta o seu ecossistema.
+					</h1>
+					<p class="text-white-50 mb-4">
+						Acesse a plataforma para integrar empresas, produtos e serviços em um grafo inteligente e seguro.
+					</p>
+					<div class="graph-nodes" aria-hidden="true">
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+					</div>
+				</div>
+				<p class="small text-white-50 mb-0">© 2026 atNodus. Todos os direitos reservados.</p>
+			</aside>
+
+			<main class="col-lg-6 d-flex flex-column justify-content-center align-items-center p-4 bg-body-tertiary">
+				<div class="card shadow-sm border w-100" style="max-width: 25rem">
+					<div class="card-body p-4">
+						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+						<h1 class="h4 fw-bold mb-1">Convite para organização</h1>
+
+						@if (!string.IsNullOrEmpty(Model.Message))
+						{
+							<p class="text-secondary small mb-4">Status do convite.</p>
+							<div class="alert alert-success py-2">@Model.Message</div>
+							<p class="text-center small mt-3 mb-0">
+								<a href="/Admin">Ir para o portal admin</a>
+								<span class="text-secondary"> · </span>
+								<a href="/">Início</a>
+							</p>
+						}
+						else if (Model.Invite is not null)
+						{
+							<p class="text-secondary small mb-4">Revise os dados e aceite ou recuse o convite.</p>
+							<p class="mb-2">Organização: <strong>@(Model.OrganizationName ?? Model.Invite.OrganizationId.ToString("D"))</strong></p>
+							<p class="mb-3">E-mail convidado: <strong>@Model.Invite.Email</strong></p>
+							@if (!string.IsNullOrEmpty(Model.Error))
+							{
+								<div class="alert alert-danger py-2">@Model.Error</div>
+							}
+							@if (Model.NeedsLogin)
+							{
+								<p class="mb-0">
+									Faça <a href="/Account/Login?returnUrl=@Uri.EscapeDataString(Request.Path + Request.QueryString)">login</a> com este e-mail para aceitar.
+								</p>
+							}
+							else
+							{
+								<form method="post" asp-page-handler="Accept">
+									<input type="hidden" asp-for="Token" />
+									@if (Model.NeedsRegistration)
+									{
+										<div class="mb-3">
+											<label class="form-label" asp-for="Input.Password">Crie uma senha</label>
+											<input class="form-control" asp-for="Input.Password" type="password" required autocomplete="new-password" />
+										</div>
+										<div class="mb-3">
+											<label class="form-label" asp-for="Input.ConfirmPassword">Confirme a senha</label>
+											<input class="form-control" asp-for="Input.ConfirmPassword" type="password" required autocomplete="new-password" />
+										</div>
+									}
+									<button class="btn btn-primary btn-lg w-100" type="submit">Aceitar convite</button>
+								</form>
+								<form method="post" asp-page-handler="Decline" class="mt-2">
+									<input type="hidden" asp-for="Token" />
+									<button class="btn btn-outline-secondary w-100" type="submit">Recusar</button>
+								</form>
+							}
+						}
+						else
+						{
+							<p class="text-secondary small mb-4">Não foi possível carregar o convite.</p>
+							<div class="alert alert-danger py-2">@(Model.Error ?? "Convite inválido.")</div>
+						}
+					</div>
+				</div>
+			</main>
 		</div>
-	}
-	else
-	{
-		<p class="error">@(Model.Error ?? "Convite inválido.")</p>
-	}
+	</div>
+	<partial name="_BrandScripts" />
 </body>
 </html>

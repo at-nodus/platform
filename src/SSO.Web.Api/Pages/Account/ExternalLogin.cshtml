@@ -2,15 +2,58 @@
 @model SSO.Web.Api.Pages.Account.ExternalLoginModel
 @{
 	Layout = null;
+	ViewData["Title"] = "Login externo";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
-	<title>External login</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Login externo — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<p>@Model.StatusMessage</p>
-	<p><a href="/Account/Login">Back to login</a></p>
+	<div class="container-fluid min-vh-100 p-0">
+		<div class="row g-0 min-vh-100">
+			<aside class="col-lg-6 d-none d-lg-flex flex-column justify-content-between login-brand p-5">
+				<div>
+					<img class="login-brand-logo" src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+				</div>
+				<div style="max-width: 26rem">
+					<p class="brand-slogan mb-3">Conecta. Integra. Evolui.</p>
+					<h1 class="font-brand display-6 fw-bold text-white mb-3">
+						O núcleo que conecta o seu ecossistema.
+					</h1>
+					<p class="text-white-50 mb-4">
+						Acesse a plataforma para integrar empresas, produtos e serviços em um grafo inteligente e seguro.
+					</p>
+					<div class="graph-nodes" aria-hidden="true">
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+					</div>
+				</div>
+				<p class="small text-white-50 mb-0">© 2026 atNodus. Todos os direitos reservados.</p>
+			</aside>
+
+			<main class="col-lg-6 d-flex flex-column justify-content-center align-items-center p-4 bg-body-tertiary">
+				<div class="card shadow-sm border w-100" style="max-width: 25rem">
+					<div class="card-body p-4">
+						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+						<h1 class="h4 fw-bold mb-1">Login externo</h1>
+						<p class="text-secondary small mb-4">Resultado da autenticação com provedor externo.</p>
+						@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+						{
+							<div class="alert alert-info py-2">@Model.StatusMessage</div>
+						}
+						<p class="text-center small mt-3 mb-0">
+							<a href="/Account/Login">Voltar ao login</a>
+						</p>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<partial name="_BrandScripts" />
 </body>
 </html>

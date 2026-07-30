@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="atNodus logo vertical">
+  <defs>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Play:wght@400;700&amp;display=swap");
+      .ur { font-family: "Play", "Segoe UI", sans-serif; font-weight: 400; font-style: normal; }
+      .ul { font-family: "Play", "Segoe UI", sans-serif; font-weight: 300; font-style: normal; }
+      .ub { font-family: "Play", "Segoe UI", sans-serif; font-weight: 700; font-style: normal; }
+    </style>
+    <linearGradient id="atn" x1="320" y1="192" x2="704" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#2D7CFF"/>
+      <stop offset="25%" stop-color="#4F74FF"/>
+      <stop offset="50%" stop-color="#6E68FF"/>
+      <stop offset="75%" stop-color="#8D59F5"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="atlogo" x1="280" y1="680" x2="744" y2="760" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#586BFA"/>
+      <stop offset="100%" stop-color="#8D59F5"/>
+    </linearGradient>
+    <linearGradient id="atslang" x1="220" y1="780" x2="804" y2="860" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#586BFA"/>
+      <stop offset="100%" stop-color="#8D59F5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon centered top (native 512 → offset 256,64) -->
+  <g transform="translate(256 64)">
+    <g fill="none" stroke="url(#atn)" stroke-width="16" stroke-linecap="square" stroke-linejoin="round">
+      <path d="M64 128 L448 384"/>
+      <path d="M64 128 L64 384"/>
+      <path d="M448 384 L448 128"/>
+    </g>
+    <g fill="none" stroke="url(#atn)" stroke-width="8" stroke-linecap="square" stroke-linejoin="round">
+      <path d="M64 384 L256 448 L256 416"/>
+      <path d="M448 128 L256 64 L256 96"/>
+      <path d="M160 192 L160 320"/>
+      <path d="M352 320 L352 192"/>
+    </g>
+    <g fill="none" stroke="url(#atn)" stroke-width="4" stroke-linecap="square" stroke-linejoin="round">
+      <path d="M160 320 L256 384 L256 352"/>
+      <path d="M352 192 L256 128 L256 160"/>
+    </g>
+    <g fill="url(#atn)">
+      <circle cx="64" cy="128" r="24"/>
+      <circle cx="448" cy="128" r="24"/>
+      <circle cx="64" cy="384" r="24"/>
+      <circle cx="448" cy="384" r="24"/>
+      <circle cx="160" cy="192" r="16"/>
+      <circle cx="160" cy="320" r="16"/>
+      <circle cx="352" cy="192" r="16"/>
+      <circle cx="352" cy="320" r="16"/>
+      <circle cx="256" cy="64" r="16"/>
+      <circle cx="256" cy="448" r="16"/>
+      <circle cx="256" cy="128" r="12"/>
+      <circle cx="256" cy="384" r="12"/>
+    </g>
+  </g>
+
+  <text text-anchor="middle" x="512" y="700" font-size="128" letter-spacing="-1">
+    <tspan class="ur" fill="url(#atlogo)">at</tspan><tspan class="ub" dx="6" fill="#09101D">Nodus</tspan>
+  </text>
+
+  <text class="ul" text-anchor="middle" x="512" y="780" fill="url(#atslang)" font-size="36" letter-spacing="4">CONECTA. INTEGRA. EVOLUI.</text>
+</svg>

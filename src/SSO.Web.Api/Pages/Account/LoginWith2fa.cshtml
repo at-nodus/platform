@@ -2,31 +2,64 @@
 @model SSO.Web.Api.Pages.Account.LoginWith2faModel
 @{
 	Layout = null;
+	ViewData["Title"] = "Autenticação em dois fatores";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
-	<title>Two-factor authentication</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; margin: 2rem auto; max-width: 420px; }
-		label { display: block; margin-top: 1rem; font-weight: 600; }
-		input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
-		button { margin-top: 1.25rem; padding: 0.6rem 1rem; width: 100%; }
-		.error { color: #a40000; }
-	</style>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Autenticação em dois fatores — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<h1>Two-factor authentication</h1>
-	<form method="post">
-		<input type="hidden" asp-for="ReturnUrl" />
-		<label asp-for="Input.TwoFactorCode">Authenticator code</label>
-		<input asp-for="Input.TwoFactorCode" autocomplete="one-time-code" />
-		@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-		{
-			<p class="error">@Model.ErrorMessage</p>
-		}
-		<button type="submit">Verify</button>
-	</form>
+	<div class="container-fluid min-vh-100 p-0">
+		<div class="row g-0 min-vh-100">
+			<aside class="col-lg-6 d-none d-lg-flex flex-column justify-content-between login-brand p-5">
+				<div>
+					<img class="login-brand-logo" src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+				</div>
+				<div style="max-width: 26rem">
+					<p class="brand-slogan mb-3">Conecta. Integra. Evolui.</p>
+					<h1 class="font-brand display-6 fw-bold text-white mb-3">
+						O núcleo que conecta o seu ecossistema.
+					</h1>
+					<p class="text-white-50 mb-4">
+						Acesse a plataforma para integrar empresas, produtos e serviços em um grafo inteligente e seguro.
+					</p>
+					<div class="graph-nodes" aria-hidden="true">
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+					</div>
+				</div>
+				<p class="small text-white-50 mb-0">© 2026 atNodus. Todos os direitos reservados.</p>
+			</aside>
+
+			<main class="col-lg-6 d-flex flex-column justify-content-center align-items-center p-4 bg-body-tertiary">
+				<div class="card shadow-sm border w-100" style="max-width: 25rem">
+					<div class="card-body p-4">
+						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+						<h1 class="h4 fw-bold mb-1">Autenticação em dois fatores</h1>
+						<p class="text-secondary small mb-4">Informe o código do seu aplicativo autenticador.</p>
+
+						<form method="post">
+							<input type="hidden" asp-for="ReturnUrl" />
+							<div class="mb-3">
+								<label class="form-label" asp-for="Input.TwoFactorCode">Código do autenticador</label>
+								<input class="form-control" asp-for="Input.TwoFactorCode" autocomplete="one-time-code" />
+							</div>
+							@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+							{
+								<div class="alert alert-danger py-2">@Model.ErrorMessage</div>
+							}
+							<button class="btn btn-primary btn-lg w-100" type="submit">Verificar</button>
+						</form>
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<partial name="_BrandScripts" />
 </body>
 </html>

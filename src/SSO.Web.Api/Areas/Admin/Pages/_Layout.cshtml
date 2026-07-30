@@ -1,85 +1,117 @@
 @using SSO.Middleware.Identity
 @inject IAdminPortalContextService Portal
+@{
+	var display = User.Identity?.Name ?? "Usuário";
+	var initials = string.Concat(display.Split(' ', StringSplitOptions.RemoveEmptyEntries).Take(2).Select(p => char.ToUpperInvariant(p[0])));
+	if (string.IsNullOrEmpty(initials)) { initials = "U"; }
+}
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>@ViewData["Title"] — SSO Admin</title>
-	<style>
-		:root { --bg:#0f1419; --panel:#1a222c; --text:#e7ecf1; --muted:#9aa7b5; --accent:#3d8bfd; --line:#2a3542; --ok:#3dd68c; --warn:#f5a524; }
-		* { box-sizing: border-box; }
-		body { margin:0; font-family: "Segoe UI", system-ui, sans-serif; background: var(--bg); color: var(--text); }
-		a { color: var(--accent); text-decoration: none; }
-		a:hover { text-decoration: underline; }
-		.shell { display:grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
-		nav { background: var(--panel); border-right: 1px solid var(--line); padding: 1.25rem 1rem; }
-		nav .brand { font-weight: 700; letter-spacing: .04em; margin-bottom: 1.5rem; }
-		nav a { display:block; padding: .45rem .6rem; border-radius: 6px; color: var(--text); margin-bottom: .25rem; }
-		nav a:hover { background: #243040; text-decoration: none; }
-		main { padding: 1.5rem 2rem; }
-		.meta { color: var(--muted); font-size: .9rem; margin-bottom: 1rem; }
-		.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
-		table { width:100%; border-collapse: collapse; }
-		th, td { text-align:left; padding: .55rem .4rem; border-bottom: 1px solid var(--line); font-size: .95rem; }
-		th { color: var(--muted); font-weight: 600; }
-		label { display:block; margin: .5rem 0 .25rem; color: var(--muted); font-size: .85rem; }
-		input, select, button, textarea { width:100%; max-width: 420px; padding: .5rem .65rem; border-radius: 6px; border: 1px solid var(--line); background:#121820; color: var(--text); }
-		button, .btn { background: var(--accent); border: none; color: white; cursor: pointer; font-weight: 600; width: auto; display: inline-block; padding: .5rem .9rem; }
-		.btn-secondary { background: #334155; }
-		.flash { padding: .75rem 1rem; border-radius: 8px; margin-bottom: 1rem; background: #143528; color: var(--ok); }
-		.error { background: #3a1d1d; color: #ff8e8e; }
-		.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-		@@media (max-width: 900px) { .shell { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
-	</style>
+	<title>@ViewData["Title"] — atNodus Admin</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<div class="shell">
-		<nav>
-			<div class="brand">SSO Admin</div>
-			<a asp-area="Admin" asp-page="/Index">Início</a>
-			<a asp-area="Admin" asp-page="/SwitchContext">Contexto</a>
-			@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.Org) || Portal.IsPlatformAdmin)
-			{
-				<a asp-area="Admin" asp-page="/Branches">Filiais</a>
-				<a asp-area="Admin" asp-page="/Invites">Convites</a>
-				<a asp-area="Admin" asp-page="/Memberships">Memberships</a>
-				<a asp-area="Admin" asp-page="/UserRoleAssignments">Atribuições</a>
-				<a asp-area="Admin" asp-page="/UserClaimAssignments">Claims de usuário</a>
-				<a asp-area="Admin" asp-page="/ProductEnablements">Habilitações</a>
-			}
-			@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.SessionsRevoke))
-			{
-				<a asp-area="Admin" asp-page="/Sessions">Sessões</a>
-			}
-			@if (Portal.IsPlatformAdmin)
-			{
-				<a asp-area="Admin" asp-page="/Organizations">Organizações</a>
-				<a asp-area="Admin" asp-page="/Products">Produtos</a>
-				<a asp-area="Admin" asp-page="/Permissions">Permissões</a>
-				<a asp-area="Admin" asp-page="/Roles">Roles</a>
-				<a asp-area="Admin" asp-page="/RolePermissions">Permissões por role</a>
-				<a asp-area="Admin" asp-page="/ClientProductBindings">Bindings</a>
-				<a asp-area="Admin" asp-page="/AuthClients">Auth Clients</a>
-				<a asp-area="Admin" asp-page="/ExternalIdPs">Provedores externos</a>
-				<a asp-area="Admin" asp-page="/ClaimDefinitions">Definições de claim</a>
-				<a asp-area="Admin" asp-page="/RoleClaims">Claims por role</a>
-				<a asp-area="Admin" asp-page="/Users">Usuários</a>
-				<a asp-area="Admin" asp-page="/LdapMaps">Mapeamentos LDAP</a>
-			}
-			@if (Portal.IsPlatformAdmin || Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.Menus))
-			{
-				<a asp-area="Admin" asp-page="/MenuItems">Itens de menu</a>
-			}
-			@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.AuditRead))
-			{
-				<a asp-area="Admin" asp-page="/Audit">Auditoria</a>
-			}
-			<a href="/Account/Login">Sair / Login</a>
-		</nav>
-		<main>
-			@RenderBody()
-		</main>
+	<div class="app-shell d-flex">
+		<aside class="app-sidebar d-none d-lg-flex flex-column p-3 sticky-top vh-100 overflow-auto">
+			<a class="app-sidebar-brand d-flex align-items-center mb-4 px-2" asp-area="Admin" asp-page="/Index">
+				<img src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+			</a>
+			<p class="text-uppercase text-secondary small fw-medium px-2 mb-2" style="letter-spacing: 0.06em; font-size: 0.7rem">Admin</p>
+			<nav class="nav nav-pills flex-column gap-1 mb-auto">
+				<a class="nav-link" asp-area="Admin" asp-page="/Index"><i class="fa-solid fa-house fa-fw" aria-hidden="true"></i>Início</a>
+				<a class="nav-link" asp-area="Admin" asp-page="/SwitchContext"><i class="fa-solid fa-building fa-fw" aria-hidden="true"></i>Contexto</a>
+				@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.Org) || Portal.IsPlatformAdmin)
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Branches"><i class="fa-solid fa-code-branch fa-fw" aria-hidden="true"></i>Filiais</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Invites"><i class="fa-solid fa-envelope fa-fw" aria-hidden="true"></i>Convites</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Memberships"><i class="fa-solid fa-users fa-fw" aria-hidden="true"></i>Memberships</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/UserRoleAssignments"><i class="fa-solid fa-user-shield fa-fw" aria-hidden="true"></i>Atribuições</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/UserClaimAssignments"><i class="fa-solid fa-id-badge fa-fw" aria-hidden="true"></i>Claims de usuário</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/ProductEnablements"><i class="fa-solid fa-toggle-on fa-fw" aria-hidden="true"></i>Habilitações</a>
+				}
+				@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.SessionsRevoke))
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Sessions">Sessões</a>
+				}
+				@if (Portal.IsPlatformAdmin)
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Organizations">Organizações</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Products">Produtos</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Permissions">Permissões</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Roles">Roles</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/RolePermissions">Permissões por role</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/ClientProductBindings">Bindings</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/AuthClients">Auth Clients</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/ExternalIdPs">Provedores externos</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/ClaimDefinitions">Definições de claim</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/RoleClaims">Claims por role</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Users">Usuários</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/LdapMaps">Mapeamentos LDAP</a>
+				}
+				@if (Portal.IsPlatformAdmin || Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.Menus))
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/MenuItems">Itens de menu</a>
+				}
+				@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.AuditRead))
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Audit">Auditoria</a>
+				}
+			</nav>
+			<p class="text-uppercase text-secondary small fw-medium px-2 mb-2 mt-4" style="letter-spacing: 0.06em; font-size: 0.7rem">Conta</p>
+			<nav class="nav nav-pills flex-column gap-1">
+				<a class="nav-link" asp-area="Me" asp-page="/Profile"><i class="fa-solid fa-user fa-fw" aria-hidden="true"></i>Meu perfil</a>
+				<a class="nav-link" href="/Account/Logout"><i class="fa-solid fa-arrow-right-from-bracket fa-fw" aria-hidden="true"></i>Sair</a>
+			</nav>
+		</aside>
+
+		<div class="app-main flex-grow-1 d-flex flex-column min-vh-100">
+			<header class="app-topbar d-flex align-items-center gap-3 px-3 px-lg-4">
+				<button class="btn btn-outline-secondary btn-icon d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileNav" aria-label="Menu">
+					<i class="fa-solid fa-bars" aria-hidden="true"></i>
+				</button>
+				<form class="flex-grow-1" style="max-width: 22rem" role="search">
+					<input class="form-control form-control-sm bg-body-tertiary" type="search" placeholder="Buscar…" aria-label="Buscar" />
+				</form>
+				<a class="avatar ms-auto" asp-area="Me" asp-page="/Profile" title="@display">@initials</a>
+			</header>
+			<main class="flex-grow-1">
+				<div class="container-fluid px-3 px-lg-4 py-3 py-lg-4 admin-content">
+					@RenderBody()
+				</div>
+			</main>
+		</div>
 	</div>
+
+	<div class="offcanvas offcanvas-start app-nav-offcanvas" tabindex="-1" id="adminMobileNav">
+		<div class="offcanvas-header">
+			<img src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" style="height:1.75rem" />
+			<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+		</div>
+		<div class="offcanvas-body">
+			<nav class="nav nav-pills flex-column gap-1">
+				<a class="nav-link" asp-area="Admin" asp-page="/Index">Início</a>
+				<a class="nav-link" asp-area="Admin" asp-page="/SwitchContext">Contexto</a>
+				@if (Portal.HasPermission(SSO.Shared.Identity.SsoAdminPermissions.Org) || Portal.IsPlatformAdmin)
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Branches">Filiais</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Invites">Convites</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Memberships">Memberships</a>
+				}
+				@if (Portal.IsPlatformAdmin)
+				{
+					<a class="nav-link" asp-area="Admin" asp-page="/Organizations">Organizações</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Products">Produtos</a>
+					<a class="nav-link" asp-area="Admin" asp-page="/Users">Usuários</a>
+				}
+				<a class="nav-link" asp-area="Me" asp-page="/Profile">Meu perfil</a>
+				<a class="nav-link" href="/Account/Logout">Sair</a>
+			</nav>
+		</div>
+	</div>
+
+	<partial name="_BrandScripts" />
 </body>
 </html>

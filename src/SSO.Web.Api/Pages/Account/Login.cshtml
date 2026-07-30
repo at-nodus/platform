@@ -2,61 +2,94 @@
 @model SSO.Web.Api.Pages.Account.LoginModel
 @{
 	Layout = null;
-	ViewData["Title"] = "Login";
+	ViewData["Title"] = "Entrar";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>SSO Login</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; margin: 2rem auto; max-width: 420px; color: #1a1a1a; }
-		h1 { font-size: 1.5rem; }
-		label { display: block; margin-top: 1rem; font-weight: 600; }
-		input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-		button { margin-top: 1.25rem; padding: 0.6rem 1rem; width: 100%; }
-		.error { color: #a40000; margin-top: 1rem; }
-		.ext { margin-top: 1.5rem; border-top: 1px solid #ddd; padding-top: 1rem; }
-		.ext form { margin-top: 0.5rem; }
-	</style>
+	<title>Entrar — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<h1>SSO</h1>
-	<p>Sign in to continue.</p>
-	<form method="post">
-		<input type="hidden" asp-for="ReturnUrl" />
-		<div>
-			<label asp-for="Input.Email">Email</label>
-			<input asp-for="Input.Email" autocomplete="username" />
+	<div class="container-fluid min-vh-100 p-0">
+		<div class="row g-0 min-vh-100">
+			<aside class="col-lg-6 d-none d-lg-flex flex-column justify-content-between login-brand p-5">
+				<div>
+					<img class="login-brand-logo" src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+				</div>
+				<div style="max-width: 26rem">
+					<p class="brand-slogan mb-3">Conecta. Integra. Evolui.</p>
+					<h1 class="font-brand display-6 fw-bold text-white mb-3">
+						O núcleo que conecta o seu ecossistema.
+					</h1>
+					<p class="text-white-50 mb-4">
+						Acesse a plataforma para integrar empresas, produtos e serviços em um grafo inteligente e seguro.
+					</p>
+					<div class="graph-nodes" aria-hidden="true">
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+					</div>
+				</div>
+				<p class="small text-white-50 mb-0">© 2026 atNodus. Todos os direitos reservados.</p>
+			</aside>
+
+			<main class="col-lg-6 d-flex flex-column justify-content-center align-items-center p-4 bg-body-tertiary">
+				<div class="card shadow-sm border w-100" style="max-width: 25rem">
+					<div class="card-body p-4">
+						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+						<h1 class="h4 fw-bold mb-1">Entrar na plataforma</h1>
+						<p class="text-secondary small mb-4">Use suas credenciais para continuar.</p>
+
+						<form method="post">
+							<input type="hidden" asp-for="ReturnUrl" />
+							<div class="mb-3">
+								<label class="form-label" asp-for="Input.Email">E-mail</label>
+								<input class="form-control" asp-for="Input.Email" autocomplete="username" placeholder="voce@empresa.com" />
+							</div>
+							<div class="mb-3">
+								<label class="form-label" asp-for="Input.Password">Senha</label>
+								<input class="form-control" asp-for="Input.Password" autocomplete="current-password" />
+							</div>
+							@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+							{
+								<div class="alert alert-danger py-2">@Model.ErrorMessage</div>
+							}
+							<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+								<div class="form-check mb-0">
+									<input class="form-check-input" asp-for="Input.RememberMe" />
+									<label class="form-check-label small" asp-for="Input.RememberMe">Lembrar-me</label>
+								</div>
+								<a class="small" href="/Account/ForgotPassword">Esqueci a senha</a>
+							</div>
+							<button class="btn btn-primary btn-lg w-100" type="submit">Entrar</button>
+						</form>
+
+						@if (Model.LdapEnabled)
+						{
+							<p class="text-center small mt-3 mb-0">
+								<a href="/Account/LoginWithLdap?returnUrl=@Uri.EscapeDataString(Model.ReturnUrl ?? "/")">Entrar com LDAP / Active Directory</a>
+							</p>
+						}
+						@if (Model.ExternalProviders.Count > 0)
+						{
+							<hr class="my-4" />
+							<p class="text-secondary small text-center">Ou continue com</p>
+							@foreach (var provider in Model.ExternalProviders)
+							{
+								<form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" class="mb-2">
+									<input type="hidden" name="provider" value="@provider.Name" />
+									<button class="btn btn-outline-secondary w-100" type="submit">@provider.DisplayName</button>
+								</form>
+							}
+						}
+					</div>
+				</div>
+			</main>
 		</div>
-		<div>
-			<label asp-for="Input.Password">Password</label>
-			<input asp-for="Input.Password" autocomplete="current-password" />
-		</div>
-		@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-		{
-			<p class="error">@Model.ErrorMessage</p>
-		}
-		<button type="submit">Sign in</button>
-	</form>
-	<p style="margin-top:1rem"><a href="/Account/ForgotPassword">Forgot password?</a></p>
-	@if (Model.LdapEnabled)
-	{
-		<p style="margin-top:0.75rem"><a href="/Account/LoginWithLdap?returnUrl=@Uri.EscapeDataString(Model.ReturnUrl ?? "/")">Sign in with LDAP / Active Directory</a></p>
-	}
-	@if (Model.ExternalProviders.Count > 0)
-	{
-		<div class="ext">
-			<p>Or continue with</p>
-			@foreach (var provider in Model.ExternalProviders)
-			{
-				<form method="post" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
-					<input type="hidden" name="provider" value="@provider.Name" />
-					<button type="submit">@provider.DisplayName</button>
-				</form>
-			}
-		</div>
-	}
+	</div>
+	<partial name="_BrandScripts" />
 </body>
 </html>

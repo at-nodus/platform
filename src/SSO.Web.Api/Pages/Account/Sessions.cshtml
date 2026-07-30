@@ -1,40 +1,65 @@
 @page
 @model SSO.Web.Api.Pages.Account.SessionsModel
 @{
+	Layout = null;
 	ViewData["Title"] = "Sessões ativas";
 }
-<h1>Sessões ativas</h1>
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-	<p class="text-success">@Model.Message</p>
-}
-<table class="table">
-	<thead>
-		<tr>
-			<th>Client</th>
-			<th>Org</th>
-			<th>Último uso</th>
-			<th>Status</th>
-			<th></th>
-		</tr>
-	</thead>
-	<tbody>
-	@foreach (var s in Model.Sessions)
-	{
-		<tr>
-			<td>@s.ClientId</td>
-			<td>@(s.OrganizationId?.ToString("D") ?? "—")</td>
-			<td>@s.LastSeenAt.ToString("u")</td>
-			<td>@(s.IsActive ? "ativa" : "revogada")</td>
-			<td>
-				@if (s.IsActive)
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Sessões ativas — atNodus</title>
+	<partial name="_BrandHead" />
+</head>
+<body class="bg-body-tertiary">
+	<main class="container min-vh-100 d-flex flex-column justify-content-center align-items-center py-4">
+		<div class="card shadow-sm border w-100" style="max-width: 48rem">
+			<div class="card-body p-4">
+				<img class="mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+				<h1 class="h4 fw-bold mb-1">Sessões ativas</h1>
+				<p class="text-secondary small mb-4">Gerencie as sessões vinculadas à sua conta.</p>
+
+				@if (!string.IsNullOrEmpty(Model.Message))
 				{
-					<form method="post" asp-page-handler="Revoke" asp-route-sessionId="@s.Id">
-						<button type="submit" class="btn btn-sm btn-outline-danger">Revogar</button>
-					</form>
+					<div class="alert alert-success py-2">@Model.Message</div>
 				}
-			</td>
-		</tr>
-	}
-	</tbody>
-</table>
+
+				<div class="table-responsive">
+					<table class="table table-sm align-middle mb-0">
+						<thead>
+							<tr>
+								<th>Cliente</th>
+								<th>Org</th>
+								<th>Último uso</th>
+								<th>Status</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+						@foreach (var s in Model.Sessions)
+						{
+							<tr>
+								<td>@s.ClientId</td>
+								<td>@(s.OrganizationId?.ToString("D") ?? "—")</td>
+								<td>@s.LastSeenAt.ToString("u")</td>
+								<td>@(s.IsActive ? "ativa" : "revogada")</td>
+								<td class="text-end">
+									@if (s.IsActive)
+									{
+										<form method="post" asp-page-handler="Revoke" asp-route-sessionId="@s.Id" class="d-inline">
+											<button type="submit" class="btn btn-sm btn-outline-danger">Revogar</button>
+										</form>
+									}
+								</td>
+							</tr>
+						}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</main>
+	<partial name="_BrandScripts" />
+</body>
+</html>

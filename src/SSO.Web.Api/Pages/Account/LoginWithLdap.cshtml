@@ -2,50 +2,81 @@
 @model SSO.Web.Api.Pages.Account.LoginWithLdapModel
 @{
 	Layout = null;
-	ViewData["Title"] = "LDAP Login";
+	ViewData["Title"] = "Login LDAP";
 }
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
-	<title>SSO LDAP Login</title>
-	<style>
-		body { font-family: Segoe UI, sans-serif; margin: 2rem auto; max-width: 420px; color: #1a1a1a; }
-		h1 { font-size: 1.5rem; }
-		label { display: block; margin-top: 1rem; font-weight: 600; }
-		input { width: 100%; padding: 0.5rem; margin-top: 0.25rem; box-sizing: border-box; }
-		button { margin-top: 1.25rem; padding: 0.6rem 1rem; width: 100%; }
-		.error { color: #a40000; margin-top: 1rem; }
-	</style>
+	<title>Login LDAP — atNodus</title>
+	<partial name="_BrandHead" />
 </head>
 <body>
-	<h1>LDAP / Active Directory</h1>
-	<p>Sign in with your directory credentials.</p>
-	@if (!Model.LdapEnabled)
-	{
-		<p class="error">LDAP authentication is not enabled.</p>
-		<p><a href="/Account/Login">Back to login</a></p>
-	}
-	else
-	{
-		<form method="post">
-			<input type="hidden" asp-for="ReturnUrl" />
-			<div>
-				<label asp-for="Input.Username">Username</label>
-				<input asp-for="Input.Username" autocomplete="username" />
-			</div>
-			<div>
-				<label asp-for="Input.Password">Password</label>
-				<input asp-for="Input.Password" autocomplete="current-password" />
-			</div>
-			@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-			{
-				<p class="error">@Model.ErrorMessage</p>
-			}
-			<button type="submit">Sign in</button>
-		</form>
-		<p style="margin-top:1rem"><a href="/Account/Login">Back to login</a></p>
-	}
+	<div class="container-fluid min-vh-100 p-0">
+		<div class="row g-0 min-vh-100">
+			<aside class="col-lg-6 d-none d-lg-flex flex-column justify-content-between login-brand p-5">
+				<div>
+					<img class="login-brand-logo" src="~/img/brand/atnodus-logo-dark.svg" alt="atNodus" />
+				</div>
+				<div style="max-width: 26rem">
+					<p class="brand-slogan mb-3">Conecta. Integra. Evolui.</p>
+					<h1 class="font-brand display-6 fw-bold text-white mb-3">
+						O núcleo que conecta o seu ecossistema.
+					</h1>
+					<p class="text-white-50 mb-4">
+						Acesse a plataforma para integrar empresas, produtos e serviços em um grafo inteligente e seguro.
+					</p>
+					<div class="graph-nodes" aria-hidden="true">
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+						<span class="graph-node"></span>
+					</div>
+				</div>
+				<p class="small text-white-50 mb-0">© 2026 atNodus. Todos os direitos reservados.</p>
+			</aside>
+
+			<main class="col-lg-6 d-flex flex-column justify-content-center align-items-center p-4 bg-body-tertiary">
+				<div class="card shadow-sm border w-100" style="max-width: 25rem">
+					<div class="card-body p-4">
+						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
+						<h1 class="h4 fw-bold mb-1">LDAP / Active Directory</h1>
+						<p class="text-secondary small mb-4">Entre com suas credenciais do diretório.</p>
+
+						@if (!Model.LdapEnabled)
+						{
+							<div class="alert alert-danger py-2">A autenticação LDAP não está habilitada.</div>
+							<p class="text-center small mt-3 mb-0">
+								<a href="/Account/Login">Voltar ao login</a>
+							</p>
+						}
+						else
+						{
+							<form method="post">
+								<input type="hidden" asp-for="ReturnUrl" />
+								<div class="mb-3">
+									<label class="form-label" asp-for="Input.Username">Usuário</label>
+									<input class="form-control" asp-for="Input.Username" autocomplete="username" />
+								</div>
+								<div class="mb-3">
+									<label class="form-label" asp-for="Input.Password">Senha</label>
+									<input class="form-control" asp-for="Input.Password" autocomplete="current-password" />
+								</div>
+								@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+								{
+									<div class="alert alert-danger py-2">@Model.ErrorMessage</div>
+								}
+								<button class="btn btn-primary btn-lg w-100" type="submit">Entrar</button>
+							</form>
+							<p class="text-center small mt-4 mb-0">
+								<a href="/Account/Login">Voltar ao login</a>
+							</p>
+						}
+					</div>
+				</div>
+			</main>
+		</div>
+	</div>
+	<partial name="_BrandScripts" />
 </body>
 </html>

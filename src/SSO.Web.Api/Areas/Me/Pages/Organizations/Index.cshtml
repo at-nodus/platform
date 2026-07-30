@@ -1,0 +1,96 @@
+@page
+@model SSO.Web.Api.Areas.Me.Pages.Organizations.IndexModel
+@{
+	ViewData["Title"] = "Empresas";
+}
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+	<div>
+		<p class="text-uppercase text-secondary small fw-medium mb-1" style="letter-spacing: 0.06em">Cadastros</p>
+		<h1 class="h2 fw-bold mb-1">Empresas</h1>
+		<p class="text-secondary mb-0">Empresas e suas redes de branches (matriz e filiais) no ecossistema.</p>
+	</div>
+</div>
+
+<div class="card border shadow-sm">
+	<div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+		<div>
+			<h2 class="h5 fw-bold mb-0">@(Model.Portal.IsPlatformAdmin ? "Todas as empresas" : "Minhas empresas")</h2>
+			<p class="small text-secondary mb-0">Organizações às quais você possui vínculo ou permissão de plataforma.</p>
+		</div>
+		@if (Model.Portal.IsPlatformAdmin)
+		{
+			<a class="btn btn-primary" asp-area="Admin" asp-page="/Organizations">
+				<i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Nova empresa
+			</a>
+		}
+	</div>
+	<div class="card-header">
+		<form method="get" class="d-flex flex-wrap justify-content-between gap-2">
+			<input class="form-control form-control-sm" style="max-width: 18rem" type="search" asp-for="Search" placeholder="Buscar por nome ou código…" />
+			<button class="btn btn-outline-secondary btn-sm" type="submit">
+				<i class="fa-solid fa-magnifying-glass me-1" aria-hidden="true"></i>Buscar
+			</button>
+		</form>
+	</div>
+	@if (Model.Items.Count == 0)
+	{
+		<div class="card-body py-5 text-center">
+			<span class="entity-icon mx-auto mb-3" aria-hidden="true">
+				<svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12" /><path d="M9 20v-6h6v6" /></svg>
+			</span>
+			<h3 class="h6 fw-bold">Nenhuma empresa encontrada</h3>
+			<p class="small text-secondary mb-0">Revise a busca ou aguarde um vínculo de empresa.</p>
+		</div>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead>
+					<tr>
+						<th>Empresa</th>
+						<th>Branches</th>
+						<th>Status</th>
+						<th>Atualizado</th>
+						<th class="text-end">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+				@foreach (var org in Model.Items)
+				{
+					var branches = Model.BranchCounts.GetValueOrDefault(org.Id);
+					<tr>
+						<td>
+							<div class="d-flex align-items-center gap-3">
+								<span class="entity-icon" aria-hidden="true">
+									<svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12" /><path d="M9 20v-6h6v6" /></svg>
+								</span>
+								<div>
+									<a class="fw-semibold text-decoration-none" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id">@org.Name</a>
+									<div class="small text-secondary">@org.Code</div>
+								</div>
+							</div>
+						</td>
+						<td><a asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id" asp-fragment="branches">@branches @(branches == 1 ? "branch" : "branches")</a></td>
+						<td><span class="badge text-bg-success">Ativa</span></td>
+						<td class="text-secondary">@((org.UpdatedAt ?? org.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy"))</td>
+						<td class="text-end">
+							<div class="table-actions">
+								<a class="btn btn-outline-secondary btn-icon" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id" title="Ver" aria-label="Ver">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i>
+								</a>
+							</div>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+		<div class="card-footer table-footer">
+			<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+				<span class="small text-secondary">@Model.Items.Count @(Model.Items.Count == 1 ? "empresa" : "empresas")</span>
+				<span class="small text-secondary">Exibindo todos os resultados</span>
+			</div>
+		</div>
+	}
+</div>

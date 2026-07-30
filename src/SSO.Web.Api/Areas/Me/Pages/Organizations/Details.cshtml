@@ -1,0 +1,293 @@
+@page "{id:guid}"
+@model SSO.Web.Api.Areas.Me.Pages.Organizations.DetailsModel
+@{
+	ViewData["Title"] = Model.Organization?.Name ?? "Empresa";
+	var backArea = Model.IsAdminRoute ? "Admin" : "Me";
+	var backPage = Model.IsAdminRoute ? "/Organizations" : "/Organizations/Index";
+}
+@if (!string.IsNullOrWhiteSpace(Model.Message))
+{
+	<div class="alert alert-success">@Model.Message</div>
+}
+@if (!string.IsNullOrWhiteSpace(Model.Error))
+{
+	<div class="alert alert-danger">@Model.Error</div>
+}
+@if (Model.Organization is null)
+{
+	<p class="text-secondary">Empresa não encontrada.</p>
+}
+else
+{
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="@backArea" asp-page="@backPage">Empresas</a></li>
+		<li class="breadcrumb-item active" aria-current="page">@Model.Organization.Name</li>
+	</ol>
+</nav>
+
+<div class="card border shadow-sm mb-3">
+	<div class="card-body d-flex flex-wrap gap-4 align-items-start">
+		<div class="profile-logo"><img src="~/img/brand/atnodus-icon.svg" alt="" /></div>
+		<div class="flex-grow-1">
+			<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+				<h1 class="h2 fw-bold mb-0">@Model.Organization.Name</h1>
+				<span class="badge text-bg-info">Empresa</span>
+				<span class="badge text-bg-success">Ativa</span>
+			</div>
+			<p class="text-secondary mb-2">Empresa com rede de branches (unidades/filiais) no ecossistema atNodus.</p>
+			<div class="d-flex flex-wrap gap-3 small text-secondary">
+				<span>Código <strong class="text-body">@Model.Organization.Code</strong></span>
+				<span>Branches <strong class="text-body">@Model.Branches.Count</strong></span>
+				<span>Produtos <strong class="text-body">@Model.Products.Count</strong></span>
+				<span>Atualizado <strong class="text-body">@((Model.Organization.UpdatedAt ?? Model.Organization.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy"))</strong></span>
+			</div>
+		</div>
+		<div class="d-flex flex-wrap gap-2 ms-lg-auto">
+			<a class="btn btn-outline-secondary" asp-area="@backArea" asp-page="@backPage">Voltar</a>
+			@if (Model.CanEditOrg)
+			{
+				<button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#organizationEdit">Editar empresa</button>
+			}
+			@if (Model.CanManageBranches)
+			{
+				<a class="btn btn-primary" href="#branches">Nova branch</a>
+			}
+		</div>
+	</div>
+</div>
+
+<div class="card border shadow-sm">
+	<div class="card-header px-0 pb-0 border-bottom-0">
+		<ul class="nav nav-tabs px-3" role="tablist">
+			<li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#dados" type="button" role="tab">Dados</button></li>
+			<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#branches" type="button" role="tab">Branches</button></li>
+			<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#contato" type="button" role="tab">Contatos</button></li>
+			<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#produtos" type="button" role="tab">Produtos</button></li>
+			<li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab">Usuários</button></li>
+		</ul>
+	</div>
+	<div class="card-body tab-content">
+		<div class="tab-pane fade show active" id="dados" role="tabpanel">
+			<h2 class="h6 text-secondary text-uppercase mb-3" style="letter-spacing: 0.04em">Identificação da empresa</h2>
+			@if (Model.CanEditOrg)
+			{
+				<dl class="row mb-0">
+					<dt class="col-sm-3 text-secondary small">Nome</dt><dd class="col-sm-9">@Model.Organization.Name</dd>
+					<dt class="col-sm-3 text-secondary small">Código</dt><dd class="col-sm-9">@Model.Organization.Code</dd>
+					<dt class="col-sm-3 text-secondary small">Tipo na rede</dt><dd class="col-sm-9"><span class="badge text-bg-info">Empresa</span></dd>
+					<dt class="col-sm-3 text-secondary small">Herança de autorização</dt><dd class="col-sm-9">@Model.Organization.BranchAuthzInheritance</dd>
+				</dl>
+				<div class="collapse mt-4" id="organizationEdit">
+					<div class="card border bg-body-tertiary">
+						<div class="card-body">
+							<form method="post" asp-page-handler="UpdateOrg" class="row g-3" style="max-width: 36rem">
+								<input type="hidden" asp-for="Id" />
+								<div class="col-md-7"><label class="form-label" asp-for="OrgName">Nome</label><input class="form-control" asp-for="OrgName" /></div>
+								<div class="col-md-5"><label class="form-label" asp-for="OrgCode">Código</label><input class="form-control" asp-for="OrgCode" /></div>
+								<div class="col-12 d-flex gap-2">
+									<button class="btn btn-primary" type="submit">Salvar alterações</button>
+									<button class="btn btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#organizationEdit">Cancelar</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			}
+			else
+			{
+				<dl class="row mb-0">
+					<dt class="col-sm-3 text-secondary small">Nome</dt><dd class="col-sm-9">@Model.Organization.Name</dd>
+					<dt class="col-sm-3 text-secondary small">Código</dt><dd class="col-sm-9">@Model.Organization.Code</dd>
+					<dt class="col-sm-3 text-secondary small">Herança de authz</dt><dd class="col-sm-9">@Model.Organization.BranchAuthzInheritance</dd>
+				</dl>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="branches" role="tabpanel">
+			<div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+				<div>
+					<h2 class="h5 fw-bold mb-1">Rede de branches</h2>
+					<p class="small text-secondary mb-0">Unidades (matriz ou filial) da empresa.</p>
+				</div>
+			</div>
+			@if (Model.CanManageBranches)
+			{
+				<div class="card border bg-body-tertiary mb-4">
+					<div class="card-body">
+						<h3 class="h6 fw-bold mb-3">@(Model.BranchEditId.HasValue ? "Editar branch" : "Nova branch")</h3>
+						<form method="post" asp-page-handler="@(Model.BranchEditId.HasValue ? "UpdateBranch" : "CreateBranch")" class="row g-2 align-items-end" style="max-width: 40rem">
+							<input type="hidden" asp-for="Id" />
+							<input type="hidden" asp-for="BranchEditId" />
+							<div class="col-md-5"><label class="form-label" asp-for="BranchName">Nome</label><input class="form-control" asp-for="BranchName" /></div>
+							<div class="col-md-4"><label class="form-label" asp-for="BranchCode">Código</label><input class="form-control" asp-for="BranchCode" /></div>
+							<div class="col-md-3"><button class="btn btn-primary w-100" type="submit">@(Model.BranchEditId.HasValue ? "Salvar" : "Adicionar")</button></div>
+						</form>
+					</div>
+				</div>
+			}
+			@if (Model.Branches.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhuma filial.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+					@foreach (var b in Model.Branches)
+					{
+						<div class="card branch-card @(b.ParentBranchId is null ? "is-hq" : "is-child") border">
+							<div class="card-body d-flex flex-wrap gap-3 align-items-start">
+								<span class="entity-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12" /><path d="M9 20v-6h6v6" /></svg></span>
+								<div class="flex-grow-1">
+									<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+										<strong>@b.Name</strong>
+										<span class="badge @(b.ParentBranchId is null ? "text-bg-info" : "text-bg-secondary")">@(b.ParentBranchId is null ? "HQ" : "Filial")</span>
+										<span class="badge text-bg-success">Ativa</span>
+									</div>
+									<p class="small text-secondary mb-0">@b.Code</p>
+								</div>
+								@if (Model.CanManageBranches)
+								{
+									<a class="btn btn-link btn-sm" asp-route-id="@Model.Id" asp-route-BranchEditId="@b.Id">Editar</a>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="contato" role="tabpanel">
+			<div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+				<div>
+					<h2 class="h5 fw-bold mb-1">Contatos da empresa</h2>
+					<p class="small text-secondary mb-0">Responsáveis e canais de atendimento.</p>
+				</div>
+			</div>
+			@if (Model.CanManageContacts)
+			{
+				<form method="post" asp-page-handler="SaveContact" class="row g-2 mb-4" style="max-width: 44rem">
+					<input type="hidden" asp-for="Id" />
+					<input type="hidden" asp-for="ContactEditId" />
+					<div class="col-md-6">
+						<label class="form-label" asp-for="ContactName">Nome</label>
+						<input class="form-control" asp-for="ContactName" required />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" asp-for="ContactTitle">Cargo</label>
+						<input class="form-control" asp-for="ContactTitle" />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" asp-for="ContactEmail">E-mail</label>
+						<input class="form-control" asp-for="ContactEmail" type="email" />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" asp-for="ContactPhone">Telefone</label>
+						<input class="form-control" asp-for="ContactPhone" />
+					</div>
+					<div class="col-12">
+						<div class="form-check">
+							<input class="form-check-input" asp-for="ContactIsPrimary" />
+							<label class="form-check-label" asp-for="ContactIsPrimary">Contato principal</label>
+						</div>
+					</div>
+					<div class="col-12">
+						<button class="btn btn-primary" type="submit">@(Model.ContactEditId.HasValue ? "Salvar contato" : "Adicionar contato")</button>
+					</div>
+				</form>
+			}
+			@if (Model.Contacts.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhum contato cadastrado.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+						@foreach (var c in Model.Contacts)
+						{
+							<div class="card border">
+								<div class="card-body d-flex flex-wrap gap-3 align-items-start">
+									<span class="entity-icon" aria-hidden="true"><i class="fa-regular fa-address-card"></i></span>
+									<div class="flex-grow-1">
+										<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+											<strong>@c.Name</strong>
+											@if (c.IsPrimary) { <span class="badge text-bg-info">Principal</span> }
+										</div>
+										<p class="small text-secondary mb-1">@(c.Title ?? "Contato")</p>
+										<div class="d-flex flex-wrap gap-3 small">
+											@if (!string.IsNullOrWhiteSpace(c.Email)) { <a href="mailto:@c.Email">@c.Email</a> }
+											@if (!string.IsNullOrWhiteSpace(c.Phone)) { <span class="text-secondary">@c.Phone</span> }
+										</div>
+									</div>
+									@if (Model.CanManageContacts)
+									{
+										<div class="table-actions">
+										<a class="btn btn-link btn-sm" asp-route-id="@Model.Id" asp-route-ContactEditId="@c.Id">Editar</a>
+										<form method="post" asp-page-handler="DeleteContact" class="d-inline">
+											<input type="hidden" name="contactId" value="@c.Id" />
+											<input type="hidden" asp-for="Id" />
+											<button class="btn btn-link btn-sm text-danger" type="submit">Excluir</button>
+										</form>
+										</div>
+									}
+								</div>
+							</div>
+						}
+				</div>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="produtos" role="tabpanel">
+			<h2 class="h5 fw-bold mb-3">Produtos associados</h2>
+			@if (Model.Products.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhum produto habilitado para esta empresa.</p>
+			}
+			else
+			{
+				<div class="d-flex flex-column gap-3">
+					@foreach (var p in Model.Products)
+					{
+						<div class="card product-row is-enabled border">
+							<div class="card-body d-flex flex-wrap align-items-center gap-3">
+								<span class="entity-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="2.5" /><circle cx="16" cy="8" r="2.5" /><circle cx="12" cy="16" r="2.5" /><path d="M10 9.5 11 14M14 9.5 13 14M10 8h4" /></svg></span>
+								<div class="flex-grow-1"><strong>@p.Name</strong><div class="small text-secondary">@p.Code · habilitado para a empresa</div></div>
+								<span class="badge text-bg-success">Liberado</span>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<div class="tab-pane fade" id="usuarios" role="tabpanel">
+			<h2 class="h5 fw-bold mb-3">Usuários</h2>
+			@if (!Model.CanViewMembers)
+			{
+				<p class="text-secondary mb-0">Você não tem permissão para listar usuários desta empresa.</p>
+			}
+			else if (Model.Members.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhum membro.</p>
+			}
+			else
+			{
+				<div class="table-responsive">
+					<table class="table table-hover">
+						<thead><tr><th>Nome</th><th>E-mail</th></tr></thead>
+						<tbody>
+						@foreach (var m in Model.Members)
+						{
+							<tr>
+								<td>@(m.DisplayName ?? "—")</td>
+								<td>@m.Email</td>
+							</tr>
+						}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	</div>
+</div>
+}

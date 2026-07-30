@@ -10,6 +10,7 @@ using SSO.Core.Domain.Identity.ClientWebhooks.Entity;
 using SSO.Core.Domain.Identity.ExternalIdentityProviders.Entity;
 using SSO.Core.Domain.Identity.Memberships.Entity;
 using SSO.Core.Domain.Identity.MenuItems.Entity;
+using SSO.Core.Domain.Identity.OrganizationContacts.Entity;
 using SSO.Core.Domain.Identity.OrganizationInvites.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Identity.Permissions.Entity;
@@ -43,6 +44,7 @@ namespace SSO.Infrastructures.Data.Identity
 		public DbSet<UserRoleAssignment> UserRoleAssignments { get; set; }
 		public DbSet<ClientProductBinding> ClientProductBindings { get; set; }
 		public DbSet<ProductEnablement> ProductEnablements { get; set; }
+		public DbSet<OrganizationContact> OrganizationContacts { get; set; }
 		public DbSet<AuthAuditEvent> AuthAuditEvents { get; set; }
 		public DbSet<MenuItem> MenuItems { get; set; }
 		public DbSet<ExternalIdentityProvider> ExternalIdentityProviders { get; set; }
@@ -78,6 +80,7 @@ namespace SSO.Infrastructures.Data.Identity
 				entity.Property(e => e.UpdatedAt).HasColumnType("datetime2").IsRequired(false);
 				entity.Property(e => e.DeletedAt).HasColumnType("datetime2").IsRequired(false);
 				entity.Property(e => e.IsDeleted).HasColumnType("bit").IsRequired(true);
+				entity.Property(e => e.DisplayName).HasColumnType("nvarchar(200)").HasMaxLength(200).IsRequired(false);
 				entity.Ignore(e => e.Password);
 			});
 
@@ -91,6 +94,7 @@ namespace SSO.Infrastructures.Data.Identity
 			builder.ApplyConfiguration(new UserRoleAssignmentMap());
 			builder.ApplyConfiguration(new ClientProductBindingMap());
 			builder.ApplyConfiguration(new ProductEnablementMap());
+			builder.ApplyConfiguration(new OrganizationContactMap());
 			builder.ApplyConfiguration(new AuthAuditEventMap());
 			builder.ApplyConfiguration(new MenuItemMap());
 			builder.ApplyConfiguration(new ExternalIdentityProviderMap());

@@ -18,6 +18,9 @@ namespace SSO.Core.Domain.Identity.Users.Entity
 		public DateTime? DeletedAt { get; set; }
 		public bool IsDeleted { get; set; }
 
+		/// <summary>Optional display name for profile UI (max 200).</summary>
+		public string DisplayName { get; set; }
+
 		[NotMapped]
 		public string Password { get; set; }
 

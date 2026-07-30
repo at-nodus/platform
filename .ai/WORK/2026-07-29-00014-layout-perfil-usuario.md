@@ -2,12 +2,13 @@
 
 > Arquivo: `.ai/WORK/2026-07-29-00014-layout-perfil-usuario.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md`  
-> Status: **Pronto para implementação** — D-00014-1..6 aceitas  
+> Status: **Implementado** — D-00014-1..6 aceitas  
 > Data: 2026-07-29  
 > Depende de: 00003 (shell `/Admin` + convites), 00011 (cadastros Admin / orgs-branches), 00013 (ProductEnablement na visão de empresa)  
 > Relaciona: 00001 (User/Membership/Invite), identidade visual `visual-identity/brands/at-nodus`  
 > Fonte de UI: `F:/DEV/cursor/at-nodus/visual-identity/brands/at-nodus/templates/`  
-> Decisões: **A / A (/Me) / A (2 rotas) / B / A (sem e-mail) / A** (D-00014-1..6)
+> Decisões: **A / A (/Me) / A (2 rotas) / B / A (sem e-mail) / A** (D-00014-1..6)  
+> Migration: `Phase16OrganizationContacts`
 
 ## Objetivo
 
@@ -212,18 +213,18 @@ Sem novas regras de domínio nos PageModels: orquestração via MediatR/API (pad
 
 ## Critérios de aceite
 
-- [ ] Login e shell autenticado usam tipografia/cores/logos do brand kit atNodus (tokens alinhados ao README da marca).
-- [ ] Páginas listagem, empresa, formulário e perfil correspondem estruturalmente aos templates (`listing` / `company` / `form` / `user`).
-- [ ] Usuário acessa **Meu perfil** e vê as 4 abas: Dados, Empresas, Acessos, Convites.
-- [ ] Edita apenas os próprios dados pessoais (e-mail **somente leitura**); não edita dados de outro usuário por essa tela.
-- [ ] Aba Empresas lista só orgs com vínculo; abrir empresa mostra a mesma UX de `company.html`.
-- [ ] Branches: criar/editar só com permission; sem permission, view (ou oculto) conforme regra.
-- [ ] Com permission de edição da org, editar dados da empresa funciona como na tela de empresa.
-- [ ] Aba Acessos lista products + roles por empresa/produto (e branch quando houver).
-- [ ] Aba Convites mostra status corretos; Pending permite Aceitar/Recusar; demais não.
-- [ ] Accept/Decline atualizam membership/status conforme Domain já implementado.
-- [ ] Usuário sem `sso.admin.*` não vê CTAs admin; APIs continuam 403 se chamado direto.
-- [ ] CONTEXT/docs atualizados; backlog marca 00014.
+- [x] Login e shell autenticado usam tipografia/cores/logos do brand kit atNodus (tokens alinhados ao README da marca).
+- [x] Páginas listagem, empresa, formulário e perfil correspondem estruturalmente aos templates (`listing` / `company` / `form` / `user`).
+- [x] Usuário acessa **Meu perfil** e vê as 4 abas: Dados, Empresas, Acessos, Convites.
+- [x] Edita apenas os próprios dados pessoais (e-mail **somente leitura**); não edita dados de outro usuário por essa tela.
+- [x] Aba Empresas lista só orgs com vínculo; abrir empresa mostra a mesma UX de `company.html`.
+- [x] Branches: criar/editar só com permission; sem permission, view (ou oculto) conforme regra.
+- [x] Com permission de edição da org, editar dados da empresa funciona como na tela de empresa.
+- [x] Aba Acessos lista products + roles por empresa/produto (e branch quando houver).
+- [x] Aba Convites mostra status corretos; Pending permite Aceitar/Recusar; demais não.
+- [x] Accept/Decline atualizam membership/status conforme Domain já implementado.
+- [x] Usuário sem `sso.admin.*` não vê CTAs admin; APIs continuam 403 se chamado direto.
+- [x] CONTEXT/docs atualizados; backlog marca 00014.
 
 ## Arquivos impactados (previsto)
 
@@ -275,12 +276,13 @@ Não é compromisso de prazo em dias — serve para priorizar no backlog.
 ## Checklist
 
 - [x] D-00014-1..6 fechadas
-- [ ] Alinhado a PLAYBOOK/architecture.md + domain-rules (UI só orquestra)
-- [ ] Naming HTTP verbs nos Commands novos (`Patch`/`Put` self-profile; Contatos)
-- [ ] AuthZ self vs admin considerado
-- [ ] Migrations para Contatos (D-00014-4 = B)
-- [ ] CONTEXT + backlog atualizados
+- [x] Alinhado a PLAYBOOK/architecture.md + domain-rules (UI só orquestra)
+- [x] Naming HTTP verbs nos Commands novos (`Patch` self-profile; Contatos Post/Put/Delete)
+- [x] AuthZ self vs admin considerado
+- [x] Migrations para Contatos (D-00014-4 = B) — `Phase16OrganizationContacts`
+- [x] CONTEXT + backlog atualizados
 - [x] Pronto para implementação
+- [x] Implementado
 
 ## Decisões abertas
 
