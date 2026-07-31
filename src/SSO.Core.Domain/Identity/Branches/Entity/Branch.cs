@@ -20,6 +20,21 @@ namespace SSO.Core.Domain.Identity.Branches.Entity
 		public Guid? ParentBranchId { get; set; }
 		public string Name { get; set; }
 		public string Code { get; set; }
+		/// <summary>Razão social da unidade.</summary>
+		public string LegalName { get; set; }
+		/// <summary>Nome fantasia da unidade.</summary>
+		public string TradeName { get; set; }
+		/// <summary>CNPJ próprio da branch.</summary>
+		public string TaxId { get; set; }
+		public string Segment { get; set; }
+		public string Description { get; set; }
+		public string PostalCode { get; set; }
+		public string Street { get; set; }
+		public string Number { get; set; }
+		public string Complement { get; set; }
+		public string City { get; set; }
+		/// <summary>UF (2 letras).</summary>
+		public string State { get; set; }
 
 		public Organization Organization { get; set; }
 		public Branch ParentBranch { get; set; }

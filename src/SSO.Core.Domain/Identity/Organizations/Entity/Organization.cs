@@ -22,6 +22,21 @@ namespace SSO.Core.Domain.Identity.Organizations.Entity
 	{
 		public string Name { get; set; }
 		public string Code { get; set; }
+		/// <summary>Razão social.</summary>
+		public string LegalName { get; set; }
+		/// <summary>Nome fantasia.</summary>
+		public string TradeName { get; set; }
+		/// <summary>CNPJ (raiz / matriz).</summary>
+		public string TaxId { get; set; }
+		public string Segment { get; set; }
+		public string Description { get; set; }
+		public string PostalCode { get; set; }
+		public string Street { get; set; }
+		public string Number { get; set; }
+		public string Complement { get; set; }
+		public string City { get; set; }
+		/// <summary>UF (2 letras).</summary>
+		public string State { get; set; }
 		/// <summary>Off | InheritFromAncestors (ADR-008 / F00009-D1). Default Off.</summary>
 		public string BranchAuthzInheritance { get; set; } = SSO.Shared.Identity.BranchAuthzInheritancePolicies.Off;
 

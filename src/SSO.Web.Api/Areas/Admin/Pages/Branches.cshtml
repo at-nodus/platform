@@ -4,78 +4,131 @@
 @{
 	ViewData["Title"] = "Filiais";
 }
-<h1>Filiais</h1>
-@if (!string.IsNullOrEmpty(Model.Message)) { <div class="flash">@Model.Message</div> }
-@if (!string.IsNullOrEmpty(Model.Error)) { <div class="flash error">@Model.Error</div> }
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+	<div>
+		<p class="text-uppercase text-secondary small fw-medium mb-1" style="letter-spacing: 0.06em">Admin · Cadastros</p>
+		<h1 class="h2 fw-bold mb-1">Filiais</h1>
+		<p class="text-secondary mb-0">Branches da organização ativa no contexto.</p>
+	</div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+
 @if (Model.Portal.OrganizationId is not null)
 {
-	@if (Model.EditId is Guid editId)
-	{
-		<div class="card">
-			<h2>Editar filial</h2>
-			<form method="post" asp-page-handler="Update">
-				<input type="hidden" name="id" value="@editId" />
-				<label>Nome</label>
-				<input asp-for="Name" required />
-				<label>Código</label>
-				<input asp-for="Code" required />
-				<label>Filial pai (opcional)</label>
-				<select asp-for="ParentBranchId">
-					<option value="">(nenhuma)</option>
-					@foreach (var b in Model.Items)
-					{
-						if (b.Id == editId) { continue; }
-						<option value="@b.Id">@b.Name</option>
-					}
-				</select>
-				<p style="margin-top:1rem">
-					<button type="submit">Salvar</button>
-					<a class="btn btn-secondary" style="margin-left:.5rem" asp-page="Branches">Cancelar</a>
-				</p>
-			</form>
+	<div class="card border shadow-sm mb-4">
+		<div class="card-header">
+			<h2 class="h5 fw-bold mb-0">@(Model.EditId.HasValue ? "Editar filial" : "Nova filial")</h2>
 		</div>
-	}
-	else
-	{
-		<div class="card">
-			<h2>Nova filial</h2>
-			<form method="post">
-				<label>Nome</label>
-				<input asp-for="Name" required />
-				<label>Código</label>
-				<input asp-for="Code" required />
-				<label>Filial pai (opcional)</label>
-				<select asp-for="ParentBranchId">
-					<option value="">(nenhuma)</option>
-					@foreach (var b in Model.Items)
-					{
-						<option value="@b.Id">@b.Name</option>
-					}
-				</select>
-				<p style="margin-top:1rem"><button type="submit">Criar</button></p>
-			</form>
-		</div>
-	}
-	<div class="card">
-		<table>
-			<thead><tr><th>Nome</th><th>Código</th><th>Pai</th><th></th></tr></thead>
-			<tbody>
-			@foreach (var b in Model.Items)
+		<div class="card-body">
+			@if (Model.EditId is Guid editId)
 			{
-				<tr>
-					<td>@b.Name</td>
-					<td>@b.Code</td>
-					<td>@(b.ParentBranchId?.ToString("D") ?? "—")</td>
-					<td>
-						<a asp-page="Branches" asp-route-EditId="@b.Id">Editar</a>
-						<form method="post" asp-page-handler="Delete" style="display:inline; margin-left:.5rem">
-							<input type="hidden" name="id" value="@b.Id" />
-							<button type="submit" class="btn-secondary">Excluir</button>
-						</form>
-					</td>
-				</tr>
+				<form method="post" asp-page-handler="Update" class="row g-3">
+					<input type="hidden" name="id" value="@editId" />
+					<div class="col-md-6"><label class="form-label" asp-for="Name">Nome (exibição)</label><input class="form-control" asp-for="Name" required /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="LegalName">Razão social</label><input class="form-control" asp-for="LegalName" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="TradeName">Nome fantasia</label><input class="form-control" asp-for="TradeName" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="TaxId">CNPJ</label><input class="form-control" asp-for="TaxId" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="Segment">Segmento</label><input class="form-control" asp-for="Segment" /></div>
+					<div class="col-12"><label class="form-label" asp-for="Description">Descrição</label><textarea class="form-control" asp-for="Description" rows="2"></textarea></div>
+					<div class="col-md-4"><label class="form-label" asp-for="PostalCode">CEP</label><input class="form-control" asp-for="PostalCode" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="City">Cidade</label><input class="form-control" asp-for="City" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="Street">Logradouro</label><input class="form-control" asp-for="Street" /></div>
+					<div class="col-md-4"><label class="form-label" asp-for="Number">Número</label><input class="form-control" asp-for="Number" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="Complement">Complemento</label><input class="form-control" asp-for="Complement" /></div>
+					<div class="col-md-4"><label class="form-label" asp-for="State">UF</label><input class="form-control" asp-for="State" maxlength="2" /></div>
+					<div class="col-12">
+						<label class="form-label" asp-for="ParentBranchId">Filial pai (opcional)</label>
+						<select class="form-select" asp-for="ParentBranchId">
+							<option value="">(nenhuma — matriz)</option>
+							@foreach (var b in Model.Items.Where(x => x.Id != editId))
+							{
+								<option value="@b.Id">@b.Name</option>
+							}
+						</select>
+					</div>
+					<div class="col-12 d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+						<a class="btn btn-outline-secondary" asp-page="Branches">Cancelar</a>
+						<button class="btn btn-primary" type="submit">Salvar alterações</button>
+					</div>
+				</form>
 			}
-			</tbody>
-		</table>
+			else
+			{
+				<form method="post" class="row g-3">
+					<div class="col-md-6"><label class="form-label" asp-for="Name">Nome (exibição)</label><input class="form-control" asp-for="Name" required /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="LegalName">Razão social</label><input class="form-control" asp-for="LegalName" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="TradeName">Nome fantasia</label><input class="form-control" asp-for="TradeName" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="TaxId">CNPJ</label><input class="form-control" asp-for="TaxId" /></div>
+					<div class="col-md-6"><label class="form-label" asp-for="Segment">Segmento</label><input class="form-control" asp-for="Segment" /></div>
+					<div class="col-12"><label class="form-label" asp-for="Description">Descrição</label><textarea class="form-control" asp-for="Description" rows="2"></textarea></div>
+					<div class="col-md-4"><label class="form-label" asp-for="PostalCode">CEP</label><input class="form-control" asp-for="PostalCode" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="City">Cidade</label><input class="form-control" asp-for="City" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="Street">Logradouro</label><input class="form-control" asp-for="Street" /></div>
+					<div class="col-md-4"><label class="form-label" asp-for="Number">Número</label><input class="form-control" asp-for="Number" /></div>
+					<div class="col-md-8"><label class="form-label" asp-for="Complement">Complemento</label><input class="form-control" asp-for="Complement" /></div>
+					<div class="col-md-4"><label class="form-label" asp-for="State">UF</label><input class="form-control" asp-for="State" maxlength="2" /></div>
+					<div class="col-12">
+						<label class="form-label" asp-for="ParentBranchId">Filial pai (opcional)</label>
+						<select class="form-select" asp-for="ParentBranchId">
+							<option value="">(nenhuma — matriz)</option>
+							@foreach (var b in Model.Items)
+							{
+								<option value="@b.Id">@b.Name</option>
+							}
+						</select>
+					</div>
+					<div class="col-12 d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+						<button class="btn btn-primary" type="submit">Criar filial</button>
+					</div>
+				</form>
+			}
+		</div>
 	</div>
+
+	<div class="card border shadow-sm">
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead>
+					<tr>
+						<th>Filial</th>
+						<th>CNPJ</th>
+						<th>Cidade</th>
+						<th>Pai</th>
+						<th class="text-end">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+				@foreach (var b in Model.Items)
+				{
+					<tr>
+						<td>
+							<div class="fw-semibold">@(string.IsNullOrWhiteSpace(b.TradeName) ? b.Name : b.TradeName)</div>
+							<div class="small text-secondary">@b.Code</div>
+						</td>
+						<td class="text-secondary">@(string.IsNullOrWhiteSpace(b.TaxId) ? "—" : b.TaxId)</td>
+						<td class="text-secondary">@(string.IsNullOrWhiteSpace(b.City) ? "—" : $"{b.City}{(string.IsNullOrWhiteSpace(b.State) ? "" : "/" + b.State)}")</td>
+						<td class="text-secondary">@(b.ParentBranchId is null ? "—" : Model.Items.FirstOrDefault(x => x.Id == b.ParentBranchId)?.Name ?? b.ParentBranchId.Value.ToString("D")[..8])</td>
+						<td class="text-end">
+							<div class="table-actions">
+								<a class="btn btn-outline-secondary btn-icon" asp-page="Branches" asp-route-EditId="@b.Id" title="Editar" aria-label="Editar"><i class="fa-solid fa-pen"></i></a>
+								<form method="post" asp-page-handler="Delete" class="d-inline">
+									<input type="hidden" name="id" value="@b.Id" />
+									<button class="btn btn-outline-secondary btn-icon text-danger" type="submit" title="Excluir" aria-label="Excluir" onclick="return confirm('Excluir esta filial?');"><i class="fa-solid fa-trash"></i></button>
+								</form>
+							</div>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-warning">Selecione uma organização em <a asp-page="SwitchContext">Contexto</a>.</div>
 }

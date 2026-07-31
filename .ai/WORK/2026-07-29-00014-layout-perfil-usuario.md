@@ -283,6 +283,17 @@ Não é compromisso de prazo em dias — serve para priorizar no backlog.
 - [x] CONTEXT + backlog atualizados
 - [x] Pronto para implementação
 - [x] Implementado
+- [x] Revisão visual 2026-07-30 — P0/P1 principais (shell Admin no Details, Organizations branded, Login copy, Users/Products polish, `/` redirect, Logout)
+
+## Lacunas remanescentes (pós-revisão)
+
+| Prioridade | Item |
+|------------|------|
+| P1 | Demais páginas Admin CRUD ainda em markup legado (Users, Invites, …) |
+| P1 | `form.html` dedicado (criar/editar empresa multi-aba) |
+| P2 | Toggles ProductEnablement por branch na aba Produtos (hoje leitura + link Admin) |
+| P2 | Filtros/paginação completos no listing Me |
+| — | **Phase17** perfil Org/Branch: LegalName, TradeName, TaxId, Segment, Description, endereço |
 
 ## Decisões abertas
 

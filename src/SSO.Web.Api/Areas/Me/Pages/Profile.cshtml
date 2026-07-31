@@ -24,7 +24,6 @@
 		<div class="flex-grow-1">
 			<div class="d-flex flex-wrap align-items-center gap-2 mb-1">
 				<h1 class="h2 fw-bold mb-0">@name</h1>
-				<span class="badge text-bg-success">Ativo</span>
 			</div>
 			<p class="text-secondary mb-2">@(u?.Email)</p>
 			<div class="d-flex flex-wrap gap-3 small text-secondary">
@@ -35,7 +34,7 @@
 		</div>
 		<div class="d-flex flex-wrap gap-2 ms-lg-auto">
 			<a class="btn btn-outline-secondary" href="/Account/ForgotPassword">Alterar senha</a>
-			<button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#profileEdit" aria-expanded="false">Editar dados</button>
+			<button class="btn btn-primary" type="button" id="btnEditProfile">Editar dados</button>
 		</div>
 	</div>
 </div>
@@ -64,7 +63,6 @@
 				<dt class="col-sm-3 text-secondary small">Nome completo</dt><dd class="col-sm-9">@name</dd>
 				<dt class="col-sm-3 text-secondary small">E-mail</dt><dd class="col-sm-9">@(u?.Email)</dd>
 				<dt class="col-sm-3 text-secondary small">Telefone</dt><dd class="col-sm-9">@(string.IsNullOrWhiteSpace(u?.PhoneNumber) ? "—" : u.PhoneNumber)</dd>
-				<dt class="col-sm-3 text-secondary small">Status</dt><dd class="col-sm-9"><span class="badge text-bg-success">Ativo</span></dd>
 			</dl>
 			<div class="collapse mt-4" id="profileEdit">
 				<div class="card border bg-body-tertiary">
@@ -225,3 +223,13 @@
 		</div>
 	</div>
 </div>
+<script>
+	document.getElementById('btnEditProfile')?.addEventListener('click', function () {
+		document.getElementById('tab-dados')?.click();
+		var el = document.getElementById('profileEdit');
+		if (el && window.bootstrap) {
+			bootstrap.Collapse.getOrCreateInstance(el).show();
+			el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}
+	});
+</script>

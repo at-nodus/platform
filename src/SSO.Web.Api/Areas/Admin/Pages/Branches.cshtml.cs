@@ -36,6 +36,39 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 		public string Code { get; set; } = string.Empty;
 
 		[BindProperty]
+		public string? LegalName { get; set; }
+
+		[BindProperty]
+		public string? TradeName { get; set; }
+
+		[BindProperty]
+		public string? TaxId { get; set; }
+
+		[BindProperty]
+		public string? Segment { get; set; }
+
+		[BindProperty]
+		public string? Description { get; set; }
+
+		[BindProperty]
+		public string? PostalCode { get; set; }
+
+		[BindProperty]
+		public string? Street { get; set; }
+
+		[BindProperty]
+		public string? Number { get; set; }
+
+		[BindProperty]
+		public string? Complement { get; set; }
+
+		[BindProperty]
+		public string? City { get; set; }
+
+		[BindProperty]
+		public string? State { get; set; }
+
+		[BindProperty]
 		public Guid? ParentBranchId { get; set; }
 
 		private bool CanManage => Portal.HasPermission(SsoAdminPermissions.Org) || Portal.IsPlatformAdmin;
@@ -61,6 +94,17 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				{
 					Name = item.Name;
 					Code = item.Code;
+					LegalName = item.LegalName;
+					TradeName = item.TradeName;
+					TaxId = item.TaxId;
+					Segment = item.Segment;
+					Description = item.Description;
+					PostalCode = item.PostalCode;
+					Street = item.Street;
+					Number = item.Number;
+					Complement = item.Complement;
+					City = item.City;
+					State = item.State;
 					ParentBranchId = item.ParentBranchId;
 				}
 			}
@@ -86,14 +130,23 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				organizationId = orgId,
 				parentBranchId = ParentBranchId,
 				name = Name,
-				code = Code
+				code = Code,
+				legalName = EmptyToNull(LegalName),
+				tradeName = EmptyToNull(TradeName),
+				taxId = EmptyToNull(TaxId),
+				segment = EmptyToNull(Segment),
+				description = EmptyToNull(Description),
+				postalCode = EmptyToNull(PostalCode),
+				street = EmptyToNull(Street),
+				number = EmptyToNull(Number),
+				complement = EmptyToNull(Complement),
+				city = EmptyToNull(City),
+				state = EmptyToNull(State)?.ToUpperInvariant()
 			});
 			var response = await _mediator.Send(cmd);
 			if (ApplyResponse(response, "Filial criada."))
 			{
-				Name = string.Empty;
-				Code = string.Empty;
-				ParentBranchId = null;
+				ClearForm();
 			}
 
 			await LoadAsync();
@@ -119,7 +172,18 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				organizationId = orgId,
 				parentBranchId = ParentBranchId,
 				name = Name,
-				code = Code
+				code = Code,
+				legalName = EmptyToNull(LegalName),
+				tradeName = EmptyToNull(TradeName),
+				taxId = EmptyToNull(TaxId),
+				segment = EmptyToNull(Segment),
+				description = EmptyToNull(Description),
+				postalCode = EmptyToNull(PostalCode),
+				street = EmptyToNull(Street),
+				number = EmptyToNull(Number),
+				complement = EmptyToNull(Complement),
+				city = EmptyToNull(City),
+				state = EmptyToNull(State)?.ToUpperInvariant()
 			});
 			var response = await _mediator.Send(cmd);
 			ApplyResponse(response, "Filial atualizada.");
@@ -146,10 +210,44 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 		private async Task LoadAsync()
 		{
 			var orgId = Portal.OrganizationId!.Value;
-			Items = await _reader.Query<Branch>().AsNoTracking()
-				.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
-				.OrderBy(x => x.Name)
-				.ToListAsync();
+			Items = (await _reader.Query<Branch>().AsNoTracking()
+					.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
+					.ToListAsync())
+				.OrderBy(x => x.ParentBranchId.HasValue ? 1 : 0)
+				.ThenBy(x => DigitsOnly(x.TaxId))
+				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+				.ToList();
+		}
+
+		private static string? EmptyToNull(string? value) =>
+			string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+		private static string DigitsOnly(string? value)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				return string.Empty;
+			}
+
+			return string.Concat(value.Where(char.IsDigit));
+		}
+
+		private void ClearForm()
+		{
+			Name = string.Empty;
+			Code = string.Empty;
+			LegalName = null;
+			TradeName = null;
+			TaxId = null;
+			Segment = null;
+			Description = null;
+			PostalCode = null;
+			Street = null;
+			Number = null;
+			Complement = null;
+			City = null;
+			State = null;
+			ParentBranchId = null;
 		}
 	}
 }

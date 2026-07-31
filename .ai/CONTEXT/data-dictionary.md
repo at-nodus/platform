@@ -27,8 +27,8 @@ A maioria das entidades de domínio herda `IdentityAuditableEntity`: `Id`, `Crea
 
 | Tabela | Entidade | Função no projeto |
 |--------|----------|-------------------|
-| `Organizations` | `Organization` | **Tenant.** Isolamento lógico de identidade e autorização. Agrupa branches, memberships, convites e política de herança de authz entre branches (`BranchAuthzInheritance`: Off / InheritFromAncestors). |
-| `Branches` | `Branch` | **Filial / unidade** dentro de uma Organization. Hierarquia estrutural via `ParentBranchId`; herança de autorização é opt-in na org (ADR-008), não automática. |
+| `Organizations` | `Organization` | **Tenant.** Isolamento lógico de identidade e autorização. Agrupa branches, memberships, convites e política de herança de authz entre branches (`BranchAuthzInheritance`: Off / InheritFromAncestors). Perfil comercial: `LegalName` (razão social), `TradeName` (fantasia), `TaxId` (CNPJ), `Segment`, `Description` e endereço (`PostalCode`/`Street`/`Number`/`Complement`/`City`/`State`). `Name`/`Code` continuam como identificadores operacionais. |
+| `Branches` | `Branch` | **Filial / unidade** dentro de uma Organization. Hierarquia estrutural via `ParentBranchId`; herança de autorização é opt-in na org (ADR-008), não automática. Mesmo perfil comercial da org (CNPJ próprio da unidade, razão/fantasia, segmento, descrição, endereço). |
 | `Products` | `Product` | **Sistema de negócio** do ecossistema que consome o SSO (≠ AuthClient OAuth). Escopo de menus, roles, claims tipadas e bindings de clientes. |
 | `Memberships` | `Membership` | **Vínculo usuário ↔ organização.** Indica que o usuário pertence ao tenant; criado tipicamente ao aceitar um convite. |
 | `OrganizationInvites` | `OrganizationInvite` | **Convite para entrar na organização.** Fluxo pending → accept / decline / cancel / expire; guarda e-mail, hash do token, expiração e quem convidou. Aceite cria `Membership`. |

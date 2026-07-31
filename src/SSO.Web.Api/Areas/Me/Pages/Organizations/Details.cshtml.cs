@@ -16,6 +16,8 @@ using SSO.Core.Domain.Identity.OrganizationContacts.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using SSO.Core.Domain.Identity.ProductEnablements.Entity;
 using SSO.Core.Domain.Identity.Products.Entity;
+using SSO.Core.Domain.Identity.Roles.Entity;
+using SSO.Core.Domain.Identity.UserRoleAssignments.Entity;
 using SSO.Core.Domain.Identity.Users.Entity;
 using SSO.Middleware.Identity;
 using SSO.Shared.Identity;
@@ -54,6 +56,9 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 		public bool CanViewMembers => Portal.IsPlatformAdmin || Portal.HasPermission(SsoAdminPermissions.Org);
 		public bool IsAdminRoute => Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase);
 
+		/// <summary>Tab ativa após postback (dados|branches|contato|produtos|usuarios).</summary>
+		public string ActiveTab { get; set; } = "dados";
+
 		[BindProperty]
 		public string OrgName { get; set; } = string.Empty;
 
@@ -61,10 +66,76 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 		public string OrgCode { get; set; } = string.Empty;
 
 		[BindProperty]
+		public string? OrgLegalName { get; set; }
+
+		[BindProperty]
+		public string? OrgTradeName { get; set; }
+
+		[BindProperty]
+		public string? OrgTaxId { get; set; }
+
+		[BindProperty]
+		public string? OrgSegment { get; set; }
+
+		[BindProperty]
+		public string? OrgDescription { get; set; }
+
+		[BindProperty]
+		public string? OrgPostalCode { get; set; }
+
+		[BindProperty]
+		public string? OrgStreet { get; set; }
+
+		[BindProperty]
+		public string? OrgNumber { get; set; }
+
+		[BindProperty]
+		public string? OrgComplement { get; set; }
+
+		[BindProperty]
+		public string? OrgCity { get; set; }
+
+		[BindProperty]
+		public string? OrgState { get; set; }
+
+		[BindProperty]
 		public string BranchName { get; set; } = string.Empty;
 
 		[BindProperty]
 		public string BranchCode { get; set; } = string.Empty;
+
+		[BindProperty]
+		public string? BranchLegalName { get; set; }
+
+		[BindProperty]
+		public string? BranchTradeName { get; set; }
+
+		[BindProperty]
+		public string? BranchTaxId { get; set; }
+
+		[BindProperty]
+		public string? BranchSegment { get; set; }
+
+		[BindProperty]
+		public string? BranchDescription { get; set; }
+
+		[BindProperty]
+		public string? BranchPostalCode { get; set; }
+
+		[BindProperty]
+		public string? BranchStreet { get; set; }
+
+		[BindProperty]
+		public string? BranchNumber { get; set; }
+
+		[BindProperty]
+		public string? BranchComplement { get; set; }
+
+		[BindProperty]
+		public string? BranchCity { get; set; }
+
+		[BindProperty]
+		public string? BranchState { get; set; }
 
 		[BindProperty(SupportsGet = true)]
 		public Guid? BranchEditId { get; set; }
@@ -97,6 +168,7 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 		{
 			public string Email { get; set; } = string.Empty;
 			public string? DisplayName { get; set; }
+			public List<string> Roles { get; set; } = new();
 		}
 
 		public async Task<IActionResult> OnGetAsync()
@@ -122,11 +194,23 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 				id = Id,
 				name = OrgName,
 				code = OrgCode,
+				legalName = EmptyToNull(OrgLegalName),
+				tradeName = EmptyToNull(OrgTradeName),
+				taxId = EmptyToNull(OrgTaxId),
+				segment = EmptyToNull(OrgSegment),
+				description = EmptyToNull(OrgDescription),
+				postalCode = EmptyToNull(OrgPostalCode),
+				street = EmptyToNull(OrgStreet),
+				number = EmptyToNull(OrgNumber),
+				complement = EmptyToNull(OrgComplement),
+				city = EmptyToNull(OrgCity),
+				state = EmptyToNull(OrgState)?.ToUpperInvariant(),
 				branchAuthzInheritance = Organization?.BranchAuthzInheritance ?? BranchAuthzInheritancePolicies.Off
 			});
 			var response = await _mediator.Send(cmd);
 			ApplyResponse(response, "Empresa atualizada.");
 			await LoadAsync();
+			ActiveTab = "dados";
 			return Page();
 		}
 
@@ -141,16 +225,27 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 			{
 				organizationId = Id,
 				name = BranchName,
-				code = BranchCode
+				code = BranchCode,
+				legalName = EmptyToNull(BranchLegalName),
+				tradeName = EmptyToNull(BranchTradeName),
+				taxId = EmptyToNull(BranchTaxId),
+				segment = EmptyToNull(BranchSegment),
+				description = EmptyToNull(BranchDescription),
+				postalCode = EmptyToNull(BranchPostalCode),
+				street = EmptyToNull(BranchStreet),
+				number = EmptyToNull(BranchNumber),
+				complement = EmptyToNull(BranchComplement),
+				city = EmptyToNull(BranchCity),
+				state = EmptyToNull(BranchState)?.ToUpperInvariant()
 			});
 			var response = await _mediator.Send(cmd);
 			if (ApplyResponse(response, "Filial criada."))
 			{
-				BranchName = string.Empty;
-				BranchCode = string.Empty;
+				ClearBranchForm();
 			}
 
 			await LoadAsync();
+			ActiveTab = "branches";
 			return Page();
 		}
 
@@ -176,14 +271,25 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 				organizationId = Id,
 				name = BranchName,
 				code = BranchCode,
-				parentBranchId = existing.ParentBranchId
+				parentBranchId = existing.ParentBranchId,
+				legalName = EmptyToNull(BranchLegalName),
+				tradeName = EmptyToNull(BranchTradeName),
+				taxId = EmptyToNull(BranchTaxId),
+				segment = EmptyToNull(BranchSegment),
+				description = EmptyToNull(BranchDescription),
+				postalCode = EmptyToNull(BranchPostalCode),
+				street = EmptyToNull(BranchStreet),
+				number = EmptyToNull(BranchNumber),
+				complement = EmptyToNull(BranchComplement),
+				city = EmptyToNull(BranchCity),
+				state = EmptyToNull(BranchState)?.ToUpperInvariant()
 			});
 			var response = await _mediator.Send(cmd);
 			ApplyResponse(response, "Filial atualizada.");
 			BranchEditId = null;
-			BranchName = string.Empty;
-			BranchCode = string.Empty;
+			ClearBranchForm();
 			await LoadAsync();
+			ActiveTab = "branches";
 			return Page();
 		}
 
@@ -231,6 +337,7 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 			ContactTitle = null;
 			ContactIsPrimary = false;
 			await LoadAsync();
+			ActiveTab = "contato";
 			return Page();
 		}
 
@@ -245,6 +352,7 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 			var response = await _mediator.Send(cmd);
 			ApplyResponse(response, "Contato removido.");
 			await LoadAsync();
+			ActiveTab = "contato";
 			return Page();
 		}
 
@@ -278,11 +386,25 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 
 			OrgName = Organization.Name;
 			OrgCode = Organization.Code;
+			OrgLegalName = Organization.LegalName;
+			OrgTradeName = Organization.TradeName;
+			OrgTaxId = Organization.TaxId;
+			OrgSegment = Organization.Segment;
+			OrgDescription = Organization.Description;
+			OrgPostalCode = Organization.PostalCode;
+			OrgStreet = Organization.Street;
+			OrgNumber = Organization.Number;
+			OrgComplement = Organization.Complement;
+			OrgCity = Organization.City;
+			OrgState = Organization.State;
 
-			Branches = await _reader.Query<Branch>().AsNoTracking()
-				.Where(x => !x.IsDeleted && x.OrganizationId == Id)
-				.OrderBy(x => x.Name)
-				.ToListAsync();
+			Branches = (await _reader.Query<Branch>().AsNoTracking()
+					.Where(x => !x.IsDeleted && x.OrganizationId == Id)
+					.ToListAsync())
+				.OrderBy(x => x.ParentBranchId.HasValue ? 1 : 0)
+				.ThenBy(x => DigitsOnly(x.TaxId))
+				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+				.ToList();
 
 			Contacts = await _reader.Query<OrganizationContact>().AsNoTracking()
 				.Where(x => !x.IsDeleted && x.OrganizationId == Id)
@@ -299,12 +421,30 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 
 			if (CanViewMembers)
 			{
-				Members = await (
+				var members = await (
 					from m in _reader.Query<Membership>().AsNoTracking()
 					join u in _reader.Query<User>().AsNoTracking() on m.UserId equals u.Id
 					where !m.IsDeleted && !u.IsDeleted && m.OrganizationId == Id
 					orderby u.Email
-					select new MemberRow { Email = u.Email ?? u.UserName ?? "", DisplayName = u.DisplayName }).ToListAsync();
+					select new { u.Id, Email = u.Email ?? u.UserName ?? "", u.DisplayName }).ToListAsync();
+
+				var userIds = members.Select(x => x.Id).ToList();
+				var roleRows = await (
+					from a in _reader.Query<UserRoleAssignment>().AsNoTracking()
+					join r in _reader.Query<Role>().AsNoTracking() on a.RoleId equals r.Id
+					where !a.IsDeleted && !r.IsDeleted && a.OrganizationId == Id && userIds.Contains(a.UserId)
+					select new { a.UserId, r.Name }).ToListAsync();
+
+				var rolesByUser = roleRows
+					.GroupBy(x => x.UserId)
+					.ToDictionary(g => g.Key, g => g.Select(x => x.Name).Distinct().OrderBy(x => x).ToList());
+
+				Members = members.Select(x => new MemberRow
+				{
+					Email = x.Email,
+					DisplayName = x.DisplayName,
+					Roles = rolesByUser.TryGetValue(x.Id, out var roles) ? roles : new List<string>()
+				}).ToList();
 			}
 
 			if (BranchEditId is Guid bid)
@@ -314,6 +454,17 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 				{
 					BranchName = b.Name;
 					BranchCode = b.Code;
+					BranchLegalName = b.LegalName;
+					BranchTradeName = b.TradeName;
+					BranchTaxId = b.TaxId;
+					BranchSegment = b.Segment;
+					BranchDescription = b.Description;
+					BranchPostalCode = b.PostalCode;
+					BranchStreet = b.Street;
+					BranchNumber = b.Number;
+					BranchComplement = b.Complement;
+					BranchCity = b.City;
+					BranchState = b.State;
 				}
 			}
 
@@ -329,6 +480,36 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 					ContactIsPrimary = c.IsPrimary;
 				}
 			}
+		}
+
+		private static string? EmptyToNull(string? value) =>
+			string.IsNullOrWhiteSpace(value) ? null : value.Trim();
+
+		private static string DigitsOnly(string? value)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				return string.Empty;
+			}
+
+			return string.Concat(value.Where(char.IsDigit));
+		}
+
+		private void ClearBranchForm()
+		{
+			BranchName = string.Empty;
+			BranchCode = string.Empty;
+			BranchLegalName = null;
+			BranchTradeName = null;
+			BranchTaxId = null;
+			BranchSegment = null;
+			BranchDescription = null;
+			BranchPostalCode = null;
+			BranchStreet = null;
+			BranchNumber = null;
+			BranchComplement = null;
+			BranchCity = null;
+			BranchState = null;
 		}
 	}
 }

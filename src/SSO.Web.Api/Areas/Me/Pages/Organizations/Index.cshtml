@@ -49,8 +49,7 @@
 				<thead>
 					<tr>
 						<th>Empresa</th>
-						<th>Branches</th>
-						<th>Status</th>
+						<th>Filiais</th>
 						<th>Atualizado</th>
 						<th class="text-end">Ações</th>
 					</tr>
@@ -66,16 +65,25 @@
 									<svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12" /><path d="M9 20v-6h6v6" /></svg>
 								</span>
 								<div>
-									<a class="fw-semibold text-decoration-none" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id">@org.Name</a>
-									<div class="small text-secondary">@org.Code</div>
+									<a class="fw-semibold text-decoration-none" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id">@(string.IsNullOrWhiteSpace(org.TradeName) ? org.Name : org.TradeName)</a>
+									<div class="small text-secondary">
+										@org.Code
+										@if (!string.IsNullOrWhiteSpace(org.TaxId)) { <span> · CNPJ @org.TaxId</span> }
+										@if (!string.IsNullOrWhiteSpace(org.Segment)) { <span> · @org.Segment</span> }
+									</div>
 								</div>
 							</div>
 						</td>
-						<td><a asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id" asp-fragment="branches">@branches @(branches == 1 ? "branch" : "branches")</a></td>
-						<td><span class="badge text-bg-success">Ativa</span></td>
+						<td><a asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id" asp-fragment="branches">@branches @(branches == 1 ? "filial" : "filiais")</a></td>
 						<td class="text-secondary">@((org.UpdatedAt ?? org.CreatedAt).ToLocalTime().ToString("dd/MM/yyyy"))</td>
 						<td class="text-end">
 							<div class="table-actions">
+								@if (Model.Portal.IsPlatformAdmin)
+								{
+									<a class="btn btn-outline-secondary btn-icon" href="/Admin/Organizations?EditId=@org.Id" title="Editar" aria-label="Editar">
+										<i class="fa-solid fa-pen" aria-hidden="true"></i>
+									</a>
+								}
 								<a class="btn btn-outline-secondary btn-icon" asp-area="Me" asp-page="/Organizations/Details" asp-route-id="@org.Id" title="Ver" aria-label="Ver">
 									<i class="fa-solid fa-eye" aria-hidden="true"></i>
 								</a>

@@ -3,73 +3,195 @@
 @{
 	ViewData["Title"] = "Organizações";
 }
-<h1>Organizações</h1>
-@if (!string.IsNullOrEmpty(Model.Message)) { <div class="flash">@Model.Message</div> }
-@if (!string.IsNullOrEmpty(Model.Error)) { <div class="flash error">@Model.Error</div> }
+<div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+	<div>
+		<p class="text-uppercase text-secondary small fw-medium mb-1" style="letter-spacing: 0.06em">Admin · Cadastros</p>
+		<h1 class="h2 fw-bold mb-1">Organizações</h1>
+		<p class="text-secondary mb-0">Cadastro e manutenção de empresas no ecossistema.</p>
+	</div>
+</div>
 
-@if (Model.EditId is Guid editId)
+@if (!string.IsNullOrEmpty(Model.Message))
 {
-	<div class="card">
-		<h2>Editar organização</h2>
-		<form method="post" asp-page-handler="Update">
-			<input type="hidden" name="id" value="@editId" />
-			<label>Nome</label>
-			<input asp-for="Name" required />
-			<label>Código</label>
-			<input asp-for="Code" required />
-			<label>Inheritance de autorização de filiais</label>
-			<select asp-for="BranchAuthzInheritance">
-				<option value="Off">Off</option>
-				<option value="InheritFromAncestors">InheritFromAncestors</option>
-			</select>
-			<p style="margin-top:1rem">
-				<button type="submit">Salvar</button>
-				<a class="btn btn-secondary" style="margin-left:.5rem" asp-page="Organizations">Cancelar</a>
-			</p>
-		</form>
-	</div>
+	<div class="alert alert-success">@Model.Message</div>
 }
-else
+@if (!string.IsNullOrEmpty(Model.Error))
 {
-	<div class="card">
-		<h2>Nova organização</h2>
-		<form method="post">
-			<label>Nome</label>
-			<input asp-for="Name" required />
-			<label>Código</label>
-			<input asp-for="Code" required />
-			<label>Inheritance de autorização de filiais</label>
-			<select asp-for="BranchAuthzInheritance">
-				<option value="Off">Off</option>
-				<option value="InheritFromAncestors">InheritFromAncestors</option>
-			</select>
-			<p style="margin-top:1rem"><button type="submit">Criar</button></p>
-		</form>
-	</div>
+	<div class="alert alert-danger">@Model.Error</div>
 }
 
-<div class="card">
-	<table>
-		<thead><tr><th>Nome</th><th>Código</th><th>Inheritance</th><th>Id</th><th></th></tr></thead>
-		<tbody>
-		@foreach (var o in Model.Items)
+<div class="card border shadow-sm mb-4">
+	<div class="card-header">
+		<h2 class="h5 fw-bold mb-0">@(Model.EditId.HasValue ? "Editar organização" : "Nova organização")</h2>
+	</div>
+	<div class="card-body">
+		@if (Model.EditId is Guid editId)
 		{
-			<tr>
-				<td>@o.Name</td>
-				<td>@o.Code</td>
-				<td>@o.BranchAuthzInheritance</td>
-				<td><code>@o.Id</code></td>
-				<td>
-					<a href="/Admin/Organizations/Details/@o.Id">Abrir</a>
-					|
-					<a asp-page="Organizations" asp-route-EditId="@o.Id">Editar</a>
-					<form method="post" asp-page-handler="Delete" style="display:inline; margin-left:.5rem">
-						<input type="hidden" name="id" value="@o.Id" />
-						<button type="submit" class="btn-secondary">Excluir</button>
-					</form>
-				</td>
-			</tr>
+			<form method="post" asp-page-handler="Update" class="row g-3">
+				<input type="hidden" name="id" value="@editId" />
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Name">Nome (exibição)</label>
+					<input class="form-control" asp-for="Name" required />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Code">Código</label>
+					<input class="form-control" asp-for="Code" required />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="LegalName">Razão social</label>
+					<input class="form-control" asp-for="LegalName" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="TradeName">Nome fantasia</label>
+					<input class="form-control" asp-for="TradeName" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="TaxId">CNPJ</label>
+					<input class="form-control" asp-for="TaxId" placeholder="00.000.000/0000-00" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Segment">Segmento</label>
+					<input class="form-control" asp-for="Segment" />
+				</div>
+				<div class="col-12">
+					<label class="form-label" asp-for="Description">Descrição</label>
+					<textarea class="form-control" asp-for="Description" rows="2"></textarea>
+				</div>
+				<div class="col-md-4"><label class="form-label" asp-for="PostalCode">CEP</label><input class="form-control" asp-for="PostalCode" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="City">Cidade</label><input class="form-control" asp-for="City" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="Street">Logradouro</label><input class="form-control" asp-for="Street" /></div>
+				<div class="col-md-4"><label class="form-label" asp-for="Number">Número</label><input class="form-control" asp-for="Number" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="Complement">Complemento</label><input class="form-control" asp-for="Complement" /></div>
+				<div class="col-md-4"><label class="form-label" asp-for="State">UF</label><input class="form-control" asp-for="State" maxlength="2" /></div>
+				<div class="col-12">
+					<label class="form-label" asp-for="BranchAuthzInheritance">Herança de autorização de filiais</label>
+					<select class="form-select" asp-for="BranchAuthzInheritance">
+						<option value="Off">Off</option>
+						<option value="InheritFromAncestors">InheritFromAncestors</option>
+					</select>
+				</div>
+				<div class="col-12 d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+					<a class="btn btn-outline-secondary" asp-page="Organizations">Cancelar</a>
+					<button class="btn btn-primary" type="submit">Salvar alterações</button>
+				</div>
+			</form>
 		}
-		</tbody>
-	</table>
+		else
+		{
+			<form method="post" class="row g-3">
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Name">Nome (exibição)</label>
+					<input class="form-control" asp-for="Name" required />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Code">Código</label>
+					<input class="form-control" asp-for="Code" required />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="LegalName">Razão social</label>
+					<input class="form-control" asp-for="LegalName" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="TradeName">Nome fantasia</label>
+					<input class="form-control" asp-for="TradeName" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="TaxId">CNPJ</label>
+					<input class="form-control" asp-for="TaxId" placeholder="00.000.000/0000-00" />
+				</div>
+				<div class="col-md-6">
+					<label class="form-label" asp-for="Segment">Segmento</label>
+					<input class="form-control" asp-for="Segment" />
+				</div>
+				<div class="col-12">
+					<label class="form-label" asp-for="Description">Descrição</label>
+					<textarea class="form-control" asp-for="Description" rows="2"></textarea>
+				</div>
+				<div class="col-md-4"><label class="form-label" asp-for="PostalCode">CEP</label><input class="form-control" asp-for="PostalCode" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="City">Cidade</label><input class="form-control" asp-for="City" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="Street">Logradouro</label><input class="form-control" asp-for="Street" /></div>
+				<div class="col-md-4"><label class="form-label" asp-for="Number">Número</label><input class="form-control" asp-for="Number" /></div>
+				<div class="col-md-8"><label class="form-label" asp-for="Complement">Complemento</label><input class="form-control" asp-for="Complement" /></div>
+				<div class="col-md-4"><label class="form-label" asp-for="State">UF</label><input class="form-control" asp-for="State" maxlength="2" /></div>
+				<div class="col-12">
+					<label class="form-label" asp-for="BranchAuthzInheritance">Herança de autorização de filiais</label>
+					<select class="form-select" asp-for="BranchAuthzInheritance">
+						<option value="Off">Off</option>
+						<option value="InheritFromAncestors">InheritFromAncestors</option>
+					</select>
+				</div>
+				<div class="col-12 d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+					<button class="btn btn-primary" type="submit">Criar organização</button>
+				</div>
+			</form>
+		}
+	</div>
+</div>
+
+<div class="card border shadow-sm">
+	<div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-3">
+		<div>
+			<h2 class="h5 fw-bold mb-0">Todas as organizações</h2>
+			<p class="small text-secondary mb-0">@Model.Items.Count @(Model.Items.Count == 1 ? "registro" : "registros")</p>
+		</div>
+	</div>
+	@if (Model.Items.Count == 0)
+	{
+		<div class="card-body py-5 text-center">
+			<p class="text-secondary mb-0">Nenhuma organização cadastrada.</p>
+		</div>
+	}
+	else
+	{
+		<div class="table-responsive">
+			<table class="table table-hover align-middle mb-0">
+				<thead>
+					<tr>
+						<th>Empresa</th>
+						<th>CNPJ</th>
+						<th>Segmento</th>
+						<th>Herança</th>
+						<th class="text-end">Ações</th>
+					</tr>
+				</thead>
+				<tbody>
+				@foreach (var o in Model.Items)
+				{
+					<tr>
+						<td>
+							<div class="d-flex align-items-center gap-3">
+								<span class="entity-icon" aria-hidden="true">
+									<svg viewBox="0 0 24 24"><path d="M4 20V8l8-4 8 4v12" /><path d="M9 20v-6h6v6" /></svg>
+								</span>
+								<div>
+									<a class="fw-semibold text-decoration-none" href="/Admin/Organizations/Details/@o.Id">@(string.IsNullOrWhiteSpace(o.TradeName) ? o.Name : o.TradeName)</a>
+									<div class="small text-secondary">@o.Code@(string.IsNullOrWhiteSpace(o.LegalName) ? "" : $" · {o.LegalName}")</div>
+								</div>
+							</div>
+						</td>
+						<td class="text-secondary">@(string.IsNullOrWhiteSpace(o.TaxId) ? "—" : o.TaxId)</td>
+						<td class="text-secondary">@(string.IsNullOrWhiteSpace(o.Segment) ? "—" : o.Segment)</td>
+						<td class="text-secondary">@o.BranchAuthzInheritance</td>
+						<td class="text-end">
+							<div class="table-actions">
+								<a class="btn btn-outline-secondary btn-icon" asp-page="Organizations" asp-route-EditId="@o.Id" title="Editar" aria-label="Editar">
+									<i class="fa-solid fa-pen" aria-hidden="true"></i>
+								</a>
+								<a class="btn btn-outline-secondary btn-icon" href="/Admin/Organizations/Details/@o.Id" title="Ver" aria-label="Ver">
+									<i class="fa-solid fa-eye" aria-hidden="true"></i>
+								</a>
+								<form method="post" asp-page-handler="Delete" class="d-inline">
+									<input type="hidden" name="id" value="@o.Id" />
+									<button class="btn btn-outline-secondary btn-icon text-danger" type="submit" title="Excluir" aria-label="Excluir" onclick="return confirm('Excluir esta organização?');">
+										<i class="fa-solid fa-trash" aria-hidden="true"></i>
+									</button>
+								</form>
+							</div>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+	}
 </div>

@@ -1082,8 +1082,12 @@ thead.table-light th {
 }
 
 .admin-content .card {
-  padding: 1.25rem;
   margin-bottom: 1rem;
+}
+
+/* Legacy Admin cards (no Bootstrap header/tabs) keep inset padding. */
+.admin-content .card:not(:has(> .card-header)):not(:has(> .card-body)) {
+  padding: 1.25rem;
 }
 
 .admin-content .card > h2 {
@@ -1098,7 +1102,7 @@ thead.table-light th {
   gap: 1rem;
 }
 
-.admin-content label {
+.admin-content label:not(.form-label):not(.form-check-label) {
   display: block;
   color: var(--text-muted);
   font-size: 0.875rem;
@@ -1106,9 +1110,9 @@ thead.table-light th {
   margin: 0.75rem 0 0.35rem;
 }
 
-.admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
-.admin-content select,
-.admin-content textarea {
+.admin-content input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(.form-control):not(.form-check-input),
+.admin-content select:not(.form-select),
+.admin-content textarea:not(.form-control) {
   display: block;
   width: 100%;
   max-width: 32rem;
@@ -1119,16 +1123,15 @@ thead.table-light th {
   border-radius: var(--radius-sm);
 }
 
-.admin-content input:focus,
-.admin-content select:focus,
-.admin-content textarea:focus {
+.admin-content input:not(.form-control):not(.form-check-input):focus,
+.admin-content select:not(.form-select):focus,
+.admin-content textarea:not(.form-control):focus {
   border-color: var(--primary);
   outline: 0;
   box-shadow: var(--focus-ring);
 }
 
-.admin-content button:not(.btn),
-.admin-content .btn:not(.btn-outline-secondary):not(.btn-link):not(.btn-secondary) {
+.admin-content button:not(.btn):not(.nav-link):not(.btn-close) {
   display: inline-block;
   width: auto;
   padding: 0.5rem 0.9rem;

@@ -41,7 +41,7 @@
 					<div class="card-body p-4">
 						<img class="d-lg-none mb-3" src="~/img/brand/atnodus-logo.svg" alt="atNodus" style="height: 2rem" />
 						<h1 class="h4 fw-bold mb-1">Entrar na plataforma</h1>
-						<p class="text-secondary small mb-4">Use suas credenciais para continuar.</p>
+						<p class="text-secondary small mb-4">Use suas credenciais corporativas para continuar.</p>
 
 						<form method="post">
 							<input type="hidden" asp-for="ReturnUrl" />
@@ -51,7 +51,7 @@
 							</div>
 							<div class="mb-3">
 								<label class="form-label" asp-for="Input.Password">Senha</label>
-								<input class="form-control" asp-for="Input.Password" autocomplete="current-password" />
+								<input class="form-control" asp-for="Input.Password" autocomplete="current-password" placeholder="••••••••" />
 							</div>
 							@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
 							{
@@ -60,7 +60,7 @@
 							<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
 								<div class="form-check mb-0">
 									<input class="form-check-input" asp-for="Input.RememberMe" />
-									<label class="form-check-label small" asp-for="Input.RememberMe">Lembrar-me</label>
+									<label class="form-check-label" asp-for="Input.RememberMe">Manter conectado</label>
 								</div>
 								<a class="small" href="/Account/ForgotPassword">Esqueci a senha</a>
 							</div>
@@ -87,6 +87,9 @@
 						}
 					</div>
 				</div>
+				<p class="text-secondary small text-center mt-4 mb-0" style="max-width: 25rem">
+					Ao entrar, você concorda com os termos de uso e a política de privacidade.
+				</p>
 			</main>
 		</div>
 	</div>
