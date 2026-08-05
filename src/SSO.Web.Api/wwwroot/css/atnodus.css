@@ -648,8 +648,12 @@ thead.table-light th {
 }
 
 .app-sidebar {
+  flex: 0 0 var(--sidebar-width);
   width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
   border-right: 1px solid var(--border-dark);
+  box-sizing: border-box;
 }
 
 .app-sidebar .text-secondary,
@@ -667,6 +671,10 @@ thead.table-light th {
   align-items: center;
   gap: 0.75rem;
   padding: 0.625rem 0.75rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-sidebar .nav-link:hover,
@@ -707,6 +715,7 @@ thead.table-light th {
 }
 
 .app-nav-offcanvas {
+  --bs-offcanvas-width: var(--sidebar-width);
   --bs-offcanvas-bg: var(--bg-dark);
   --bs-offcanvas-border-color: var(--border-dark);
   --bs-offcanvas-color: var(--text-on-dark);
