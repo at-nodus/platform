@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SSO.Core.Application.Identity.Branches.Commands;
 using SSO.Core.Domain.Identity._Context.Interfaces.Infrastructures.Data;
+using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Entity;
 using SSO.Middleware.Identity;
 using SSO.Shared.Identity;
@@ -210,27 +211,18 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 		private async Task LoadAsync()
 		{
 			var orgId = Portal.OrganizationId!.Value;
-			Items = (await _reader.Query<Branch>().AsNoTracking()
-					.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
-					.ToListAsync())
-				.OrderBy(x => x.ParentBranchId.HasValue ? 1 : 0)
-				.ThenBy(x => DigitsOnly(x.TaxId))
-				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+			Items = PartyAddressFormatting.OrderBranchesMatrizThenTaxId(
+					await _reader.Query<Branch>().AsNoTracking()
+						.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
+						.ToListAsync(),
+					x => x.ParentBranchId,
+					x => x.TaxId,
+					x => x.Name)
 				.ToList();
 		}
 
 		private static string? EmptyToNull(string? value) =>
 			string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-
-		private static string DigitsOnly(string? value)
-		{
-			if (string.IsNullOrWhiteSpace(value))
-			{
-				return string.Empty;
-			}
-
-			return string.Concat(value.Where(char.IsDigit));
-		}
 
 		private void ClearForm()
 		{

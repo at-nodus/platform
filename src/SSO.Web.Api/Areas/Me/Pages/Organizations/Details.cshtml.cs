@@ -10,6 +10,7 @@ using SSO.Core.Application.Identity.Branches.Commands;
 using SSO.Core.Application.Identity.OrganizationContacts.Commands;
 using SSO.Core.Application.Identity.Organizations.Commands;
 using SSO.Core.Domain.Identity._Context.Interfaces.Infrastructures.Data;
+using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Entity;
 using SSO.Core.Domain.Identity.Memberships.Entity;
 using SSO.Core.Domain.Identity.OrganizationContacts.Entity;
@@ -398,12 +399,13 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 			OrgCity = Organization.City;
 			OrgState = Organization.State;
 
-			Branches = (await _reader.Query<Branch>().AsNoTracking()
-					.Where(x => !x.IsDeleted && x.OrganizationId == Id)
-					.ToListAsync())
-				.OrderBy(x => x.ParentBranchId.HasValue ? 1 : 0)
-				.ThenBy(x => DigitsOnly(x.TaxId))
-				.ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+			Branches = PartyAddressFormatting.OrderBranchesMatrizThenTaxId(
+					await _reader.Query<Branch>().AsNoTracking()
+						.Where(x => !x.IsDeleted && x.OrganizationId == Id)
+						.ToListAsync(),
+					x => x.ParentBranchId,
+					x => x.TaxId,
+					x => x.Name)
 				.ToList();
 
 			Contacts = await _reader.Query<OrganizationContact>().AsNoTracking()
@@ -484,16 +486,6 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 
 		private static string? EmptyToNull(string? value) =>
 			string.IsNullOrWhiteSpace(value) ? null : value.Trim();
-
-		private static string DigitsOnly(string? value)
-		{
-			if (string.IsNullOrWhiteSpace(value))
-			{
-				return string.Empty;
-			}
-
-			return string.Concat(value.Where(char.IsDigit));
-		}
 
 		private void ClearBranchForm()
 		{

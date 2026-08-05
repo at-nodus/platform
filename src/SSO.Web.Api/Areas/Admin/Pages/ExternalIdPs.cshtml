@@ -20,14 +20,16 @@
 				<td>@(p.IsEnabled ? "Sim" : "Não")</td>
 				<td>@(p.AllowJitProvisioning ? "Sim" : "Não")</td>
 				<td>
-					<form method="post" asp-page-handler="ToggleEnabled" style="display:inline">
-						<input type="hidden" name="id" value="@p.Id" />
-						<button type="submit" class="btn-secondary">@(p.IsEnabled ? "Desabilitar" : "Habilitar")</button>
-					</form>
-					<form method="post" asp-page-handler="ToggleJit" style="display:inline; margin-left:.5rem">
-						<input type="hidden" name="id" value="@p.Id" />
-						<button type="submit" class="btn-secondary">JIT: @(p.AllowJitProvisioning ? "desligar" : "ligar")</button>
-					</form>
+					<div class="d-flex gap-2">
+						<form method="post" asp-page-handler="ToggleEnabled">
+							<input type="hidden" name="id" value="@p.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">@(p.IsEnabled ? "Desabilitar" : "Habilitar")</button>
+						</form>
+						<form method="post" asp-page-handler="ToggleJit">
+							<input type="hidden" name="id" value="@p.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">JIT: @(p.AllowJitProvisioning ? "desligar" : "ligar")</button>
+						</form>
+					</div>
 				</td>
 			</tr>
 		}

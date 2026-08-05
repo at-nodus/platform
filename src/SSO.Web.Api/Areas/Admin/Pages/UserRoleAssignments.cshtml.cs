@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SSO.Core.Application.Identity.UserRoleAssignments.Commands;
 using SSO.Core.Domain.Identity._Context.Interfaces.Infrastructures.Data;
+using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Entity;
 using SSO.Core.Domain.Identity.Products.Entity;
 using SSO.Core.Domain.Identity.Roles.Entity;
@@ -106,10 +107,14 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 
 			if (Portal.OrganizationId is Guid orgId)
 			{
-				Branches = await _reader.Query<Branch>().AsNoTracking()
-					.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
-					.OrderBy(x => x.Name)
-					.ToListAsync();
+				Branches = PartyAddressFormatting.OrderBranchesMatrizThenTaxId(
+						await _reader.Query<Branch>().AsNoTracking()
+							.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
+							.ToListAsync(),
+						x => x.ParentBranchId,
+						x => x.TaxId,
+						x => x.Name)
+					.ToList();
 
 				Items = await _reader.Query<UserRoleAssignment>().AsNoTracking()
 					.Where(x => !x.IsDeleted && x.OrganizationId == orgId)

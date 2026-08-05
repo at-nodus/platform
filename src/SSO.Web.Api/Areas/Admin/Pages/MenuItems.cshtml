@@ -31,10 +31,10 @@
 			<input asp-for="PermissionCode" />
 			<label>Ordem</label>
 			<input asp-for="SortOrder" type="number" />
-			<p style="margin-top:1rem">
-				<button type="submit">Salvar</button>
-				<a class="btn btn-secondary" style="margin-left:.5rem" asp-page="MenuItems">Cancelar</a>
-			</p>
+			<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+				<a class="btn btn-outline-secondary" asp-page="MenuItems">Cancelar</a>
+				<button class="btn btn-primary" type="submit">Salvar alterações</button>
+			</div>
 		</form>
 	</div>
 }
@@ -60,7 +60,9 @@ else
 			<input asp-for="PermissionCode" />
 			<label>Ordem</label>
 			<input asp-for="SortOrder" type="number" />
-			<p style="margin-top:1rem"><button type="submit">Criar</button></p>
+			<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+				<button class="btn btn-primary" type="submit">Criar</button>
+			</div>
 		</form>
 	</div>
 }
@@ -80,11 +82,13 @@ else
 				<td>@m.PermissionCode</td>
 				<td>@m.SortOrder</td>
 				<td>
-					<a asp-page="MenuItems" asp-route-EditId="@m.Id">Editar</a>
-					<form method="post" asp-page-handler="Delete" style="display:inline; margin-left:.5rem">
-						<input type="hidden" name="id" value="@m.Id" />
-						<button type="submit" class="btn-secondary">Excluir</button>
-					</form>
+					<div class="d-flex gap-2 align-items-center">
+						<a asp-page="MenuItems" asp-route-EditId="@m.Id">Editar</a>
+						<form method="post" asp-page-handler="Delete">
+							<input type="hidden" name="id" value="@m.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+						</form>
+					</div>
 				</td>
 			</tr>
 		}

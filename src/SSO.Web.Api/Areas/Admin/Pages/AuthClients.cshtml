@@ -27,7 +27,9 @@
 				<option value="@p.Id">@p.Name</option>
 			}
 		</select>
-		<p style="margin-top:1rem"><button type="submit">Criar</button></p>
+		<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+			<button class="btn btn-primary" type="submit">Criar</button>
+		</div>
 	</form>
 </div>
 
@@ -47,7 +49,7 @@
 					{
 						<form method="post" asp-page-handler="Disable" style="display:inline">
 							<input type="hidden" name="clientId" value="@c.ClientId" />
-							<button type="submit" class="btn-secondary">Desabilitar</button>
+							<button class="btn btn-outline-secondary btn-sm" type="submit">Desabilitar</button>
 						</form>
 					}
 				</td>

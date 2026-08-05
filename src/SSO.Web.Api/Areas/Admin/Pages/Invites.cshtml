@@ -14,7 +14,9 @@
 		<form method="post" asp-page-handler="Send">
 			<label>E-mail</label>
 			<input asp-for="Email" type="email" required />
-			<p style="margin-top:1rem"><button type="submit">Convidar</button></p>
+			<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+				<button class="btn btn-primary" type="submit">Convidar</button>
+			</div>
 		</form>
 	</div>
 	<div class="card">
@@ -30,14 +32,16 @@
 					<td>
 						@if (i.Status == "Pending")
 						{
-							<form method="post" asp-page-handler="Resend" style="display:inline">
-								<input type="hidden" name="id" value="@i.Id" />
-								<button type="submit" class="btn-secondary">Reenviar</button>
-							</form>
-							<form method="post" asp-page-handler="Cancel" style="display:inline; margin-left:.5rem">
-								<input type="hidden" name="id" value="@i.Id" />
-								<button type="submit" class="btn-secondary">Cancelar</button>
-							</form>
+							<div class="d-flex gap-2">
+								<form method="post" asp-page-handler="Resend">
+									<input type="hidden" name="id" value="@i.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Reenviar</button>
+								</form>
+								<form method="post" asp-page-handler="Cancel">
+									<input type="hidden" name="id" value="@i.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Cancelar</button>
+								</form>
+							</div>
 						}
 					</td>
 				</tr>

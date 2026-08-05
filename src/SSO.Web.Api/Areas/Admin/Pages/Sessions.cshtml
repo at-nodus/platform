@@ -12,7 +12,9 @@
 	<form method="get">
 		<label>Id do usuário</label>
 		<input asp-for="UserId" required />
-		<p style="margin-top:1rem"><button type="submit">Buscar</button></p>
+		<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+			<button class="btn btn-primary" type="submit">Buscar</button>
+		</div>
 	</form>
 </div>
 
@@ -35,7 +37,7 @@
 							<form method="post" asp-page-handler="Revoke" style="display:inline">
 								<input type="hidden" name="sessionId" value="@s.Id" />
 								<input type="hidden" name="userId" value="@Model.UserId" />
-								<button type="submit" class="btn-secondary">Revogar</button>
+								<button class="btn btn-outline-secondary btn-sm" type="submit">Revogar</button>
 							</form>
 						}
 					</td>

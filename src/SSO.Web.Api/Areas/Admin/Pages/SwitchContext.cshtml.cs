@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Entity;
 using SSO.Core.Domain.Identity.Memberships.Entity;
 using SSO.Core.Domain.Identity.Organizations.Entity;
@@ -98,10 +99,14 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 			{
 				OrganizationId = orgId;
 				BranchId = Portal.BranchId;
-				Branches = await _db.Branches.AsNoTracking()
-					.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
-					.OrderBy(x => x.Name)
-					.ToListAsync();
+				Branches = PartyAddressFormatting.OrderBranchesMatrizThenTaxId(
+						await _db.Branches.AsNoTracking()
+							.Where(x => !x.IsDeleted && x.OrganizationId == orgId)
+							.ToListAsync(),
+						x => x.ParentBranchId,
+						x => x.TaxId,
+						x => x.Name)
+					.ToList();
 			}
 		}
 	}

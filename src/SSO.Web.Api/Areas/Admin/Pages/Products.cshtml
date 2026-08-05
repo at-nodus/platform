@@ -17,10 +17,10 @@
 			<input asp-for="Name" required />
 			<label>Código</label>
 			<input asp-for="Code" required />
-			<p style="margin-top:1rem">
-				<button type="submit">Salvar</button>
-				<a class="btn btn-secondary" style="margin-left:.5rem" asp-page="Products">Cancelar</a>
-			</p>
+			<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+				<a class="btn btn-outline-secondary" asp-page="Products">Cancelar</a>
+				<button class="btn btn-primary" type="submit">Salvar alterações</button>
+			</div>
 		</form>
 	</div>
 }
@@ -33,7 +33,9 @@ else
 			<input asp-for="Name" required />
 			<label>Código</label>
 			<input asp-for="Code" required />
-			<p style="margin-top:1rem"><button type="submit">Criar</button></p>
+			<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
+				<button class="btn btn-primary" type="submit">Criar</button>
+			</div>
 		</form>
 	</div>
 }
@@ -49,11 +51,13 @@ else
 				<td>@p.Code</td>
 				<td><code>@p.Id</code></td>
 				<td>
-					<a asp-page="Products" asp-route-EditId="@p.Id">Editar</a>
-					<form method="post" asp-page-handler="Delete" style="display:inline; margin-left:.5rem">
-						<input type="hidden" name="id" value="@p.Id" />
-						<button type="submit" class="btn-secondary">Excluir</button>
-					</form>
+					<div class="d-flex gap-2 align-items-center">
+						<a asp-page="Products" asp-route-EditId="@p.Id">Editar</a>
+						<form method="post" asp-page-handler="Delete">
+							<input type="hidden" name="id" value="@p.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+						</form>
+					</div>
 				</td>
 			</tr>
 		}

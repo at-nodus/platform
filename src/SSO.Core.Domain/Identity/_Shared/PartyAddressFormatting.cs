@@ -65,5 +65,25 @@ namespace SSO.Core.Domain.Identity._Shared
 
 		public static bool HasAnyAddress(params string[] values) =>
 			values.Any(v => !string.IsNullOrWhiteSpace(v));
+
+		public static string DigitsOnly(string? value)
+		{
+			if (string.IsNullOrWhiteSpace(value))
+			{
+				return string.Empty;
+			}
+
+			return string.Concat(value.Where(char.IsDigit));
+		}
+
+		public static IOrderedEnumerable<T> OrderBranchesMatrizThenTaxId<T>(
+			IEnumerable<T> source,
+			Func<T, Guid?> parentBranchId,
+			Func<T, string?> taxId,
+			Func<T, string> name) =>
+			source
+				.OrderBy(x => parentBranchId(x).HasValue ? 1 : 0)
+				.ThenBy(x => DigitsOnly(taxId(x)))
+				.ThenBy(x => name(x), StringComparer.OrdinalIgnoreCase);
 	}
 }
