@@ -66,6 +66,45 @@ dotnet test
 
 Seed de desenvolvimento: `admin@sso.local` / `ChangeMe!123`. Endpoints OIDC em `/connect/*`; Swagger apenas em Development.
 
+### Docker
+
+Stack local: SQL Server + API (`docker-compose.yml`). Copie o `.env` e ajuste senhas se necessário.
+
+```bash
+cp .env.example .env
+
+# Build da imagem e sobe SQL Server + API
+docker compose up --build
+
+# Em segundo plano
+docker compose up --build -d
+
+# Health
+curl http://localhost:8080/health/live
+```
+
+API em `http://localhost:8080` (porta `SSO_API_PORT`). Auto-migrate e seed ligados no compose (Development).
+
+```bash
+# Rebuild após alteração de código (recria a imagem e o container da API)
+docker compose up --build -d --force-recreate api
+
+# Só SQL Server (API via `dotnet run`)
+docker compose up -d sqlserver
+
+# Parar
+docker compose down
+
+# Parar e remover volume do SQL (reset do banco)
+docker compose down -v
+```
+
+Imagem isolada (sem compose):
+
+```bash
+docker build -t sso-web-api:local .
+```
+
 ### Migrations (EF)
 
 ```bash
