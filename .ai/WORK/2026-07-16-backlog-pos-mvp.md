@@ -21,6 +21,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **implementado** | P1 (dados) | P0 (integridade) |
 | 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **implementado** (D1–D6 = A) | P0 (comercial) | P0 (multi-produto) |
 | 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **implementado** (D1–D6) | P1 (UX) | P0 (marca / self-service) |
+| 00015 | Refinamento modelagem Identity × OpenIddict × domínio | [2026-08-16-00015-refinamento-modelagem-identity-openiddict.md](2026-08-16-00015-refinamento-modelagem-identity-openiddict.md) — **refinamento** (D1–D8 propostas) | P1 (dados) | P0 (integridade / modelo) |
 
 ## Dependências entre features
 
@@ -48,6 +49,10 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 00014 Layout + Perfil ◄── 00003 shell/convites + 00011 cadastros + templates visual-identity
         │                 (+ 00013 para aba Produtos da empresa)
         └──► brand kit atNodus no Razor + self-service Meu perfil (Dados / Empresas / Acessos / Convites)
+
+00015 Modelagem Identity×OpenIddict ◄── 00012 FKs Guid + 00007 sidecars + 00013 enablement
+        │
+        └──► FKs ClientId→OpenIddict, FK composta Branch×Org, drop AspNetRoles ociosas
 ```
 
 ## Ordem recomendada (primeiro produto em produção)
@@ -58,6 +63,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 4. 00006 / 00007 conforme demanda de clientes (APIs já entregues; UI em 00011)  
 5. 00008 / 00009 quando o modelo de authz exigir  
 6. **00013** Product Enablement antes de cobrar / restringir products por empresa  
-7. **00014** Layout atNodus + Perfil do Usuário (UX/marca e self-service)
+7. **00014** Layout atNodus + Perfil do Usuário (UX/marca e self-service)  
+8. **00015** Integridade do modelo (OpenIddict↔sidecars, Branch∈Org, Identity sem roles ociosas) — após aceite D-00015-*
 
 Épico base: [2026-07-14-00001-plataforma-sso.md](2026-07-14-00001-plataforma-sso.md).
