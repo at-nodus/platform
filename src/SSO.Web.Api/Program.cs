@@ -7,6 +7,7 @@ using SSO.Middleware;
 using SSO.Middleware.AddServices;
 using SSO.Middleware.Identity;
 using SSO.Shared.Identity;
+using System.Text.Json.Serialization;
 
 Log.Logger = new LoggerConfiguration()
 	.MinimumLevel.Information()
@@ -59,7 +60,11 @@ try
 	}
 
 	builder.Services.AddMiddleware(builder.Configuration, typeof(Program).Assembly, builder.Environment);
-	builder.Services.AddControllersWithViews();
+	builder.Services.AddControllersWithViews()
+		.AddJsonOptions(options =>
+		{
+			options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+		});
 	builder.Services.AddRazorPages(options =>
 	{
 		options.Conventions.AddAreaFolderApplicationModelConvention(

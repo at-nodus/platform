@@ -87,6 +87,9 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.IsUnique()
 				.HasFilter("[IsDeleted] = 0");
 
+			builder.HasAlternateKey(e => new { e.Id, e.OrganizationId })
+				.HasName("AK_Branches_Id_OrganizationId");
+
 			builder.HasOne(e => e.Organization)
 				.WithMany(o => o.Branches)
 				.HasForeignKey(e => e.OrganizationId)
@@ -94,7 +97,8 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasOne(e => e.ParentBranch)
 				.WithMany(b => b.ChildBranches)
-				.HasForeignKey(e => e.ParentBranchId)
+				.HasForeignKey(e => new { e.ParentBranchId, e.OrganizationId })
+				.HasPrincipalKey(b => new { b.Id, b.OrganizationId })
 				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}

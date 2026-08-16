@@ -24,7 +24,7 @@
 | **Product** | Sistema do ecossistema que consome o SSO (conceito de negócio) |
 | **ProductEnablement** | Habilitação comercial Organization × Product (pré-condição de token com org; ≠ permission de usuário) |
 | **AuthClient** | Cliente OAuth/OIDC registrado, ligado a um Product (≠ Product) |
-| **Membership** | Vínculo usuário ↔ organização (e opcionalmente branch) |
+| **Membership** | Vínculo usuário ↔ organização. Branch **não** é pertinência: o membro pode escolher qualquer filial da org no switch-context; assignments só afetam permissions/claims |
 | **Permission** | Capacidade autorizável dinâmica |
 | **Claim tipada** | Atributo de domínio (`ClaimDefinition` → JWT `sso_c_{code}`); não substitui Permission para gate de rota |
 | **Effective permissions** | Conjunto resolvido no contexto User×Org×Branch×Product; embutido no access token (ADR-005) |

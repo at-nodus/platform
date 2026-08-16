@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.OrganizationContacts.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.OrganizationContacts.Notifications
 		public Task Handle(PutOrganizationContactNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<PutOrganizationContactNotificationHandler>()
-				.Log(LogLevel.Information, "OrganizationContact putted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "OrganizationContact putted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

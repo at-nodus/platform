@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.Products.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.Products.Notifications
 		public Task Handle(PutProductNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<PutProductNotificationHandler>()
-				.Log(LogLevel.Information, "Product putted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "Product putted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

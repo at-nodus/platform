@@ -28,6 +28,8 @@ namespace SSO.Tests.IntegrationTests.Identity
 
 			Assert.IsNotNull(server.Services.GetService<IdentityDbContext>());
 			Assert.IsNotNull(server.Services.GetService<UserManager<User>>());
+			Assert.IsNotNull(server.Services.GetService<SignInManager<User>>());
+			Assert.IsNull(server.Services.GetService<RoleManager<IdentityRole<Guid>>>());
 			Assert.IsNotNull(server.Services.GetService<IOpenIddictApplicationManager>());
 		}
 	}

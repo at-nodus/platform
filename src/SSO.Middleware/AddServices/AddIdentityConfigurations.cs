@@ -54,7 +54,7 @@ namespace SSO.Middleware.AddServices
 			});
 
 			services
-				.AddIdentity<User, IdentityRole<Guid>>(options =>
+				.AddIdentityCore<User>(options =>
 				{
 					options.Password.RequiredLength = 8;
 					options.User.RequireUniqueEmail = true;
@@ -64,7 +64,17 @@ namespace SSO.Middleware.AddServices
 					options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(hardening.Lockout.DefaultLockoutMinutes);
 				})
 				.AddEntityFrameworkStores<IdentityDbContext>()
+				.AddSignInManager()
 				.AddDefaultTokenProviders();
+
+			services.AddAuthentication(options =>
+				{
+					options.DefaultScheme = IdentityConstants.ApplicationScheme;
+					options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+					options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+					options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+				})
+				.AddIdentityCookies();
 
 			services.AddAuthentication()
 				.AddScheme<AuthenticationSchemeOptions, TestPermissionsAuthHandler>(

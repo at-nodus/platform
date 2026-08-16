@@ -1,13 +1,14 @@
-using BAYSOFT.Abstractions.Core.Domain.Entities.Validations;
-using SSO.Core.Domain.Identity.UserRoleAssignments.Entity;
-
-namespace SSO.Core.Domain.Identity.UserRoleAssignments.Validations.DomainValidations
-{
-	public sealed class UpdateUserRoleAssignmentSpecificationsValidator : DomainValidator<UserRoleAssignment>
-	{
-		public UpdateUserRoleAssignmentSpecificationsValidator()
-		{
-
-		}
-	}
-}
+using BAYSOFT.Abstractions.Core.Domain.Entities.Validations;
+using SSO.Core.Domain.Identity.UserRoleAssignments.Entity;
+using SSO.Core.Domain.Identity.UserRoleAssignments.Specifications;
+
+namespace SSO.Core.Domain.Identity.UserRoleAssignments.Validations.DomainValidations
+{
+	public sealed class UpdateUserRoleAssignmentSpecificationsValidator : DomainValidator<UserRoleAssignment>
+	{
+		public UpdateUserRoleAssignmentSpecificationsValidator(UserRoleAssignmentBranchDoesNotBelongToOrganizationSpecification spec)
+		{
+			Add(nameof(spec), new DomainRule<UserRoleAssignment>(spec.Not(), spec.ToString()));
+		}
+	}
+}

@@ -8,7 +8,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 	{
 		public void Configure(EntityTypeBuilder<UserSession> builder)
 		{
-			builder.ToTable("UserSessions");
+			builder.ToTable("UserSessions", t =>
+			{
+				t.HasCheckConstraint(
+					"CK_UserSessions_BranchRequiresOrg",
+					"[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+			});
 
 			builder.Property(p => p.Id)
 				.HasColumnName("Id")
@@ -18,7 +23,7 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasKey(e => e.Id);
 
 			builder.Property(e => e.UserId).HasColumnType("UNIQUEIDENTIFIER").IsRequired(true);
-			builder.Property(e => e.ClientId).HasColumnType("nvarchar(128)").IsRequired(true);
+			builder.Property(e => e.ClientId).HasColumnType("nvarchar(100)").IsRequired(true);
 			builder.Property(e => e.OrganizationId).HasColumnType("UNIQUEIDENTIFIER").IsRequired(false);
 			builder.Property(e => e.BranchId).HasColumnType("UNIQUEIDENTIFIER").IsRequired(false);
 			builder.Property(e => e.LastSeenAt).HasColumnType("datetime2").IsRequired(true);
@@ -45,8 +50,11 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasOne(e => e.Branch)
 				.WithMany(b => b.UserSessions)
-				.HasForeignKey(e => e.BranchId)
+				.HasForeignKey(e => new { e.BranchId, e.OrganizationId })
+				.HasPrincipalKey(b => new { b.Id, b.OrganizationId })
 				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOpenIddictClient();
 		}
 	}
 }

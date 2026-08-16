@@ -8,7 +8,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 	{
 		public void Configure(EntityTypeBuilder<UserRoleAssignment> builder)
 		{
-			builder.ToTable("UserRoleAssignments");
+			builder.ToTable("UserRoleAssignments", t =>
+			{
+				t.HasCheckConstraint(
+					"CK_UserRoleAssignments_BranchRequiresOrg",
+					"[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+			});
 
 			builder.Property(p => p.Id)
 				.HasColumnName("Id")
@@ -49,7 +54,13 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasIndex(e => new { e.UserId, e.RoleId, e.OrganizationId, e.BranchId, e.ProductId })
 				.IsUnique()
-				.HasFilter("[IsDeleted] = 0");
+				.HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NOT NULL")
+				.HasDatabaseName("UX_UserRoleAssignments_Tenant");
+
+			builder.HasIndex(e => new { e.UserId, e.RoleId, e.ProductId })
+				.IsUnique()
+				.HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NULL AND [BranchId] IS NULL")
+				.HasDatabaseName("UX_UserRoleAssignments_Platform");
 
 			builder.HasOne(e => e.User)
 				.WithMany(u => u.UserRoleAssignments)
@@ -68,7 +79,8 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasOne(e => e.Branch)
 				.WithMany(b => b.UserRoleAssignments)
-				.HasForeignKey(e => e.BranchId)
+				.HasForeignKey(e => new { e.BranchId, e.OrganizationId })
+				.HasPrincipalKey(b => new { b.Id, b.OrganizationId })
 				.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasOne(e => e.Product)

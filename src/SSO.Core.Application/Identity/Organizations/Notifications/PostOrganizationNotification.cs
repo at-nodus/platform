@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.Organizations.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.Organizations.Notifications
 		public Task Handle(PostOrganizationNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<PostOrganizationNotificationHandler>()
-				.Log(LogLevel.Information, "Organization posted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "Organization posted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

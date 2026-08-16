@@ -14,6 +14,7 @@ using SSO.Core.Domain.Identity.Users.Entity;
 using SSO.Core.Domain.Interfaces.Infrastructures.Services;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 
 namespace SSO.Tests
 {
@@ -42,6 +43,10 @@ namespace SSO.Tests
 			services.AddSingleton<IMailService>(sp => sp.GetRequiredService<CapturingMailService>());
 
 			services.AddControllersWithViews()
+				.AddJsonOptions(options =>
+				{
+					options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+				})
 				.AddApplicationPart(typeof(SamplesController).Assembly);
 
 			services.AddRazorPages(options =>

@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.RolePermissions.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.RolePermissions.Notifications
 		public Task Handle(PutRolePermissionNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<PutRolePermissionNotificationHandler>()
-				.Log(LogLevel.Information, "RolePermission putted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "RolePermission putted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

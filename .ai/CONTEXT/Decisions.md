@@ -128,7 +128,7 @@ Plano: `.ai/WORK/2026-07-16-00010-observabilidade-cicd.md` (**implementado**).
 |----|---------|--------|
 | D-00012-1 | Navigation properties no Domain (lado FK **e** collections inversas) + `HasOne`/`WithMany`/`HasForeignKey` nos maps (`DeleteBehavior.Restrict`) | **Aceito** (B) |
 | D-00012-2 | `AuthAuditEvent` e `WebhookOutbox` permanecem **sem FK** (retenção histórica) | **Aceito** (A) |
-| D-00012-3 | `ClientId` string **sem FK SQL** para OpenIddict; validação na aplicação | **Aceito** (A) |
+| D-00012-3 | `ClientId` string **sem FK SQL** para OpenIddict; validação na aplicação | **Superseded parcialmente** por D-00015-1 (sidecars operacionais passam a ter FK; Audit/Outbox/Revoked/ExternalIdp.ClientId continuam fracos) |
 | D-00012-4 | `RevokedSession.SessionId` / `UserId` **fracos** (deny-list / snapshot) | **Aceito** (A) |
 
 Plano: `.ai/WORK/2026-07-27-00012-bug-foreign-keys-fracas.md`.
@@ -159,7 +159,7 @@ Plano: `.ai/WORK/2026-07-28-00013-product-enablement.md` (**implementado**).
 | D-00015-7 | Sem tenancy em OpenIddict Tokens/Authorizations; contexto = `UserSession` + claims | **Aceito** (A) |
 | D-00015-8 | `MenuItem.PermissionCode` permanece string + spec; sem FK para `Permissions` | **Aceito** (A) |
 
-Plano: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md` (**D1–D8 aceitas A — pronto para implementação**).
+Plano: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md` (**implementado**).
 
 ## Decisões feature 00001 (D1–D12)
 

@@ -18,7 +18,7 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.HasKey(e => e.Id);
 
 			builder.Property(e => e.ClientId)
-				.HasColumnType("NVARCHAR(128)")
+				.HasColumnType("nvarchar(100)")
 				.HasColumnName("ClientId")
 				.IsRequired(true);
 			builder.Property(e => e.ProductId)
@@ -39,6 +39,8 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.WithMany(p => p.ClientProductBindings)
 				.HasForeignKey(e => e.ProductId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOpenIddictClient();
 		}
 	}
 }

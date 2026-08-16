@@ -2,7 +2,7 @@
 
 > Arquivo: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md` + `migration.md`  
-> Status: **Pronto para implementação** — D-00015-1..8 aceitas (**todas A**, 2026-08-16)  
+> Status: **Implementado** — D-00015-1..8 aceitas (**todas A**, 2026-08-16)  
 > Data: 2026-08-16  
 > Depende de: 00012 (FKs Guid explícitas), 00013 (ProductEnablement), ADR-001/002/003/006  
 > Relaciona: 00007 (AuthClient sidecar), 00005 (sessão/`sid`), 00008 (claims tipadas)  
@@ -13,7 +13,7 @@
 
 Aproximar a estrutura persistida dos padrões **ASP.NET Identity** e **OpenIddict/OIDC**, eliminar duplicidades de responsabilidade e **fortalecer relacionamentos reais de negócio** (Organization, Branch, Product, User) com FKs/índices/constraints coerentes — sem inventar FKs artificiais e sem mover regras de domínio para dentro das tabelas dos frameworks.
 
-Entregável desta fase: plano aceito. Implementação nos lotes A–D (OpenIddict FKs → FK composta → drop Identity roles → specs/docs).
+Entregável desta fase: modelagem alinhada (OpenIddict FKs, FK composta Branch×Org, drop Identity roles, specs/docs).
 
 ## Contexto
 
@@ -529,13 +529,13 @@ Cada lote = migration + testes de modelo + regressão mínima. Não misturar DRO
 
 ## Estratégia de testes
 
-- [ ] Modelo EF: FK ClientId Restrict nos 4 sidecars
-- [ ] Modelo EF: Audit/Outbox/Revoked/ExternalIdp.ClientId **sem** FK
-- [ ] Modelo EF: FK composta Branch+Org
+- [x] Modelo EF: FK ClientId Restrict nos 4 sidecars
+- [x] Modelo EF: Audit/Outbox/Revoked/ExternalIdp.ClientId **sem** FK
+- [x] Modelo EF: FK composta Branch+Org
 - [ ] Insert assignment Branch de outra org **falha** no SQL
 - [ ] Insert segundo assignment platform duplicado **falha**
 - [ ] Insert sidecar com client_id inexistente **falha**
-- [ ] `AddIdentityCore` + login/2FA/external login verdes
+- [x] `AddIdentityCore` + login/2FA/external login verdes
 - [ ] Switch-context + ProductEnablement + TokenClaimsFactory regressão
 - [ ] Seed OpenIddict + metadata + binding na mesma transação lógica (ordem)
 
@@ -546,9 +546,9 @@ Cada lote = migration + testes de modelo + regressão mínima. Não misturar DRO
 - [x] Análise C# / EF snapshot / uso Identity / OpenIddict / claims
 - [x] Alinhado a ADR-001 (Domain ≠ OpenIddict), ADR-002 (AuthN Identity ≠ AuthZ domínio), ADR-003 (tenant=Org)
 - [x] Decisões D-00015-1..8 aceitas (todas A, 2026-08-16)
-- [ ] Inventário SQL de homolog
-- [ ] Migrations
-- [ ] CONTEXT atualizado (na implementação)
+- [x] Inventário SQL de homolog
+- [x] Migrations
+- [x] CONTEXT atualizado (na implementação)
 - [x] Pronto para implementação
 
 ---

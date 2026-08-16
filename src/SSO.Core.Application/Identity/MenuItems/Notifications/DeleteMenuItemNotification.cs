@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.MenuItems.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.MenuItems.Notifications
 		public Task Handle(DeleteMenuItemNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<DeleteMenuItemNotificationHandler>()
-				.Log(LogLevel.Information, "MenuItem deleted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "MenuItem deleted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

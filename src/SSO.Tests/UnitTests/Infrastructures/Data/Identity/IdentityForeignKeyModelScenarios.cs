@@ -72,6 +72,19 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 		}
 
 		[TestMethod]
+		public void Identity_Model_Should_Declare_Composite_Branch_Organization_Fks()
+		{
+			using var context = IdentityDbContextExtensions.GetInMemoryIdentityDbContext(nameof(Identity_Model_Should_Declare_Composite_Branch_Organization_Fks));
+			var model = context.Model;
+
+			AssertCompositeBranchOrgFk<UserRoleAssignment>(model, nameof(UserRoleAssignment.BranchId), nameof(UserRoleAssignment.OrganizationId));
+			AssertCompositeBranchOrgFk<UserClaimAssignment>(model, nameof(UserClaimAssignment.BranchId), nameof(UserClaimAssignment.OrganizationId));
+			AssertCompositeBranchOrgFk<UserSession>(model, nameof(UserSession.BranchId), nameof(UserSession.OrganizationId));
+			AssertCompositeBranchOrgFk<LdapGroupRoleMap>(model, nameof(LdapGroupRoleMap.BranchId), nameof(LdapGroupRoleMap.OrganizationId));
+			AssertCompositeBranchOrgFk<Branch>(model, nameof(Branch.ParentBranchId), nameof(Branch.OrganizationId));
+		}
+
+		[TestMethod]
 		public void Identity_Model_Should_Keep_Intentional_Weak_References()
 		{
 			using var context = IdentityDbContextExtensions.GetInMemoryIdentityDbContext(nameof(Identity_Model_Should_Keep_Intentional_Weak_References));
@@ -83,9 +96,21 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 			AssertNoFk<RevokedSession>(model, nameof(RevokedSession.SessionId));
 			AssertNoFk<RevokedSession>(model, nameof(RevokedSession.UserId));
 			AssertNoFk<RevokedSession>(model, nameof(RevokedSession.ClientId));
-			AssertNoFk<ClientProductBinding>(model, nameof(ClientProductBinding.ClientId));
-			AssertNoFk<UserSession>(model, nameof(UserSession.ClientId));
+			AssertHasFk<ClientProductBinding>(model, nameof(ClientProductBinding.ClientId));
+			AssertHasFk<UserSession>(model, nameof(UserSession.ClientId));
 			AssertNoFk<ExternalIdentityProvider>(model, nameof(ExternalIdentityProvider.ClientId));
+		}
+
+		[TestMethod]
+		public void Identity_Model_Should_Declare_Restrict_FKs_For_OpenIddict_ClientId()
+		{
+			using var context = IdentityDbContextExtensions.GetInMemoryIdentityDbContext(nameof(Identity_Model_Should_Declare_Restrict_FKs_For_OpenIddict_ClientId));
+			var model = context.Model;
+
+			AssertHasFk<ClientProductBinding>(model, nameof(ClientProductBinding.ClientId));
+			AssertHasFk<UserSession>(model, nameof(UserSession.ClientId));
+			AssertHasFk<SSO.Core.Domain.Identity.AuthClientMetadata.Entity.AuthClientMetadataEntity>(model, nameof(SSO.Core.Domain.Identity.AuthClientMetadata.Entity.AuthClientMetadataEntity.ClientId));
+			AssertHasFk<SSO.Core.Domain.Identity.ClientWebhooks.Entity.ClientWebhookEndpoint>(model, nameof(SSO.Core.Domain.Identity.ClientWebhooks.Entity.ClientWebhookEndpoint.ClientId));
 		}
 
 		[TestMethod]
@@ -144,6 +169,23 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 			Assert.AreEqual(DeleteBehavior.Restrict, fk.DeleteBehavior, $"{typeof(TEntity).Name}.{foreignKeyProperty} should Restrict.");
 		}
 
+		private static void AssertCompositeBranchOrgFk<TEntity>(IModel model, string branchIdProperty, string organizationIdProperty)
+		{
+			var entity = model.FindEntityType(typeof(TEntity));
+			Assert.IsNotNull(entity, $"Entity type {typeof(TEntity).Name} missing from model.");
+
+			var fk = entity.GetForeignKeys()
+				.FirstOrDefault(x =>
+					x.PrincipalEntityType.ClrType == typeof(Branch)
+					&& x.Properties.Any(p => p.Name == branchIdProperty)
+					&& x.Properties.Any(p => p.Name == organizationIdProperty));
+			Assert.IsNotNull(fk, $"{typeof(TEntity).Name} should have composite FK ({branchIdProperty}, {organizationIdProperty}) → Branches.");
+			Assert.AreEqual(DeleteBehavior.Restrict, fk.DeleteBehavior, $"{typeof(TEntity).Name} composite Branch FK should Restrict.");
+			CollectionAssert.AreEquivalent(
+				new[] { "Id", "OrganizationId" },
+				fk.PrincipalKey.Properties.Select(p => p.Name).ToArray());
+		}
+
 		private static void AssertNoFk<TEntity>(IModel model, string propertyName)
 		{
 			var entity = model.FindEntityType(typeof(TEntity));
@@ -151,7 +193,7 @@ namespace SSO.Tests.UnitTests.Infrastructures.Data.Identity
 
 			var fk = entity.GetForeignKeys()
 				.FirstOrDefault(x => x.Properties.Any(p => p.Name == propertyName));
-			Assert.IsNull(fk, $"{typeof(TEntity).Name}.{propertyName} must remain a weak reference (D-00012).");
+			Assert.IsNull(fk, $"{typeof(TEntity).Name}.{propertyName} must remain a weak reference (D-00012 / D-00015).");
 		}
 	}
 }

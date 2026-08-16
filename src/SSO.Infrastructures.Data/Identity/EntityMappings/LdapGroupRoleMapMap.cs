@@ -8,7 +8,12 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 	{
 		public void Configure(EntityTypeBuilder<LdapGroupRoleMap> builder)
 		{
-			builder.ToTable("LdapGroupRoleMaps");
+			builder.ToTable("LdapGroupRoleMaps", t =>
+			{
+				t.HasCheckConstraint(
+					"CK_LdapGroupRoleMaps_BranchRequiresOrg",
+					"[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+			});
 
 			builder.Property(p => p.Id)
 				.HasColumnName("Id")
@@ -49,7 +54,8 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 
 			builder.HasOne(e => e.Branch)
 				.WithMany(b => b.LdapGroupRoleMaps)
-				.HasForeignKey(e => e.BranchId)
+				.HasForeignKey(e => new { e.BranchId, e.OrganizationId })
+				.HasPrincipalKey(b => new { b.Id, b.OrganizationId })
 				.OnDelete(DeleteBehavior.Restrict);
 		}
 	}

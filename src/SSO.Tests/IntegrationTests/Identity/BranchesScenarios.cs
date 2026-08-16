@@ -29,7 +29,7 @@ namespace SSO.Tests.IntegrationTests.Identity
 				"/api/identity/branches",
 				new StringContent(JsonConvert.SerializeObject(branch), Encoding.UTF8, "application/json"));
 
-			Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+			Assert.AreEqual(HttpStatusCode.Created, response.StatusCode, await response.Content.ReadAsStringAsync());
 		}
 
 		[TestMethod]

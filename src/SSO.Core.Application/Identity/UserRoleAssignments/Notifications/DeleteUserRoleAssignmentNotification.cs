@@ -1,6 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using SSO.Core.Application.Identity._Shared;
 using SSO.Core.Domain.Identity.UserRoleAssignments.Entity;
 using System;
 using System.Threading;
@@ -26,7 +26,7 @@ namespace SSO.Core.Application.Identity.UserRoleAssignments.Notifications
 		public Task Handle(DeleteUserRoleAssignmentNotification notification, CancellationToken cancellationToken)
 		{
 			Logger.CreateLogger<DeleteUserRoleAssignmentNotificationHandler>()
-				.Log(LogLevel.Information, "UserRoleAssignment deleted! Payload: {Payload}", JsonConvert.SerializeObject(notification.Payload));
+				.Log(LogLevel.Information, "UserRoleAssignment deleted! Payload: {Payload}", NotificationPayloadSerializer.Serialize(notification.Payload));
 			return Task.CompletedTask;
 		}
 	}

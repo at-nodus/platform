@@ -47,7 +47,13 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.Property(e => e.DeletedAt).HasColumnType("datetime2").IsRequired(false);
 			builder.Property(e => e.IsDeleted).HasColumnType("bit").IsRequired(true);
 
-			builder.HasIndex(e => e.OrganizationId);
+			builder.HasIndex(e => e.OrganizationId)
+				.HasDatabaseName("IX_OrganizationContacts_OrganizationId");
+
+			builder.HasIndex(e => new { e.OrganizationId, e.IsPrimary })
+				.IsUnique()
+				.HasFilter("[IsDeleted] = 0 AND [IsPrimary] = 1")
+				.HasDatabaseName("UX_OrganizationContacts_Primary");
 
 			builder.HasOne(e => e.Organization)
 				.WithMany(o => o.OrganizationContacts)

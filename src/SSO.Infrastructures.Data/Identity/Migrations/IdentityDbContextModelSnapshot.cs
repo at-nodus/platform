@@ -23,58 +23,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
-
-                    b.ToTable("AspNetRoles", "IdentityDb");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", "IdentityDb");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
@@ -120,21 +68,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.ToTable("AspNetUserLogins", "IdentityDb");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", "IdentityDb");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -165,6 +98,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("ClientId")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -214,8 +148,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId")
-                        .IsUnique()
-                        .HasFilter("[ClientId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("OpenIddictApplications", "IdentityDb");
                 });
@@ -418,7 +351,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("ConsentRememberDays")
                         .HasColumnType("int");
@@ -467,14 +400,14 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .HasColumnType("UNIQUEIDENTIFIER")
                         .HasColumnName("Id");
 
+                    b.Property<string>("City")
+                        .HasColumnType("NVARCHAR(128)")
+                        .HasColumnName("City");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(64)")
                         .HasColumnName("Code");
-
-                    b.Property<string>("City")
-                        .HasColumnType("NVARCHAR(128)")
-                        .HasColumnName("City");
 
                     b.Property<string>("Complement")
                         .HasColumnType("NVARCHAR(128)")
@@ -543,11 +476,14 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentBranchId");
+                    b.HasAlternateKey("Id", "OrganizationId")
+                        .HasName("AK_Branches_Id_OrganizationId");
 
                     b.HasIndex("OrganizationId", "Code")
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("ParentBranchId", "OrganizationId");
 
                     b.ToTable("Branches", "IdentityDb");
                 });
@@ -612,7 +548,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR(128)")
+                        .HasColumnType("nvarchar(100)")
                         .HasColumnName("ClientId");
 
                     b.Property<DateTime>("CreatedAt")
@@ -651,7 +587,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -779,17 +715,20 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId");
-
                     b.HasIndex("ProductId");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("BranchId", "OrganizationId");
 
                     b.HasIndex("OrganizationId", "GroupIdentifier", "RoleId", "ProductId")
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("LdapGroupRoleMaps", "IdentityDb");
+                    b.ToTable("LdapGroupRoleMaps", "IdentityDb", t =>
+                        {
+                            t.HasCheckConstraint("CK_LdapGroupRoleMaps_BranchRequiresOrg", "[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+                        });
                 });
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.Memberships.Entity.Membership", b =>
@@ -932,7 +871,13 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizationId");
+                    b.HasIndex("OrganizationId")
+                        .HasDatabaseName("IX_OrganizationContacts_OrganizationId");
+
+                    b.HasIndex("OrganizationId", "IsPrimary")
+                        .IsUnique()
+                        .HasDatabaseName("UX_OrganizationContacts_Primary")
+                        .HasFilter("[IsDeleted] = 0 AND [IsPrimary] = 1");
 
                     b.ToTable("OrganizationContacts", "IdentityDb");
                 });
@@ -1393,19 +1338,28 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId");
-
                     b.HasIndex("ClaimDefinitionId");
 
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("BranchId", "OrganizationId");
+
+                    b.HasIndex("UserId", "ClaimDefinitionId", "ProductId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_UserClaimAssignments_Platform")
+                        .HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NULL AND [BranchId] IS NULL");
+
                     b.HasIndex("UserId", "ClaimDefinitionId", "OrganizationId", "BranchId", "ProductId")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasDatabaseName("UX_UserClaimAssignments_Tenant")
+                        .HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NOT NULL");
 
-                    b.ToTable("UserClaimAssignments", "IdentityDb");
+                    b.ToTable("UserClaimAssignments", "IdentityDb", t =>
+                        {
+                            t.HasCheckConstraint("CK_UserClaimAssignments_BranchRequiresOrg", "[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+                        });
                 });
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.UserRoleAssignments.Entity.UserRoleAssignment", b =>
@@ -1453,19 +1407,28 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId");
-
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("ProductId");
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("BranchId", "OrganizationId");
+
+                    b.HasIndex("UserId", "RoleId", "ProductId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_UserRoleAssignments_Platform")
+                        .HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NULL AND [BranchId] IS NULL");
+
                     b.HasIndex("UserId", "RoleId", "OrganizationId", "BranchId", "ProductId")
                         .IsUnique()
-                        .HasFilter("[IsDeleted] = 0");
+                        .HasDatabaseName("UX_UserRoleAssignments_Tenant")
+                        .HasFilter("[IsDeleted] = 0 AND [OrganizationId] IS NOT NULL");
 
-                    b.ToTable("UserRoleAssignments", "IdentityDb");
+                    b.ToTable("UserRoleAssignments", "IdentityDb", t =>
+                        {
+                            t.HasCheckConstraint("CK_UserRoleAssignments_BranchRequiresOrg", "[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+                        });
                 });
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.UserSessions.Entity.UserSession", b =>
@@ -1480,7 +1443,7 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -1511,15 +1474,20 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BranchId");
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("OrganizationId");
 
                     b.HasIndex("UserId");
 
+                    b.HasIndex("BranchId", "OrganizationId");
+
                     b.HasIndex("UserId", "RevokedAt");
 
-                    b.ToTable("UserSessions", "IdentityDb");
+                    b.ToTable("UserSessions", "IdentityDb", t =>
+                        {
+                            t.HasCheckConstraint("CK_UserSessions_BranchRequiresOrg", "[BranchId] IS NULL OR [OrganizationId] IS NOT NULL");
+                        });
                 });
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.Users.Entity.User", b =>
@@ -1649,15 +1617,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.ToTable("WebhookOutbox", "IdentityDb");
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("SSO.Core.Domain.Identity.Users.Entity.User", null)
@@ -1669,21 +1628,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
-                    b.HasOne("SSO.Core.Domain.Identity.Users.Entity.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("SSO.Core.Domain.Identity.Users.Entity.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -1724,6 +1668,16 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                     b.Navigation("Authorization");
                 });
 
+            modelBuilder.Entity("SSO.Core.Domain.Identity.AuthClientMetadata.Entity.AuthClientMetadataEntity", b =>
+                {
+                    b.HasOne("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .HasPrincipalKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SSO.Core.Domain.Identity.Branches.Entity.Branch", b =>
                 {
                     b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
@@ -1734,7 +1688,8 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
                     b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "ParentBranch")
                         .WithMany("ChildBranches")
-                        .HasForeignKey("ParentBranchId")
+                        .HasForeignKey("ParentBranchId", "OrganizationId")
+                        .HasPrincipalKey("Id", "OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Organization");
@@ -1754,6 +1709,13 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.ClientProductBindings.Entity.ClientProductBinding", b =>
                 {
+                    b.HasOne("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .HasPrincipalKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SSO.Core.Domain.Identity.Products.Entity.Product", "Product")
                         .WithMany("ClientProductBindings")
                         .HasForeignKey("ProductId")
@@ -1761,6 +1723,16 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("SSO.Core.Domain.Identity.ClientWebhooks.Entity.ClientWebhookEndpoint", b =>
+                {
+                    b.HasOne("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .HasPrincipalKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.ExternalIdentityProviders.Entity.ExternalIdentityProvider", b =>
@@ -1775,11 +1747,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.LdapGroupRoleMaps.Entity.LdapGroupRoleMap", b =>
                 {
-                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
-                        .WithMany("LdapGroupRoleMaps")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
                         .WithMany("LdapGroupRoleMaps")
                         .HasForeignKey("OrganizationId")
@@ -1797,6 +1764,12 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
+                        .WithMany("LdapGroupRoleMaps")
+                        .HasForeignKey("BranchId", "OrganizationId")
+                        .HasPrincipalKey("Id", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Branch");
 
@@ -1933,11 +1906,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.UserClaimAssignments.Entity.UserClaimAssignment", b =>
                 {
-                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
-                        .WithMany("UserClaimAssignments")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SSO.Core.Domain.Identity.ClaimDefinitions.Entity.ClaimDefinition", "ClaimDefinition")
                         .WithMany("UserClaimAssignments")
                         .HasForeignKey("ClaimDefinitionId")
@@ -1961,6 +1929,12 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
+                        .WithMany("UserClaimAssignments")
+                        .HasForeignKey("BranchId", "OrganizationId")
+                        .HasPrincipalKey("Id", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Branch");
 
                     b.Navigation("ClaimDefinition");
@@ -1974,11 +1948,6 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.UserRoleAssignments.Entity.UserRoleAssignment", b =>
                 {
-                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
-                        .WithMany("UserRoleAssignments")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
                         .WithMany("UserRoleAssignments")
                         .HasForeignKey("OrganizationId")
@@ -2002,6 +1971,12 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
+                        .WithMany("UserRoleAssignments")
+                        .HasForeignKey("BranchId", "OrganizationId")
+                        .HasPrincipalKey("Id", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Branch");
 
                     b.Navigation("Organization");
@@ -2015,10 +1990,12 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
 
             modelBuilder.Entity("SSO.Core.Domain.Identity.UserSessions.Entity.UserSession", b =>
                 {
-                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
-                        .WithMany("UserSessions")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                    b.HasOne("OpenIddict.EntityFrameworkCore.Models.OpenIddictEntityFrameworkCoreApplication<System.Guid>", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .HasPrincipalKey("ClientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SSO.Core.Domain.Identity.Organizations.Entity.Organization", "Organization")
                         .WithMany("UserSessions")
@@ -2030,6 +2007,12 @@ namespace SSO.Infrastructures.Data.Identity.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("SSO.Core.Domain.Identity.Branches.Entity.Branch", "Branch")
+                        .WithMany("UserSessions")
+                        .HasForeignKey("BranchId", "OrganizationId")
+                        .HasPrincipalKey("Id", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Branch");
 

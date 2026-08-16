@@ -34,19 +34,19 @@ Identity store no `IdentityDbContext` (ADR-006).
 
 ### Negativas / trade-offs
 
-- Dois “mundos” de roles (Identity opcional vs domínio SSO) — documentar e evitar duplicação sem propósito.
+- AuthZ **não** usa `IdentityRole` / `AspNetRoles`. O store é `IdentityUserContext<User, Guid>` (D-00015-2): só users, claims, logins e tokens de conta.
 - Entidade de domínio nomeada **`User`** (estende `IdentityUser`); evitar o nome `ApplicationUser`.
-- Extensão de `IdentityUser`/`IdentityRole` precisa de disciplina de mapping.
+- Extensão de `IdentityUser` precisa de disciplina de mapping.
 
 ## Impacto no código
 
-- Projetos: Domain (portas), Data (Identity maps), Middleware (`AddIdentity`), Application (comandos de conta).
-- Migrações: schema Identity em `IdentityDb`.
+- Projetos: Domain (portas), Data (`IdentityUserContext`), Middleware (`AddIdentityCore` + `AddSignInManager` + cookies), Application (comandos de conta).
+- Migrações: schema Identity em `IdentityDb`; `Phase18cDropUnusedIdentityRoles` remove `AspNetRoles` / `AspNetUserRoles` / `AspNetRoleClaims`.
 - UI: fluxos de conta integrados com Razor login (D6) nas fases 2/4.
 
 ## Referências
 
-- Feature 00001 (D5, D12)
+- Feature 00001 (D5, D12); feature 00015 (D-00015-2)
 - ADR-001, ADR-004, ADR-006
 - `CONTEXT/business.md`
 )

@@ -17,7 +17,7 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 				.IsRequired(true);
 			builder.HasKey(e => e.Id);
 
-			builder.Property(e => e.ClientId).HasColumnType("nvarchar(128)").IsRequired(true);
+			builder.Property(e => e.ClientId).HasColumnType("nvarchar(100)").IsRequired(true);
 			builder.Property(e => e.Url).HasColumnType("nvarchar(1024)").IsRequired(true);
 			builder.Property(e => e.HmacSecret).HasColumnType("nvarchar(256)").IsRequired(true);
 			builder.Property(e => e.IsEnabled).HasColumnType("bit").IsRequired(true);
@@ -28,6 +28,8 @@ namespace SSO.Infrastructures.Data.Identity.EntityMappings
 			builder.Property(e => e.IsDeleted).HasColumnType("bit").IsRequired(true);
 
 			builder.HasIndex(e => e.ClientId).IsUnique().HasFilter("[IsDeleted] = 0");
+
+			builder.HasOpenIddictClient();
 		}
 	}
 }

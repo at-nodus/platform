@@ -1,6 +1,8 @@
 using System;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore.Models;
 using SSO.Core.Domain.Identity.AuthClientMetadata.Entity;
 using SSO.Core.Domain.Identity.AuthAuditEvents.Entity;
 using SSO.Core.Domain.Identity.Branches.Entity;
@@ -30,7 +32,7 @@ using SSO.Infrastructures.Data.Identity.EntityMappings;
 
 namespace SSO.Infrastructures.Data.Identity
 {
-	public sealed class IdentityDbContext : Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityDbContext<User, IdentityRole<Guid>, Guid>
+	public sealed class IdentityDbContext : IdentityUserContext<User, Guid>
 	{
 		public static string Schema => "IdentityDb";
 
@@ -73,6 +75,15 @@ namespace SSO.Infrastructures.Data.Identity
 			base.OnModelCreating(builder);
 
 			builder.HasDefaultSchema(Schema);
+			builder.UseOpenIddict<Guid>();
+
+			builder.Entity<OpenIddictEntityFrameworkCoreApplication<Guid>>(entity =>
+			{
+				entity.Property(a => a.ClientId)
+					.IsRequired()
+					.HasMaxLength(100);
+				entity.HasAlternateKey(a => a.ClientId);
+			});
 
 			builder.Entity<User>(entity =>
 			{
