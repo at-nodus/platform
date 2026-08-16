@@ -150,16 +150,16 @@ Plano: `.ai/WORK/2026-07-28-00013-product-enablement.md` (**implementado**).
 
 | ID | Decisão | Status |
 |----|---------|--------|
-| D-00015-1 | FK `ClientId` → `OpenIddictApplications` (alternate key) nos sidecars operacionais; Audit/Outbox/Revoked continuam fracos. Supersede **parcial** de D-00012-3 | **Proposto A** |
-| D-00015-2 | Remover `AspNetRoles` / `AspNetUserRoles` / `AspNetRoleClaims` (`IdentityUserContext`); authz permanece `AuthRoles` | **Proposto A** |
-| D-00015-3 | FK composta `(BranchId, OrganizationId)` → `Branches` | **Proposto A** |
-| D-00015-4 | Unique filtrado em dois índices (tenant vs platform) para assignments | **Proposto A** |
-| D-00015-5 | Sem `BranchMembership`; Membership = User↔Org; corrigir glossário | **Proposto A** |
-| D-00015-6 | Sem `OrganizationId` em OpenIddict Applications; Product só via `ClientProductBinding` | **Proposto A** |
-| D-00015-7 | Sem tenancy em OpenIddict Tokens/Authorizations; contexto = `UserSession` + claims | **Proposto A** |
-| D-00015-8 | `MenuItem.PermissionCode` permanece string + spec; sem FK para `Permissions` | **Proposto A** |
+| D-00015-1 | FK `ClientId` → `OpenIddictApplications` (alternate key) nos sidecars operacionais; Audit/Outbox/Revoked continuam fracos. Supersede **parcial** de D-00012-3 | **Aceito** (A) |
+| D-00015-2 | Remover `AspNetRoles` / `AspNetUserRoles` / `AspNetRoleClaims` (`IdentityUserContext`); authz permanece `AuthRoles` | **Aceito** (A) |
+| D-00015-3 | FK composta `(BranchId, OrganizationId)` → `Branches` | **Aceito** (A) |
+| D-00015-4 | Unique filtrado em dois índices (tenant vs platform) para assignments | **Aceito** (A) |
+| D-00015-5 | Sem `BranchMembership`; Membership = User↔Org; corrigir glossário | **Aceito** (A) |
+| D-00015-6 | Sem `OrganizationId` em OpenIddict Applications; Product só via `ClientProductBinding` | **Aceito** (A) |
+| D-00015-7 | Sem tenancy em OpenIddict Tokens/Authorizations; contexto = `UserSession` + claims | **Aceito** (A) |
+| D-00015-8 | `MenuItem.PermissionCode` permanece string + spec; sem FK para `Permissions` | **Aceito** (A) |
 
-Plano: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md` (**refinamento — sem implementação**).
+Plano: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md` (**D1–D8 aceitas A — pronto para implementação**).
 
 ## Decisões feature 00001 (D1–D12)
 

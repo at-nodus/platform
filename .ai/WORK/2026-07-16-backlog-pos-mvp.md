@@ -21,7 +21,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00012 | Bug: FKs fracas Identity | [2026-07-27-00012-bug-foreign-keys-fracas.md](2026-07-27-00012-bug-foreign-keys-fracas.md) — **implementado** | P1 (dados) | P0 (integridade) |
 | 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **implementado** (D1–D6 = A) | P0 (comercial) | P0 (multi-produto) |
 | 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **implementado** (D1–D6) | P1 (UX) | P0 (marca / self-service) |
-| 00015 | Refinamento modelagem Identity × OpenIddict × domínio | [2026-08-16-00015-refinamento-modelagem-identity-openiddict.md](2026-08-16-00015-refinamento-modelagem-identity-openiddict.md) — **refinamento** (D1–D8 propostas) | P1 (dados) | P0 (integridade / modelo) |
+| 00015 | Refinamento modelagem Identity × OpenIddict × domínio | [2026-08-16-00015-refinamento-modelagem-identity-openiddict.md](2026-08-16-00015-refinamento-modelagem-identity-openiddict.md) — **pronto p/ implementação** (D1–D8 = A) | P1 (dados) | P0 (integridade / modelo) |
 
 ## Dependências entre features
 

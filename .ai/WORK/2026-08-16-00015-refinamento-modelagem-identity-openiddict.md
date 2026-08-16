@@ -2,18 +2,18 @@
 
 > Arquivo: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md`  
 > Template: `.ai/TEMPLATES/feature-plan.md` + `migration.md`  
-> Status: **Refinamento** — plano técnico; **sem implementação** até D-00015-1..8 aceitas  
+> Status: **Pronto para implementação** — D-00015-1..8 aceitas (**todas A**, 2026-08-16)  
 > Data: 2026-08-16  
 > Depende de: 00012 (FKs Guid explícitas), 00013 (ProductEnablement), ADR-001/002/003/006  
 > Relaciona: 00007 (AuthClient sidecar), 00005 (sessão/`sid`), 00008 (claims tipadas)  
-> Decisões: **propostas** (D-00015-1..8) — aguardam aceite  
+> Decisões: **A / A / A / A / A / A / A / A** (D-00015-1..8)  
 > Migration prevista: `Phase18OpenIddictClientFks` + `Phase18bCompositeBranchOrgFks` + `Phase18cIdentityRoleCleanup` (nomes finais na implementação)
 
 ## Objetivo
 
 Aproximar a estrutura persistida dos padrões **ASP.NET Identity** e **OpenIddict/OIDC**, eliminar duplicidades de responsabilidade e **fortalecer relacionamentos reais de negócio** (Organization, Branch, Product, User) com FKs/índices/constraints coerentes — sem inventar FKs artificiais e sem mover regras de domínio para dentro das tabelas dos frameworks.
 
-Entregável desta feature: **plano de ação técnico** (este arquivo). Implementação só após aceite das decisões.
+Entregável desta fase: plano aceito. Implementação nos lotes A–D (OpenIddict FKs → FK composta → drop Identity roles → specs/docs).
 
 ## Contexto
 
@@ -545,72 +545,26 @@ Cada lote = migration + testes de modelo + regressão mínima. Não misturar DRO
 
 - [x] Análise C# / EF snapshot / uso Identity / OpenIddict / claims
 - [x] Alinhado a ADR-001 (Domain ≠ OpenIddict), ADR-002 (AuthN Identity ≠ AuthZ domínio), ADR-003 (tenant=Org)
-- [ ] Decisões D-00015-1..8 aceitas pelo PO/arquitetura
+- [x] Decisões D-00015-1..8 aceitas (todas A, 2026-08-16)
 - [ ] Inventário SQL de homolog
-- [ ] Migrations (após aceite)
+- [ ] Migrations
 - [ ] CONTEXT atualizado (na implementação)
-- [ ] Pronto para implementação **somente após aceite**
+- [x] Pronto para implementação
 
 ---
 
-## Decisões abertas (aceitar A/B antes de código)
+## Decisões aceitas (2026-08-16) — todas **A**
 
-### D-00015-1 — FK sidecars → OpenIddict — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Alternate key `ClientId` + FK Restrict nos 4 sidecars operacionais. **Supersede parcial de D-00012-3**. Audit/Outbox/Revoked permanecem fracos |
-| B | Coluna `ApplicationId` Guid (PK OpenIddict) nos sidecars; `ClientId` denormalizado |
-| C | Manter D-00012-3 (sem FK SQL) |
-
-### D-00015-2 — AspNetRoles ociosas — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | `IdentityUserContext<User>`; DROP AspNetRoles/UserRoles/RoleClaims se vazias |
-| B | Manter tabelas vazias (menor risco de schema, maior confusão de modelo) |
-
-### D-00015-3 — Consistência Branch∈Org — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | FK composta SQL + specs |
-| B | Só specs (banco continua aceitando mismatch) |
-
-### D-00015-4 — Unique NULL-safe assignments — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Dois índices filtrados (tenant vs platform) |
-| B | Sentinela Guid vazio no lugar de NULL (pior semântica) |
-
-### D-00015-5 — User ↔ Branch — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Sem BranchMembership; Membership = User↔Org; corrigir glossário |
-| B | Criar `BranchMembership` e restringir switch-context (**nova regra de produto**) |
-
-### D-00015-6 — Application ↔ Organization / Product — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Sem Org no OpenIddict; Product só via `ClientProductBinding` + FK ClientId |
-| B | `AuthClientMetadata.OrganizationId` opcional agora (white-label antecipado) |
-
-### D-00015-7 — Tenancy em tokens OpenIddict — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Não; `UserSession` + claims |
-| B | Estender entidade OpenIddict Token/Authorization com OrganizationId |
-
-### D-00015-8 — MenuItem.PermissionCode — **Proposto: A**
-
-| Opção | Descrição |
-|-------|-----------|
-| **A (proposta)** | Continua string; spec “código existe” |
-| B | Alternate key `Permissions.Code` (não filtrada) + FK — exige `Code` imutável e unique inclusive soft-deleted |
+| ID | Escolha | Significado |
+|----|---------|-------------|
+| **D-00015-1** | **A** | Alternate key `ClientId` + FK Restrict nos 4 sidecars operacionais. Supersede parcial de D-00012-3. Audit/Outbox/Revoked fracos |
+| **D-00015-2** | **A** | `IdentityUserContext<User>`; DROP AspNetRoles/UserRoles/RoleClaims se vazias. AuthZ = `AuthRoles` |
+| **D-00015-3** | **A** | FK composta `(BranchId, OrganizationId)` → `Branches` + specs |
+| **D-00015-4** | **A** | Dois unique filtrados (tenant vs platform) em assignments |
+| **D-00015-5** | **A** | Sem `BranchMembership`; Membership = User↔Org; lista/switch = todas as filiais da org |
+| **D-00015-6** | **A** | Sem Org no OpenIddict Application; Product só via `ClientProductBinding` |
+| **D-00015-7** | **A** | Sem tenancy em OpenIddict Tokens/Authorizations; contexto = `UserSession` + claims |
+| **D-00015-8** | **A** | `MenuItem.PermissionCode` string + spec “código existe”; sem FK |
 
 ---
 
