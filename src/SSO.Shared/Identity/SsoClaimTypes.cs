@@ -24,12 +24,14 @@ namespace SSO.Shared.Identity
 		public const string DevServiceClientSecret = "dev-service-secret-change-me";
 		public const string AdminApiClientId = "sso-admin-api";
 		public const string AdminApiClientSecret = "sso-admin-secret-change-me";
+		public const string RoadCrewMobileClientId = "roadcrew-mobile";
 	}
 
 	public static class SsoProductCodes
 	{
 		/// <summary>Platform admin product — exempt from org ProductEnablement gate (D-00013-3).</summary>
 		public const string Platform = "sso-platform";
+		public const string RoadCrew = "roadcrew";
 	}
 
 	public static class SsoAuthErrors

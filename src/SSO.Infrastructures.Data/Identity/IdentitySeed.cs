@@ -57,9 +57,16 @@ namespace SSO.Infrastructures.Data.Identity
 		public static readonly Guid DevClaimDepartmentId = Guid.Parse("b1111111-1111-1111-1111-111111111111");
 		public static readonly Guid DevClaimMfaRequiredId = Guid.Parse("b2222222-2222-2222-2222-222222222222");
 		public static readonly Guid DevClaimCanExportId = Guid.Parse("b3333333-3333-3333-3333-333333333333");
+		public static readonly Guid RoadCrewOrganizationId = Guid.Parse("c1111111-1111-1111-1111-111111111111");
+		public static readonly Guid RoadCrewProductId = Guid.Parse("c2222222-2222-2222-2222-222222222222");
+		public static readonly Guid RoadCrewRiderUserId = Guid.Parse("c3333333-3333-3333-3333-333333333333");
+		public static readonly Guid RoadCrewRiderMembershipId = Guid.Parse("c4444444-4444-4444-4444-444444444444");
+		public static readonly Guid RoadCrewAdminMembershipId = Guid.Parse("c5555555-5555-5555-5555-555555555555");
 
 		public const string DevUserEmail = "admin@sso.local";
 		public const string DevUserPassword = "ChangeMe!123";
+		public const string RoadCrewRiderEmail = "rider@roadcrew.local";
+		public const string RoadCrewRiderPassword = "ChangeMe!123";
 		public const string PermissionAccess = "sso.access";
 		public const string PermissionHqReports = "hq.reports";
 		public const string PermissionFilialOps = "filial.ops";
@@ -151,6 +158,7 @@ namespace SSO.Infrastructures.Data.Identity
 			await EnsureTypedClaimsCatalogAsync(context);
 			await EnsureOpenIddictClientsAsync(services);
 			await EnsureAuthClientMetadataAsync(context);
+			await EnsureRoadCrewAsync(services, context);
 		}
 
 		private static async Task EnsureBranchesAsync(IdentityDbContext context)
@@ -677,6 +685,46 @@ namespace SSO.Infrastructures.Data.Identity
 					}
 				});
 			}
+
+			if (await applicationManager.FindByClientIdAsync(SsoClients.RoadCrewMobileClientId) is null)
+			{
+				await applicationManager.CreateAsync(new OpenIddictApplicationDescriptor
+				{
+					ClientId = SsoClients.RoadCrewMobileClientId,
+					DisplayName = "RoadCrew Mobile",
+					ClientType = ClientTypes.Public,
+					ConsentType = ConsentTypes.Implicit,
+					RedirectUris =
+					{
+						new Uri("com.atnodus.roadcrew://callback"),
+						new Uri("http://localhost:5080/callback")
+					},
+					PostLogoutRedirectUris =
+					{
+						new Uri("com.atnodus.roadcrew://logout"),
+						new Uri("http://localhost:5080/")
+					},
+					Permissions =
+					{
+						Permissions.Endpoints.Authorization,
+						Permissions.Endpoints.Token,
+						Permissions.Endpoints.EndSession,
+						Permissions.Endpoints.Revocation,
+						Permissions.GrantTypes.AuthorizationCode,
+						Permissions.GrantTypes.RefreshToken,
+						Permissions.Prefixes.GrantType + SsoGrantTypes.SwitchContext,
+						Permissions.ResponseTypes.Code,
+						Permissions.Scopes.Email,
+						Permissions.Scopes.Profile,
+						Permissions.Scopes.Roles,
+						Permissions.Prefixes.Scope + Scopes.OfflineAccess
+					},
+					Requirements =
+					{
+						Requirements.Features.ProofKeyForCodeExchange
+					}
+				});
+			}
 		}
 
 		private static async Task EnsureScopeAsync(IOpenIddictScopeManager scopeManager, string name, string displayName)
@@ -714,6 +762,13 @@ namespace SSO.Infrastructures.Data.Identity
 				isSystem: true,
 				isFirstParty: true,
 				AuthClientConsentPolicies.Never);
+			await EnsureMetaAsync(
+				context,
+				SsoClients.RoadCrewMobileClientId,
+				"RoadCrew Mobile",
+				isSystem: true,
+				isFirstParty: true,
+				AuthClientConsentPolicies.Never);
 			await context.SaveChangesAsync();
 		}
 
@@ -736,6 +791,99 @@ namespace SSO.Infrastructures.Data.Identity
 				isSystem,
 				isFirstParty,
 				requireConsent));
+		}
+
+		private static async Task EnsureRoadCrewAsync(IServiceProvider services, IdentityDbContext context)
+		{
+			if (!await context.Organizations.AnyAsync(x => x.Id == RoadCrewOrganizationId))
+			{
+				var organization = new Organization
+				{
+					Id = RoadCrewOrganizationId,
+					Name = "RoadCrew Consumer",
+					Code = "roadcrew-consumer",
+					BranchAuthzInheritance = BranchAuthzInheritancePolicies.Off
+				};
+				organization.MarkCreated();
+				context.Organizations.Add(organization);
+			}
+
+			if (!await context.Products.AnyAsync(x => x.Id == RoadCrewProductId))
+			{
+				var product = new Product
+				{
+					Id = RoadCrewProductId,
+					Name = "RoadCrew",
+					Code = SsoProductCodes.RoadCrew
+				};
+				product.MarkCreated();
+				context.Products.Add(product);
+			}
+
+			await context.SaveChangesAsync();
+
+			var userManager = services.GetRequiredService<UserManager<User>>();
+			if (await userManager.FindByIdAsync(RoadCrewRiderUserId.ToString()) is null)
+			{
+				var rider = new User
+				{
+					Id = RoadCrewRiderUserId,
+					Email = RoadCrewRiderEmail,
+					UserName = RoadCrewRiderEmail,
+					EmailConfirmed = true,
+					DisplayName = "Rider"
+				};
+				rider.MarkCreated();
+				var created = await userManager.CreateAsync(rider, RoadCrewRiderPassword);
+				if (!created.Succeeded)
+				{
+					throw new InvalidOperationException(
+						"Failed to seed RoadCrew rider: " + string.Join("; ", created.Errors));
+				}
+			}
+
+			if (!await context.Memberships.AnyAsync(x => x.Id == RoadCrewRiderMembershipId))
+			{
+				var membership = new Membership
+				{
+					Id = RoadCrewRiderMembershipId,
+					UserId = RoadCrewRiderUserId,
+					OrganizationId = RoadCrewOrganizationId
+				};
+				membership.MarkCreated();
+				context.Memberships.Add(membership);
+			}
+
+			if (!await context.Memberships.AnyAsync(x => x.Id == RoadCrewAdminMembershipId))
+			{
+				var membership = new Membership
+				{
+					Id = RoadCrewAdminMembershipId,
+					UserId = DevUserId,
+					OrganizationId = RoadCrewOrganizationId
+				};
+				membership.MarkCreated();
+				context.Memberships.Add(membership);
+			}
+
+			await EnsureClientBindingAsync(context, SsoClients.RoadCrewMobileClientId, RoadCrewProductId);
+			await EnsureProductEnablementAsync(context, RoadCrewOrganizationId, RoadCrewProductId);
+			await EnsureAssignmentAsync(
+				context,
+				RoadCrewRiderUserId,
+				DevRoleOrgMemberId,
+				RoadCrewOrganizationId,
+				null,
+				RoadCrewProductId);
+			await EnsureAssignmentAsync(
+				context,
+				DevUserId,
+				DevRoleOrgMemberId,
+				RoadCrewOrganizationId,
+				null,
+				RoadCrewProductId);
+
+			await context.SaveChangesAsync();
 		}
 	}
 }
