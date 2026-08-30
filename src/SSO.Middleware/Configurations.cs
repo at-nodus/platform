@@ -46,7 +46,10 @@ namespace SSO.Middleware
 
 			services.AddInheritStringLocalizerFactory();
 
-			services.AddIdentityFoundation(configuration, environment);
+			services.AddIdentityFoundation(
+				configuration,
+				environment,
+				disableTransportSecurityRequirement: environment?.IsDevelopment() == true);
 			if (environment != null)
 			{
 				services.AddSsoHardening(configuration, environment);

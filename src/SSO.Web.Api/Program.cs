@@ -104,7 +104,11 @@ try
 		app.UseSwaggerUI();
 	}
 
-	app.UseHttpsRedirection();
+	if (!app.Environment.IsDevelopment())
+	{
+		app.UseHttpsRedirection();
+	}
+
 	app.UseStaticFiles();
 
 	var obsOptions = app.Services.GetService<SsoObservabilityOptions>() ?? new SsoObservabilityOptions();
