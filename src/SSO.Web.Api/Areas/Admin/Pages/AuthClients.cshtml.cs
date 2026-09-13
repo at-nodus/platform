@@ -80,15 +80,15 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				ClientSecret = plainSecret,
 				ConsentType = ConsentTypes.External
 			};
-			descriptor.Permissions.Add(Permissions.Endpoints.Authorization);
-			descriptor.Permissions.Add(Permissions.Endpoints.Token);
-			descriptor.Permissions.Add(Permissions.Endpoints.Revocation);
-			descriptor.Permissions.Add(Permissions.Endpoints.EndSession);
-			descriptor.Permissions.Add(Permissions.GrantTypes.AuthorizationCode);
-			descriptor.Permissions.Add(Permissions.GrantTypes.RefreshToken);
-			descriptor.Permissions.Add(Permissions.ResponseTypes.Code);
-			descriptor.Permissions.Add(Permissions.Scopes.Email);
-			descriptor.Permissions.Add(Permissions.Scopes.Profile);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Authorization);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Token);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.Revocation);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Endpoints.EndSession);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.AuthorizationCode);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.GrantTypes.RefreshToken);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.ResponseTypes.Code);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Scopes.Email);
+			descriptor.Permissions.Add(OpenIddictConstants.Permissions.Scopes.Profile);
 			descriptor.Requirements.Add(Requirements.Features.ProofKeyForCodeExchange);
 
 			await _applications.CreateAsync(descriptor);

@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SSO.Core.Application.Identity.Branches.Commands;
+using SSO.Core.Application.Identity.Memberships.Commands;
 using SSO.Core.Application.Identity.OrganizationContacts.Commands;
 using SSO.Core.Application.Identity.Organizations.Commands;
+using SSO.Core.Application.Identity.ProductEnablements.Commands;
 using SSO.Core.Domain.Identity._Context.Interfaces.Infrastructures.Data;
 using SSO.Core.Domain.Identity._Shared;
 using SSO.Core.Domain.Identity.Branches.Entity;
@@ -49,12 +51,14 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 		public List<Branch> Branches { get; set; } = new();
 		public List<OrganizationContact> Contacts { get; set; } = new();
 		public List<ProductRow> Products { get; set; } = new();
+		public List<Product> AvailableProducts { get; set; } = new();
 		public List<MemberRow> Members { get; set; } = new();
 
 		public bool CanEditOrg => Portal.IsPlatformAdmin;
 		public bool CanManageBranches => Portal.IsPlatformAdmin || Portal.HasPermission(SsoAdminPermissions.Org);
 		public bool CanManageContacts => Portal.IsPlatformAdmin || Portal.HasPermission(SsoAdminPermissions.Org);
 		public bool CanViewMembers => Portal.IsPlatformAdmin || Portal.HasPermission(SsoAdminPermissions.Org);
+		public bool CanWriteEnablements => Portal.IsPlatformAdmin && IsAdminRoute;
 		public bool IsAdminRoute => Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase);
 
 		/// <summary>Tab ativa após postback (dados|branches|contato|produtos|usuarios).</summary>
@@ -159,14 +163,21 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 		[BindProperty(SupportsGet = true)]
 		public Guid? ContactEditId { get; set; }
 
+		[BindProperty]
+		public Guid EnablementProductId { get; set; }
+
 		public sealed class ProductRow
 		{
+			public Guid EnablementId { get; set; }
+			public Guid ProductId { get; set; }
 			public string Name { get; set; } = string.Empty;
 			public string Code { get; set; } = string.Empty;
 		}
 
 		public sealed class MemberRow
 		{
+			public Guid UserId { get; set; }
+			public Guid MembershipId { get; set; }
 			public string Email { get; set; } = string.Empty;
 			public string? DisplayName { get; set; }
 			public List<string> Roles { get; set; } = new();
@@ -357,6 +368,66 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 			return Page();
 		}
 
+		public async Task<IActionResult> OnPostDeleteBranchAsync(Guid branchId)
+		{
+			if (!CanManageBranches || !IsAdminRoute || !await EnsureCanViewAsync())
+			{
+				return Forbid();
+			}
+
+			var cmd = AdminWrap.FromAnonymous<DeleteBranchCommand>(new { id = branchId });
+			var response = await _mediator.Send(cmd);
+			ApplyResponse(response, "Filial removida.");
+			await LoadAsync();
+			ActiveTab = "branches";
+			return Page();
+		}
+
+		public async Task<IActionResult> OnPostCreateEnablementAsync()
+		{
+			if (!CanWriteEnablements || !await EnsureCanViewAsync())
+			{
+				return Forbid();
+			}
+
+			var cmd = AdminWrap.FromAnonymous<PostProductEnablementCommand>(new { organizationId = Id, productId = EnablementProductId });
+			var response = await _mediator.Send(cmd);
+			ApplyResponse(response, "Produto habilitado para a organização.");
+			await LoadAsync();
+			ActiveTab = "produtos";
+			return Page();
+		}
+
+		public async Task<IActionResult> OnPostDeleteEnablementAsync(Guid enablementId)
+		{
+			if (!CanWriteEnablements || !await EnsureCanViewAsync())
+			{
+				return Forbid();
+			}
+
+			var cmd = AdminWrap.FromAnonymous<DeleteProductEnablementCommand>(new { id = enablementId });
+			var response = await _mediator.Send(cmd);
+			ApplyResponse(response, "Habilitação removida.");
+			await LoadAsync();
+			ActiveTab = "produtos";
+			return Page();
+		}
+
+		public async Task<IActionResult> OnPostDeleteMembershipAsync(Guid membershipId)
+		{
+			if (!CanViewMembers || !IsAdminRoute || !await EnsureCanViewAsync())
+			{
+				return Forbid();
+			}
+
+			var cmd = AdminWrap.FromAnonymous<DeleteMembershipCommand>(new { id = membershipId });
+			var response = await _mediator.Send(cmd);
+			ApplyResponse(response, "Membership removida.");
+			await LoadAsync();
+			ActiveTab = "usuarios";
+			return Page();
+		}
+
 		private async Task<bool> EnsureCanViewAsync()
 		{
 			if (Portal.IsPlatformAdmin)
@@ -419,7 +490,16 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 				join p in _reader.Query<Product>().AsNoTracking() on e.ProductId equals p.Id
 				where !e.IsDeleted && !p.IsDeleted && e.OrganizationId == Id
 				orderby p.Name
-				select new ProductRow { Name = p.Name, Code = p.Code }).ToListAsync();
+				select new ProductRow { EnablementId = e.Id, ProductId = p.Id, Name = p.Name, Code = p.Code }).ToListAsync();
+
+			if (CanWriteEnablements)
+			{
+				var enabledIds = Products.Select(x => x.ProductId).ToList();
+				AvailableProducts = await _reader.Query<Product>().AsNoTracking()
+					.Where(x => !x.IsDeleted && !enabledIds.Contains(x.Id))
+					.OrderBy(x => x.Name)
+					.ToListAsync();
+			}
 
 			if (CanViewMembers)
 			{
@@ -428,7 +508,7 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 					join u in _reader.Query<User>().AsNoTracking() on m.UserId equals u.Id
 					where !m.IsDeleted && !u.IsDeleted && m.OrganizationId == Id
 					orderby u.Email
-					select new { u.Id, Email = u.Email ?? u.UserName ?? "", u.DisplayName }).ToListAsync();
+					select new { MembershipId = m.Id, u.Id, Email = u.Email ?? u.UserName ?? "", u.DisplayName }).ToListAsync();
 
 				var userIds = members.Select(x => x.Id).ToList();
 				var roleRows = await (
@@ -443,6 +523,8 @@ namespace SSO.Web.Api.Areas.Me.Pages.Organizations
 
 				Members = members.Select(x => new MemberRow
 				{
+					UserId = x.Id,
+					MembershipId = x.MembershipId,
 					Email = x.Email,
 					DisplayName = x.DisplayName,
 					Roles = rolesByUser.TryGetValue(x.Id, out var roles) ? roles : new List<string>()

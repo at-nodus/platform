@@ -91,6 +91,17 @@ else
 			<li class="nav-item" role="presentation">
 				<button class="nav-link @(IsTab("usuarios") ? "active" : null)" id="tab-usuarios" data-bs-toggle="tab" data-bs-target="#usuarios" type="button" role="tab" aria-controls="usuarios" aria-selected="@(IsTab("usuarios") ? "true" : "false")">Usuários</button>
 			</li>
+			@if (Model.IsAdminRoute && Model.CanViewMembers)
+			{
+				<li class="nav-item"><a class="nav-link" href="/Admin/Organizations/@Model.Id/Invites">Convites</a></li>
+				<li class="nav-item"><a class="nav-link" href="/Admin/Organizations/@Model.Id/Assignments">Acessos</a></li>
+				<li class="nav-item"><a class="nav-link" href="/Admin/Organizations/@Model.Id/UserClaims">Claims</a></li>
+				@if (Model.Portal.IsPlatformAdmin)
+				{
+					<li class="nav-item"><a class="nav-link" href="/Admin/Organizations/@Model.Id/LdapMaps">LDAP</a></li>
+					<li class="nav-item"><a class="nav-link" href="/Admin/Organizations/@Model.Id/IdPs">IdPs</a></li>
+				}
+			}
 		</ul>
 	</div>
 	<div class="card-body tab-content" id="companyTabsContent">
@@ -223,7 +234,17 @@ else
 								</div>
 								@if (Model.CanManageBranches)
 								{
-									<a class="btn btn-link btn-sm" asp-route-id="@Model.Id" asp-route-BranchEditId="@b.Id" asp-fragment="branches">Editar</a>
+									<div class="d-flex gap-2">
+										<a class="btn btn-link btn-sm" asp-route-id="@Model.Id" asp-route-BranchEditId="@b.Id" asp-fragment="branches">Editar</a>
+										@if (Model.IsAdminRoute)
+										{
+											<form method="post" asp-page-handler="DeleteBranch">
+												<input type="hidden" asp-for="Id" />
+												<input type="hidden" name="branchId" value="@b.Id" />
+												<button class="btn btn-link btn-sm text-danger" type="submit">Excluir</button>
+											</form>
+										}
+									</div>
 								}
 							</div>
 						</div>
@@ -333,13 +354,27 @@ else
 			<div class="d-flex flex-wrap justify-content-between gap-3 mb-3">
 				<div>
 					<h2 class="h5 fw-bold mb-1">Produtos associados</h2>
-					<p class="small text-secondary mb-0">Habilitações vigentes para esta empresa. Edição avançada por branch fica em Admin → Habilitações.</p>
+					<p class="small text-secondary mb-0">Habilitações vigentes para esta empresa.</p>
 				</div>
-				@if (Model.IsAdminRoute)
-				{
-					<a class="btn btn-outline-secondary btn-sm" asp-area="Admin" asp-page="/ProductEnablements">Gerenciar habilitações</a>
-				}
 			</div>
+			@if (Model.IsAdminRoute && Model.CanWriteEnablements)
+			{
+				<form method="post" asp-page-handler="CreateEnablement" class="row g-2 mb-4" style="max-width: 36rem">
+					<input type="hidden" asp-for="Id" />
+					<div class="col-md-8">
+						<label class="form-label" asp-for="EnablementProductId">Habilitar produto</label>
+						<select class="form-select" asp-for="EnablementProductId">
+							@foreach (var p in Model.AvailableProducts)
+							{
+								<option value="@p.Id">@p.Name</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-4 d-flex align-items-end">
+						<button class="btn btn-primary" type="submit" disabled="@(Model.AvailableProducts.Count == 0)">Habilitar</button>
+					</div>
+				</form>
+			}
 			@if (Model.Products.Count == 0)
 			{
 				<p class="text-secondary mb-0">Nenhum produto habilitado para esta empresa.</p>
@@ -360,6 +395,14 @@ else
 									<input class="form-check-input" type="checkbox" role="switch" checked disabled />
 									<label class="form-check-label">Liberado</label>
 								</div>
+								@if (Model.IsAdminRoute && Model.CanWriteEnablements)
+								{
+									<form method="post" asp-page-handler="DeleteEnablement" class="ms-2">
+										<input type="hidden" asp-for="Id" />
+										<input type="hidden" name="enablementId" value="@p.EnablementId" />
+										<button class="btn btn-link btn-sm text-danger" type="submit">Remover</button>
+									</form>
+								}
 							</div>
 						</div>
 					}
@@ -375,7 +418,7 @@ else
 				</div>
 				@if (Model.CanViewMembers && Model.IsAdminRoute)
 				{
-					<a class="btn btn-primary btn-sm" asp-area="Admin" asp-page="/Invites">Convidar usuário</a>
+					<a class="btn btn-primary btn-sm" href="/Admin/Organizations/@Model.Id/Invites">Convidar usuário</a>
 				}
 			</div>
 			@if (!Model.CanViewMembers)
@@ -396,6 +439,10 @@ else
 									<th>Usuário</th>
 									<th>Perfis</th>
 									<th>Status</th>
+									@if (Model.IsAdminRoute && Model.CanViewMembers)
+									{
+										<th></th>
+									}
 								</tr>
 							</thead>
 							<tbody>
@@ -428,6 +475,16 @@ else
 										}
 									</td>
 									<td><span class="badge text-bg-success">Ativo</span></td>
+									@if (Model.IsAdminRoute && Model.CanViewMembers)
+									{
+										<td>
+											<form method="post" asp-page-handler="DeleteMembership" class="d-inline">
+												<input type="hidden" asp-for="Id" />
+												<input type="hidden" name="membershipId" value="@m.MembershipId" />
+												<button class="btn btn-link btn-sm text-danger" type="submit">Remover vínculo</button>
+											</form>
+										</td>
+									}
 								</tr>
 							}
 							</tbody>

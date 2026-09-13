@@ -1,0 +1,46 @@
+@page "/Admin/Organizations/{id:guid}/IdPs"
+@model SSO.Web.Api.Areas.Admin.Pages.Organizations.IdPsModel
+@{
+	Layout = "../Shared/_OrganizationHubLayout";
+	ViewData["Title"] = "IdPs";
+	ViewData["OrganizationId"] = Model.Id;
+	ViewData["HubTab"] = "idps";
+}
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+<p class="text-secondary small mb-3">Provedores federados desta empresa. O catálogo global permanece em Provedores externos.</p>
+@if (Model.Items.Count == 0)
+{
+	<p class="text-secondary mb-0">Nenhum IdP exclusivo desta organização.</p>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead><tr><th>Nome</th><th>Tipo</th><th>Habilitado</th><th>JIT</th><th></th></tr></thead>
+			<tbody>
+			@foreach (var p in Model.Items)
+			{
+				<tr>
+					<td>@p.DisplayName (@p.Code)</td>
+					<td>@p.ProviderType</td>
+					<td>@(p.IsEnabled ? "Sim" : "Não")</td>
+					<td>@(p.AllowJitProvisioning ? "Sim" : "Não")</td>
+					<td>
+						<div class="d-flex gap-2">
+							<form method="post" asp-page-handler="ToggleEnabled">
+								<input type="hidden" name="idpId" value="@p.Id" />
+								<button class="btn btn-outline-secondary btn-sm" type="submit">@(p.IsEnabled ? "Desabilitar" : "Habilitar")</button>
+							</form>
+							<form method="post" asp-page-handler="ToggleJit">
+								<input type="hidden" name="idpId" value="@p.Id" />
+								<button class="btn btn-outline-secondary btn-sm" type="submit">JIT</button>
+							</form>
+						</div>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+}

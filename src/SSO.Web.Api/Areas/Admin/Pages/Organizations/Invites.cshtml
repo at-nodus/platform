@@ -1,0 +1,57 @@
+@page "/Admin/Organizations/{id:guid}/Invites"
+@model SSO.Web.Api.Areas.Admin.Pages.Organizations.InvitesModel
+@{
+	Layout = "../Shared/_OrganizationHubLayout";
+	ViewData["Title"] = "Convites";
+	ViewData["OrganizationId"] = Model.Id;
+	ViewData["HubTab"] = "invites";
+}
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+<p class="text-secondary small mb-3">Membership só é criada após o aceite do convidado.</p>
+<form method="post" asp-page-handler="Send" class="row g-2 mb-4" style="max-width: 32rem">
+	<div class="col-md-8">
+		<label class="form-label" asp-for="Email">E-mail</label>
+		<input class="form-control" asp-for="Email" type="email" required />
+	</div>
+	<div class="col-md-4 d-flex align-items-end">
+		<button class="btn btn-primary" type="submit">Convidar</button>
+	</div>
+</form>
+@if (Model.Items.Count == 0)
+{
+	<p class="text-secondary mb-0">Nenhum convite.</p>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead><tr><th>E-mail</th><th>Status</th><th>Expira</th><th></th></tr></thead>
+			<tbody>
+			@foreach (var i in Model.Items)
+			{
+				<tr>
+					<td>@i.Email</td>
+					<td>@i.Status</td>
+					<td>@i.ExpiresAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+					<td>
+						@if (i.Status == "Pending")
+						{
+							<div class="d-flex gap-2">
+								<form method="post" asp-page-handler="Resend">
+									<input type="hidden" name="inviteId" value="@i.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Reenviar</button>
+								</form>
+								<form method="post" asp-page-handler="Cancel">
+									<input type="hidden" name="inviteId" value="@i.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Cancelar</button>
+								</form>
+							</div>
+						}
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+}

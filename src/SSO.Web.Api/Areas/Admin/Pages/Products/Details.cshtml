@@ -1,0 +1,156 @@
+@page "{id:guid}"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Products.DetailsModel
+@{
+	ViewData["Title"] = Model.Product?.Name ?? "Produto";
+	var tab = Model.ActiveTab;
+	bool Is(string key) => string.Equals(tab, key, StringComparison.Ordinal);
+}
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="Admin" asp-page="/Products">Produtos</a></li>
+		<li class="breadcrumb-item active">@(Model.Product?.Name ?? "Produto")</li>
+	</ol>
+</nav>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+@if (Model.Product is null)
+{
+	<p class="text-secondary">Produto não encontrado.</p>
+}
+else
+{
+	<div class="card border shadow-sm mb-3">
+		<div class="card-body">
+			<h1 class="h2 fw-bold mb-1">@Model.Product.Name</h1>
+			<p class="text-secondary mb-0">Código <strong class="text-body">@Model.Product.Code</strong></p>
+		</div>
+	</div>
+	<div class="card border shadow-sm">
+		<div class="card-header px-0 pb-0 border-bottom-0">
+			<ul class="nav nav-tabs px-3">
+				<li class="nav-item"><a class="nav-link @(Is("dados") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.ProductDetails(Model.Id)">Dados</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("menus") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.ProductDetails(Model.Id, "menus")">Menus</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("enablements") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.ProductDetails(Model.Id, "enablements")">Empresas</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("bindings") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.ProductDetails(Model.Id, "bindings")">Clients</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("claims") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.ProductDetails(Model.Id, "claims")">Claims</a></li>
+			</ul>
+		</div>
+		<div class="card-body">
+			@if (Is("dados"))
+			{
+				<form method="post" asp-page-handler="Update" class="row g-3" style="max-width: 36rem">
+					<div class="col-12"><label class="form-label" asp-for="Name">Nome</label><input class="form-control" asp-for="Name" required /></div>
+					<div class="col-12"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+					<div class="col-12"><button class="btn btn-primary" type="submit">Salvar</button></div>
+				</form>
+			}
+			else if (Is("menus"))
+			{
+				@if (Model.CanManageMenus)
+				{
+					<form method="post" asp-page-handler="CreateMenu" class="row g-3 mb-4">
+						<input type="hidden" name="tab" value="menus" />
+						<div class="col-md-3"><label class="form-label" asp-for="MenuCode">Código</label><input class="form-control" asp-for="MenuCode" required /></div>
+						<div class="col-md-3"><label class="form-label" asp-for="MenuTitle">Título</label><input class="form-control" asp-for="MenuTitle" required /></div>
+						<div class="col-md-3"><label class="form-label" asp-for="MenuRoute">Rota</label><input class="form-control" asp-for="MenuRoute" required /></div>
+						<div class="col-md-2"><label class="form-label" asp-for="MenuPermissionCode">Permissão</label><input class="form-control" asp-for="MenuPermissionCode" /></div>
+						<div class="col-md-1"><label class="form-label" asp-for="MenuSortOrder">Ordem</label><input class="form-control" asp-for="MenuSortOrder" type="number" /></div>
+						<div class="col-12"><button class="btn btn-primary" type="submit">Adicionar item</button></div>
+					</form>
+				}
+				<div class="table-responsive">
+					<table class="table table-hover align-middle mb-0">
+						<thead><tr><th>Código</th><th>Título</th><th>Rota</th><th>Permissão</th><th></th></tr></thead>
+						<tbody>
+						@foreach (var m in Model.MenuItems)
+						{
+							<tr>
+								<td>@m.Code</td>
+								<td>@m.Title</td>
+								<td>@m.Route</td>
+								<td>@m.PermissionCode</td>
+								<td>
+									@if (Model.CanManageMenus)
+									{
+										<form method="post" asp-page-handler="DeleteMenu" class="d-inline">
+											<input type="hidden" name="tab" value="menus" />
+											<input type="hidden" name="menuId" value="@m.Id" />
+											<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+										</form>
+									}
+								</td>
+							</tr>
+						}
+						</tbody>
+					</table>
+				</div>
+			}
+			else if (Is("enablements"))
+			{
+				<p class="text-secondary small">Empresas com este produto habilitado. A habilitação se escreve no hub da organização.</p>
+				<ul class="list-group">
+					@foreach (var o in Model.EnabledOrganizations)
+					{
+						<li class="list-group-item d-flex justify-content-between">
+							<span>@o.Name</span>
+							<a href="/Admin/Organizations/Details/@o.Id#produtos">Abrir empresa</a>
+						</li>
+					}
+				</ul>
+			}
+			else if (Is("bindings"))
+			{
+				<p class="text-secondary small">Clients ligados a este produto. Bindings se escrevem no hub do Auth Client.</p>
+				<ul class="list-group">
+					@foreach (var b in Model.Bindings)
+					{
+						<li class="list-group-item d-flex justify-content-between">
+							<code>@b.ClientId</code>
+							<a href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.AuthClientDetails(b.ClientId, "bindings")">Abrir client</a>
+						</li>
+					}
+				</ul>
+			}
+			else if (Is("claims"))
+			{
+				<form method="post" asp-page-handler="CreateClaim" class="row g-3 mb-4">
+					<input type="hidden" name="tab" value="claims" />
+					<div class="col-md-3"><label class="form-label" asp-for="ClaimCode">Código</label><input class="form-control" asp-for="ClaimCode" required /></div>
+					<div class="col-md-3"><label class="form-label" asp-for="ClaimName">Nome</label><input class="form-control" asp-for="ClaimName" required /></div>
+					<div class="col-md-2"><label class="form-label" asp-for="ClaimValueType">Tipo</label>
+						<select class="form-select" asp-for="ClaimValueType">
+							<option value="string">string</option>
+							<option value="int">int</option>
+							<option value="bool">bool</option>
+						</select>
+					</div>
+					<div class="col-md-4"><label class="form-label" asp-for="ClaimDescription">Descrição</label><input class="form-control" asp-for="ClaimDescription" /></div>
+					<div class="col-12"><button class="btn btn-primary" type="submit">Criar claim</button></div>
+				</form>
+				<div class="table-responsive">
+					<table class="table table-hover mb-0">
+						<thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th></th></tr></thead>
+						<tbody>
+						@foreach (var c in Model.Claims)
+						{
+							<tr>
+								<td>@c.Code</td>
+								<td>@c.Name</td>
+								<td>@c.ValueType</td>
+								<td>
+									<form method="post" asp-page-handler="DeleteClaim" class="d-inline">
+										<input type="hidden" name="tab" value="claims" />
+										<input type="hidden" name="claimId" value="@c.Id" />
+										<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+									</form>
+								</td>
+							</tr>
+						}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	</div>
+}

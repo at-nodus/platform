@@ -52,7 +52,7 @@ else
 				<td><code>@r.Id</code></td>
 				<td>
 					<div class="d-flex gap-2 align-items-center">
-						<a asp-page="Roles" asp-route-EditId="@r.Id">Editar</a>
+						<a href="/Admin/Roles/Details/@r.Id">Abrir</a>
 						<form method="post" asp-page-handler="Delete">
 							<input type="hidden" name="id" value="@r.Id" />
 							<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>

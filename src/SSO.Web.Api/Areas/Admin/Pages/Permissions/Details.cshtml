@@ -1,0 +1,52 @@
+@page "{id:guid}"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Permissions.DetailsModel
+@{
+	ViewData["Title"] = Model.Permission?.Name ?? "Permissão";
+}
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="Admin" asp-page="/Permissions">Permissões</a></li>
+		<li class="breadcrumb-item active">@(Model.Permission?.Code ?? "Permissão")</li>
+	</ol>
+</nav>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+@if (Model.Permission is null)
+{
+	<p class="text-secondary">Permissão não encontrada.</p>
+}
+else
+{
+	<div class="card border shadow-sm mb-3">
+		<div class="card-body">
+			<form method="post" asp-page-handler="Update" class="row g-3" style="max-width: 36rem">
+				<div class="col-md-6"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+				<div class="col-md-6"><label class="form-label" asp-for="Name">Nome</label><input class="form-control" asp-for="Name" required /></div>
+				<div class="col-12"><button class="btn btn-primary" type="submit">Salvar</button></div>
+			</form>
+		</div>
+	</div>
+	<div class="card border shadow-sm">
+		<div class="card-body">
+			<h2 class="h5 fw-bold mb-3">Roles que concedem esta permissão</h2>
+			<p class="text-secondary small">A escrita do vínculo fica no hub da role.</p>
+			@if (Model.Roles.Count == 0)
+			{
+				<p class="text-secondary mb-0">Nenhuma role vinculada.</p>
+			}
+			else
+			{
+				<ul class="list-group">
+					@foreach (var r in Model.Roles)
+					{
+						<li class="list-group-item d-flex justify-content-between">
+							<span>@r.Code — @r.Name</span>
+							<a href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.RoleDetails(r.Id, "permissions")">Abrir role</a>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+}

@@ -1,0 +1,200 @@
+@page "{id:guid}"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Users.DetailsModel
+@{
+	ViewData["Title"] = Model.Account?.Email ?? "Usuário";
+	bool Is(string key) => string.Equals(Model.ActiveTab, key, StringComparison.Ordinal);
+}
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="Admin" asp-page="/Users">Usuários</a></li>
+		<li class="breadcrumb-item active">@(Model.Account?.Email ?? "Usuário")</li>
+	</ol>
+</nav>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+@if (Model.Account is null)
+{
+	<p class="text-secondary">Usuário não encontrado.</p>
+}
+else
+{
+	<div class="card border shadow-sm mb-3">
+		<div class="card-body">
+			<h1 class="h2 fw-bold mb-1">@(Model.Account.DisplayName ?? Model.Account.Email)</h1>
+			<p class="text-secondary mb-0">@Model.Account.Email · @Model.Account.UserName</p>
+		</div>
+	</div>
+	<div class="card border shadow-sm">
+		<div class="card-header px-0 pb-0 border-bottom-0">
+			<ul class="nav nav-tabs px-3">
+				<li class="nav-item"><a class="nav-link @(Is("dados") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.UserDetails(Model.Id)">Dados</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("memberships") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.UserDetails(Model.Id, "memberships")">Empresas</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("assignments") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.UserDetails(Model.Id, "assignments")">Acessos</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("claims") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.UserDetails(Model.Id, "claims")">Claims</a></li>
+				@if (Model.CanRevokeSessions)
+				{
+					<li class="nav-item"><a class="nav-link @(Is("sessions") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.UserDetails(Model.Id, "sessions")">Sessões</a></li>
+				}
+			</ul>
+		</div>
+		<div class="card-body">
+			@if (Is("dados"))
+			{
+				<dl class="row mb-0">
+					<dt class="col-sm-3 text-secondary small">Id</dt><dd class="col-sm-9"><code>@Model.Account.Id</code></dd>
+					<dt class="col-sm-3 text-secondary small">E-mail</dt><dd class="col-sm-9">@Model.Account.Email (confirmado: @Model.Account.EmailConfirmed)</dd>
+					<dt class="col-sm-3 text-secondary small">Username</dt><dd class="col-sm-9">@Model.Account.UserName</dd>
+					<dt class="col-sm-3 text-secondary small">Telefone</dt><dd class="col-sm-9">@(Model.Account.PhoneNumber ?? "—")</dd>
+					<dt class="col-sm-3 text-secondary small">Criado</dt><dd class="col-sm-9">@Model.Account.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+				</dl>
+			}
+			else if (Is("memberships"))
+			{
+				<p class="text-secondary small">Vínculos. Novos membros entram só por convite na empresa.</p>
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Empresa</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var m in Model.Memberships)
+					{
+						<tr>
+							<td>@m.OrganizationName</td>
+							<td>
+								<a href="/Admin/Organizations/Details/@m.OrganizationId">Abrir</a>
+								<form method="post" asp-page-handler="RemoveMembership" class="d-inline ms-2">
+									<input type="hidden" name="tab" value="memberships" />
+									<input type="hidden" name="membershipId" value="@m.Id" />
+									<button class="btn btn-link btn-sm text-danger" type="submit">Remover</button>
+								</form>
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+			else if (Is("assignments"))
+			{
+				<p class="text-secondary small">Inclui acessos de plataforma (sem organização) e por empresa.</p>
+				<form method="post" asp-page-handler="AddAssignment" class="row g-3 mb-4">
+					<input type="hidden" name="tab" value="assignments" />
+					<div class="col-md-3">
+						<label class="form-label" asp-for="RoleId">Role</label>
+						<select class="form-select" asp-for="RoleId">
+							@foreach (var r in Model.Roles) { <option value="@r.Id">@r.Code</option> }
+						</select>
+					</div>
+					<div class="col-md-3">
+						<label class="form-label" asp-for="ProductId">Produto</label>
+						<select class="form-select" asp-for="ProductId">
+							@foreach (var p in Model.Products) { <option value="@p.Id">@p.Name</option> }
+						</select>
+					</div>
+					<div class="col-md-3">
+						<label class="form-label" asp-for="AssignmentOrganizationId">Organização (vazio = plataforma)</label>
+						<select class="form-select" asp-for="AssignmentOrganizationId">
+							<option value="">(plataforma)</option>
+							@foreach (var o in Model.Organizations) { <option value="@o.Id">@o.Name</option> }
+						</select>
+					</div>
+					<div class="col-md-3 d-flex align-items-end">
+						<button class="btn btn-primary" type="submit">Atribuir</button>
+					</div>
+				</form>
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Role</th><th>Produto</th><th>Escopo</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var a in Model.Assignments)
+					{
+						var role = Model.Roles.FirstOrDefault(x => x.Id == a.RoleId);
+						var product = Model.Products.FirstOrDefault(x => x.Id == a.ProductId);
+						var org = Model.Organizations.FirstOrDefault(x => x.Id == a.OrganizationId);
+						<tr>
+							<td>@(role?.Code ?? a.RoleId.ToString())</td>
+							<td>@(product?.Name ?? a.ProductId.ToString())</td>
+							<td>@(org?.Name ?? "plataforma")</td>
+							<td>
+								<form method="post" asp-page-handler="RemoveAssignment" class="d-inline">
+									<input type="hidden" name="tab" value="assignments" />
+									<input type="hidden" name="assignmentId" value="@a.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
+								</form>
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+			else if (Is("claims"))
+			{
+				<form method="post" asp-page-handler="AddClaim" class="row g-3 mb-4">
+					<input type="hidden" name="tab" value="claims" />
+					<div class="col-md-3">
+						<label class="form-label" asp-for="ClaimDefinitionId">Claim</label>
+						<select class="form-select" asp-for="ClaimDefinitionId">
+							@foreach (var d in Model.Definitions) { <option value="@d.Id">@d.Code</option> }
+						</select>
+					</div>
+					<div class="col-md-3">
+						<label class="form-label" asp-for="ClaimValue">Valor</label>
+						<input class="form-control" asp-for="ClaimValue" required />
+					</div>
+					<div class="col-md-3">
+						<label class="form-label" asp-for="ClaimProductId">Produto</label>
+						<select class="form-select" asp-for="ClaimProductId">
+							@foreach (var p in Model.Products) { <option value="@p.Id">@p.Name</option> }
+						</select>
+					</div>
+					<div class="col-md-3 d-flex align-items-end"><button class="btn btn-primary" type="submit">Atribuir</button></div>
+				</form>
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Claim</th><th>Valor</th><th>Escopo</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var a in Model.UserClaims)
+					{
+						var def = Model.Definitions.FirstOrDefault(x => x.Id == a.ClaimDefinitionId);
+						var org = Model.Organizations.FirstOrDefault(x => x.Id == a.OrganizationId);
+						<tr>
+							<td>@(def?.Code ?? a.ClaimDefinitionId.ToString())</td>
+							<td>@a.Value</td>
+							<td>@(org?.Name ?? "plataforma")</td>
+							<td>
+								<form method="post" asp-page-handler="RemoveClaim" class="d-inline">
+									<input type="hidden" name="tab" value="claims" />
+									<input type="hidden" name="assignmentId" value="@a.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
+								</form>
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+			else if (Is("sessions"))
+			{
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Client</th><th>Último acesso</th><th>Status</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var s in Model.Sessions)
+					{
+						<tr>
+							<td><code>@s.ClientId</code></td>
+							<td>@s.LastSeenAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+							<td>@(s.IsActive ? "Ativa" : "Revogada")</td>
+							<td>
+								@if (s.IsActive)
+								{
+									<form method="post" asp-page-handler="RevokeSession" class="d-inline">
+										<input type="hidden" name="tab" value="sessions" />
+										<input type="hidden" name="sessionId" value="@s.Id" />
+										<button class="btn btn-outline-secondary btn-sm" type="submit">Revogar</button>
+									</form>
+								}
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+		</div>
+	</div>
+}

@@ -1,0 +1,121 @@
+@page "{id:guid}"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Roles.DetailsModel
+@{
+	ViewData["Title"] = Model.Role?.Name ?? "Role";
+	bool Is(string key) => string.Equals(Model.ActiveTab, key, StringComparison.Ordinal);
+}
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="Admin" asp-page="/Roles">Roles</a></li>
+		<li class="breadcrumb-item active">@(Model.Role?.Name ?? "Role")</li>
+	</ol>
+</nav>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+@if (Model.Role is null)
+{
+	<p class="text-secondary">Role não encontrada.</p>
+}
+else
+{
+	<div class="card border shadow-sm mb-3">
+		<div class="card-body">
+			<h1 class="h2 fw-bold mb-1">@Model.Role.Name</h1>
+			<p class="text-secondary mb-0">Código <strong class="text-body">@Model.Role.Code</strong></p>
+		</div>
+	</div>
+	<div class="card border shadow-sm">
+		<div class="card-header px-0 pb-0 border-bottom-0">
+			<ul class="nav nav-tabs px-3">
+				<li class="nav-item"><a class="nav-link @(Is("dados") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.RoleDetails(Model.Id)">Dados</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("permissions") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.RoleDetails(Model.Id, "permissions")">Permissões</a></li>
+				<li class="nav-item"><a class="nav-link @(Is("claims") ? "active" : null)" href="@SSO.Web.Api.Areas.Admin.AdminHubUrls.RoleDetails(Model.Id, "claims")">Claims</a></li>
+			</ul>
+		</div>
+		<div class="card-body">
+			@if (Is("dados"))
+			{
+				<form method="post" asp-page-handler="Update" class="row g-3" style="max-width: 36rem">
+					<div class="col-12"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+					<div class="col-12"><label class="form-label" asp-for="Name">Nome</label><input class="form-control" asp-for="Name" required /></div>
+					<div class="col-12"><button class="btn btn-primary" type="submit">Salvar</button></div>
+				</form>
+			}
+			else if (Is("permissions"))
+			{
+				<form method="post" asp-page-handler="AddPermission" class="row g-2 mb-4" style="max-width: 32rem">
+					<input type="hidden" name="tab" value="permissions" />
+					<div class="col-md-8">
+						<select class="form-select" asp-for="PermissionId">
+							@foreach (var p in Model.AvailablePermissions)
+							{
+								<option value="@p.Id">@p.Code — @p.Name</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-4"><button class="btn btn-primary" type="submit">Vincular</button></div>
+				</form>
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Permissão</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var rp in Model.RolePermissions)
+					{
+						var perm = Model.AllPermissions.FirstOrDefault(x => x.Id == rp.PermissionId);
+						<tr>
+							<td>@(perm?.Code ?? rp.PermissionId.ToString())</td>
+							<td>
+								<form method="post" asp-page-handler="RemovePermission" class="d-inline">
+									<input type="hidden" name="tab" value="permissions" />
+									<input type="hidden" name="rolePermissionId" value="@rp.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
+								</form>
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+			else if (Is("claims"))
+			{
+				<form method="post" asp-page-handler="AddClaim" class="row g-3 mb-4">
+					<input type="hidden" name="tab" value="claims" />
+					<div class="col-md-5">
+						<label class="form-label" asp-for="ClaimDefinitionId">Claim</label>
+						<select class="form-select" asp-for="ClaimDefinitionId">
+							@foreach (var d in Model.Definitions)
+							{
+								<option value="@d.Id">@d.Code (@d.ValueType)</option>
+							}
+						</select>
+					</div>
+					<div class="col-md-5">
+						<label class="form-label" asp-for="ClaimValue">Valor</label>
+						<input class="form-control" asp-for="ClaimValue" required />
+					</div>
+					<div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary" type="submit">Vincular</button></div>
+				</form>
+				<table class="table table-hover mb-0">
+					<thead><tr><th>Claim</th><th>Valor</th><th></th></tr></thead>
+					<tbody>
+					@foreach (var c in Model.RoleClaims)
+					{
+						var def = Model.Definitions.FirstOrDefault(x => x.Id == c.ClaimDefinitionId);
+						<tr>
+							<td>@(def?.Code ?? c.ClaimDefinitionId.ToString())</td>
+							<td>@c.Value</td>
+							<td>
+								<form method="post" asp-page-handler="RemoveClaim" class="d-inline">
+									<input type="hidden" name="tab" value="claims" />
+									<input type="hidden" name="roleClaimId" value="@c.Id" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
+								</form>
+							</td>
+						</tr>
+					}
+					</tbody>
+				</table>
+			}
+		</div>
+	</div>
+}

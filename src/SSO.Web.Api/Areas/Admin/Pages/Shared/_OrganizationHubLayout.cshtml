@@ -1,0 +1,19 @@
+@{
+	Layout = "/Areas/Admin/Pages/_Layout.cshtml";
+}
+@if (ViewData["OrganizationId"] is Guid orgId)
+{
+	@await Component.InvokeAsync("OrganizationHubHeader", new { organizationId = orgId })
+	<div class="card border shadow-sm">
+		<div class="card-header px-0 pb-0 border-bottom-0">
+			<partial name="_OrganizationHubTabs" />
+		</div>
+		<div class="card-body">
+			@RenderBody()
+		</div>
+	</div>
+}
+else
+{
+	@RenderBody()
+}

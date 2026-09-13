@@ -1,0 +1,51 @@
+@using SSO.Middleware.Identity
+@using SSO.Shared.Identity
+@using SSO.Web.Api.Areas.Admin
+@inject IAdminPortalContextService Portal
+@{
+	var page = (ViewContext.RouteData.Values["page"]?.ToString() ?? string.Empty).TrimEnd('/');
+	var path = Context.Request.Path.Value ?? string.Empty;
+	bool PathHas(string segment) => path.Contains(segment, StringComparison.OrdinalIgnoreCase);
+	bool IsPage(string name) =>
+		page.Equals("/" + name, StringComparison.OrdinalIgnoreCase)
+		|| page.EndsWith("/" + name, StringComparison.OrdinalIgnoreCase)
+		|| PathHas("/Admin/" + name);
+	var isHome = page.Equals("/Index", StringComparison.OrdinalIgnoreCase)
+		|| path.TrimEnd('/').Equals("/Admin", StringComparison.OrdinalIgnoreCase);
+	var isMyOrg = page.Equals("/MyOrganization", StringComparison.OrdinalIgnoreCase);
+	var isOrganizations = PathHas("/Organizations") && !isMyOrg;
+	var isProducts = PathHas("/Products");
+	var isRoles = PathHas("/Roles") && !PathHas("/UserRole");
+	var isUsers = PathHas("/Users");
+	var isPermissions = PathHas("/Permissions") && !PathHas("/RolePermissions");
+	var isAuthClients = PathHas("/AuthClients");
+	var isIdps = PathHas("/ExternalIdPs");
+	var isSessions = PathHas("/Sessions");
+	var isAudit = PathHas("/Audit");
+	var canOrg = Portal.HasPermission(SsoAdminPermissions.Org) || Portal.IsPlatformAdmin;
+	var showMyOrg = canOrg && (Portal.OrganizationId is not null || !Portal.IsPlatformAdmin);
+}
+<a class="nav-link @(isHome ? "active" : null)" asp-area="Admin" asp-page="/Index" aria-current="@(isHome ? "page" : null)"><i class="fa-solid fa-house fa-fw" aria-hidden="true"></i>Início</a>
+<a class="nav-link @(IsPage("SwitchContext") ? "active" : null)" asp-area="Admin" asp-page="/SwitchContext"><i class="fa-solid fa-building fa-fw" aria-hidden="true"></i>Contexto</a>
+@if (showMyOrg)
+{
+	<a class="nav-link @(isMyOrg || (isOrganizations && Portal.OrganizationId is Guid oid && PathHas(oid.ToString("D"))) ? "active" : null)" asp-area="Admin" asp-page="/MyOrganization"><i class="fa-solid fa-city fa-fw" aria-hidden="true"></i>Minha organização</a>
+}
+@if (Portal.IsPlatformAdmin)
+{
+	<a class="nav-link @(isOrganizations && !isMyOrg ? "active" : null)" asp-area="Admin" asp-page="/Organizations" aria-current="@(isOrganizations ? "page" : null)"><i class="fa-solid fa-building-flag fa-fw" aria-hidden="true"></i>Organizações</a>
+	<a class="nav-link @(isProducts ? "active" : null)" asp-area="Admin" asp-page="/Products"><i class="fa-solid fa-cubes fa-fw" aria-hidden="true"></i>Produtos</a>
+	<a class="nav-link @(isUsers ? "active" : null)" asp-area="Admin" asp-page="/Users"><i class="fa-solid fa-user fa-fw" aria-hidden="true"></i>Usuários</a>
+	<a class="nav-link @(isRoles ? "active" : null)" asp-area="Admin" asp-page="/Roles"><i class="fa-solid fa-user-shield fa-fw" aria-hidden="true"></i>Roles</a>
+	<a class="nav-link @(isPermissions ? "active" : null)" asp-area="Admin" asp-page="/Permissions"><i class="fa-solid fa-key fa-fw" aria-hidden="true"></i>Permissões</a>
+	<a class="nav-link @(isAuthClients ? "active" : null)" asp-area="Admin" asp-page="/AuthClients"><i class="fa-solid fa-id-card fa-fw" aria-hidden="true"></i>Auth Clients</a>
+	<a class="nav-link @(isIdps ? "active" : null)" asp-area="Admin" asp-page="/ExternalIdPs"><i class="fa-solid fa-right-to-bracket fa-fw" aria-hidden="true"></i>Provedores externos</a>
+}
+@if (Portal.HasPermission(SsoAdminPermissions.SessionsRevoke))
+{
+	<a class="nav-link @(isSessions ? "active" : null)" asp-area="Admin" asp-page="/Sessions"><i class="fa-solid fa-clock-rotate-left fa-fw" aria-hidden="true"></i>Sessões</a>
+}
+@if (Portal.HasPermission(SsoAdminPermissions.AuditRead))
+{
+	<a class="nav-link @(isAudit ? "active" : null)" asp-area="Admin" asp-page="/Audit"><i class="fa-solid fa-clipboard-list fa-fw" aria-hidden="true"></i>Auditoria</a>
+}

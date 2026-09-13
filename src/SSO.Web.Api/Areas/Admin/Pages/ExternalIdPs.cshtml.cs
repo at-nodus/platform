@@ -39,7 +39,7 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				return Forbid();
 			}
 
-			var idp = await _db.ExternalIdentityProviders.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+			var idp = await _db.ExternalIdentityProviders.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted && x.OrganizationId == null);
 			if (idp is null)
 			{
 				Error = "Provedor não encontrado.";
@@ -63,7 +63,7 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 				return Forbid();
 			}
 
-			var idp = await _db.ExternalIdentityProviders.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+			var idp = await _db.ExternalIdentityProviders.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted && x.OrganizationId == null);
 			if (idp is null)
 			{
 				Error = "Provedor não encontrado.";
@@ -83,7 +83,7 @@ namespace SSO.Web.Api.Areas.Admin.Pages
 		private async Task LoadAsync()
 		{
 			Items = await _db.ExternalIdentityProviders.AsNoTracking()
-				.Where(x => !x.IsDeleted)
+				.Where(x => !x.IsDeleted && x.OrganizationId == null)
 				.OrderBy(x => x.Code)
 				.ToListAsync();
 		}

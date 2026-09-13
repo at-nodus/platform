@@ -1,0 +1,52 @@
+@page
+@model SSO.Web.Api.Areas.Admin.Pages.Products.ClaimsModel
+@{
+	ViewData["Title"] = "Claims globais";
+}
+<nav aria-label="breadcrumb" class="mb-3">
+	<ol class="breadcrumb mb-0">
+		<li class="breadcrumb-item"><a asp-area="Admin" asp-page="/Products">Produtos</a></li>
+		<li class="breadcrumb-item active">Claims globais</li>
+	</ol>
+</nav>
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+<div class="card border shadow-sm">
+	<div class="card-body">
+		<p class="text-secondary small">Definições sem produto. Claims de um produto ficam no hub daquele produto.</p>
+		<form method="post" class="row g-3 mb-4">
+			<div class="col-md-3"><label class="form-label" asp-for="Code">Código</label><input class="form-control" asp-for="Code" required /></div>
+			<div class="col-md-3"><label class="form-label" asp-for="Name">Nome</label><input class="form-control" asp-for="Name" required /></div>
+			<div class="col-md-2"><label class="form-label" asp-for="ValueType">Tipo</label>
+				<select class="form-select" asp-for="ValueType">
+					<option value="string">string</option>
+					<option value="int">int</option>
+					<option value="bool">bool</option>
+				</select>
+			</div>
+			<div class="col-md-4"><label class="form-label" asp-for="Description">Descrição</label><input class="form-control" asp-for="Description" /></div>
+			<div class="col-12"><button class="btn btn-primary" type="submit">Criar</button></div>
+		</form>
+		<div class="table-responsive">
+			<table class="table table-hover mb-0">
+				<thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th></th></tr></thead>
+				<tbody>
+				@foreach (var c in Model.Items)
+				{
+					<tr>
+						<td>@c.Code</td>
+						<td>@c.Name</td>
+						<td>@c.ValueType</td>
+						<td>
+							<form method="post" asp-page-handler="Delete" class="d-inline">
+								<input type="hidden" name="id" value="@c.Id" />
+								<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+							</form>
+						</td>
+					</tr>
+				}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>

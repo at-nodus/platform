@@ -1,49 +1,6 @@
 @page
-@using System.Linq
 @model SSO.Web.Api.Areas.Admin.Pages.ClientProductBindingsModel
 @{
-	ViewData["Title"] = "Bindings Cliente↔Produto";
+	ViewData["Title"] = "Bindings";
 }
-<h1>Bindings Cliente ↔ Produto</h1>
-@if (!string.IsNullOrEmpty(Model.Message)) { <div class="flash">@Model.Message</div> }
-@if (!string.IsNullOrEmpty(Model.Error)) { <div class="flash error">@Model.Error</div> }
-
-<div class="card">
-	<h2>Novo binding</h2>
-	<form method="post">
-		<label>Client Id</label>
-		<input asp-for="ClientId" required />
-		<label>Produto</label>
-		<select asp-for="ProductId">
-			@foreach (var p in Model.Products)
-			{
-				<option value="@p.Id">@p.Name (@p.Code)</option>
-			}
-		</select>
-		<div class="d-flex justify-content-end gap-2 mt-2 pt-3 border-top">
-			<button class="btn btn-primary" type="submit">Criar</button>
-		</div>
-	</form>
-</div>
-
-<div class="card">
-	<table>
-		<thead><tr><th>Client Id</th><th>Produto</th><th></th></tr></thead>
-		<tbody>
-		@foreach (var b in Model.Items)
-		{
-			var product = Model.Products.FirstOrDefault(x => x.Id == b.ProductId);
-			<tr>
-				<td>@b.ClientId</td>
-				<td>@(product?.Name ?? b.ProductId.ToString())</td>
-				<td>
-					<form method="post" asp-page-handler="Delete" style="display:inline">
-						<input type="hidden" name="id" value="@b.Id" />
-						<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
-					</form>
-				</td>
-			</tr>
-		}
-		</tbody>
-	</table>
-</div>
+<p class="text-secondary">Redirecionando…</p>

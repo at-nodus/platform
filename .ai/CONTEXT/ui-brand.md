@@ -36,6 +36,12 @@ Mesma página `Areas/Me/Pages/Organizations/Details`:
 
 CTAs de escrita gated por `sso.admin.*` / Platform.
 
+Na rota Admin, abas extras (Convites, Acessos, Claims, LDAP, IdPs) e CRUD de enablement/membership (00016). Na rota `/Me`, essas abas **não** aparecem.
+
+## Hubs Admin (00016)
+
+Sidebar: raízes (Organizações, Produtos, Usuários, Roles, Permissões, Auth Clients, Provedores globais) + Contexto / Minha organização / Sessões / Auditoria. Chrome do hub da empresa: `OrganizationHubHeader` + `_OrganizationHubTabs`.
+
 ## Contatos
 
 Aggregate `OrganizationContact` — API `api/identity/organization-contacts` + aba Contatos no detalhe da empresa.

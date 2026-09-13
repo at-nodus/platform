@@ -1,0 +1,95 @@
+@page "/Admin/Organizations/{id:guid}/UserClaims"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Organizations.UserClaimsModel
+@{
+	Layout = "../Shared/_OrganizationHubLayout";
+	ViewData["Title"] = "Claims";
+	ViewData["OrganizationId"] = Model.Id;
+	ViewData["HubTab"] = "userclaims";
+}
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+<form method="post" class="row g-3 mb-4">
+	<div class="col-md-4">
+		<label class="form-label" asp-for="UserId">Usuário</label>
+		<select class="form-select" asp-for="UserId" required>
+			@foreach (var u in Model.Members)
+			{
+				<option value="@u.Id">@u.Label</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4">
+		<label class="form-label" asp-for="ClaimDefinitionId">Claim</label>
+		<select class="form-select" asp-for="ClaimDefinitionId">
+			@foreach (var d in Model.Definitions)
+			{
+				<option value="@d.Id">@d.Code (@d.ValueType)</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4">
+		<label class="form-label" asp-for="Value">Valor</label>
+		<input class="form-control" asp-for="Value" required />
+	</div>
+	<div class="col-md-4">
+		<label class="form-label" asp-for="ProductId">Produto</label>
+		<select class="form-select" asp-for="ProductId">
+			@foreach (var p in Model.Products)
+			{
+				<option value="@p.Id">@p.Name</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4">
+		<label class="form-label" asp-for="BranchId">Filial (opcional)</label>
+		<select class="form-select" asp-for="BranchId">
+			<option value="">(org-wide)</option>
+			@foreach (var b in Model.Branches)
+			{
+				<option value="@b.Id">@b.Name</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4 d-flex align-items-end">
+		<div class="form-check mb-2">
+			<input class="form-check-input" asp-for="Inheritable" />
+			<label class="form-check-label" asp-for="Inheritable">Herdável</label>
+		</div>
+	</div>
+	<div class="col-12">
+		<button class="btn btn-primary" type="submit">Atribuir</button>
+	</div>
+</form>
+@if (Model.Items.Count == 0)
+{
+	<p class="text-secondary mb-0">Nenhuma claim atribuída nesta empresa.</p>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead><tr><th>Usuário</th><th>Claim</th><th>Valor</th><th>Produto</th><th></th></tr></thead>
+			<tbody>
+			@foreach (var a in Model.Items)
+			{
+				var def = Model.Definitions.FirstOrDefault(x => x.Id == a.ClaimDefinitionId);
+				var product = Model.Products.FirstOrDefault(x => x.Id == a.ProductId);
+				var member = Model.Members.FirstOrDefault(x => x.Id == a.UserId);
+				<tr>
+					<td>@(member?.Label ?? a.UserId.ToString())</td>
+					<td>@(def?.Code ?? a.ClaimDefinitionId.ToString())</td>
+					<td>@a.Value</td>
+					<td>@(product?.Name ?? a.ProductId.ToString())</td>
+					<td>
+						<form method="post" asp-page-handler="Delete" class="d-inline">
+							<input type="hidden" name="assignmentId" value="@a.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">Remover</button>
+						</form>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+}

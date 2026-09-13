@@ -22,6 +22,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 | 00013 | Product Enablement (Org × Product) | [2026-07-28-00013-product-enablement.md](2026-07-28-00013-product-enablement.md) — **implementado** (D1–D6 = A) | P0 (comercial) | P0 (multi-produto) |
 | 00014 | Layout atNodus + Perfil do Usuário | [2026-07-29-00014-layout-perfil-usuario.md](2026-07-29-00014-layout-perfil-usuario.md) — **implementado** (D1–D6) | P1 (UX) | P0 (marca / self-service) |
 | 00015 | Refinamento modelagem Identity × OpenIddict × domínio | [2026-08-16-00015-refinamento-modelagem-identity-openiddict.md](2026-08-16-00015-refinamento-modelagem-identity-openiddict.md) — **implementado** | P1 (dados) | P0 (integridade / modelo) |
+| 00016 | Navegação aninhada dos cadastros Admin | [2026-09-07-00016-navegacao-aninhada-cadastros-admin.md](2026-09-07-00016-navegacao-aninhada-cadastros-admin.md) — **implementado** (D-00016-1..8) | P1 (UX) | P0 (IA do portal) |
 
 ## Dependências entre features
 
@@ -53,6 +54,10 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 00015 Modelagem Identity×OpenIddict ◄── 00012 FKs Guid + 00007 sidecars + 00013 enablement
         │
         └──► FKs ClientId→OpenIddict, FK composta Branch×Org, drop AspNetRoles ociosas
+
+00016 Nav aninhada Admin ◄── 00011 páginas soltas + 00014 hub da empresa (incompleto)
+        │
+        └──► menu só raízes; filhos dentro do Details do pai (Org/Product/Role/User/AuthClient)
 ```
 
 ## Ordem recomendada (primeiro produto em produção)
@@ -64,6 +69,7 @@ Planos de feature derivados das evolutivas prioritárias após o MVP SSO.
 5. 00008 / 00009 quando o modelo de authz exigir  
 6. **00013** Product Enablement antes de cobrar / restringir products por empresa  
 7. **00014** Layout atNodus + Perfil do Usuário (UX/marca e self-service)  
-8. **00015** Integridade do modelo (OpenIddict↔sidecars, Branch∈Org, Identity sem roles ociosas) — após aceite D-00015-*
+8. **00015** Integridade do modelo (OpenIddict↔sidecars, Branch∈Org, Identity sem roles ociosas) — após aceite D-00015-*  
+9. **00016** Navegação aninhada dos cadastros Admin — **implementado** (UI/IA; Domain/API intactos; hub Branch fora — D-00016-7 B)
 
 Épico base: [2026-07-14-00001-plataforma-sso.md](2026-07-14-00001-plataforma-sso.md).

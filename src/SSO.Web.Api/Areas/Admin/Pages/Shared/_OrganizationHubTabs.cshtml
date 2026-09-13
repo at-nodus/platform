@@ -1,0 +1,29 @@
+@using SSO.Middleware.Identity
+@using SSO.Shared.Identity
+@using SSO.Web.Api.Areas.Admin
+@inject IAdminPortalContextService Portal
+@{
+	var id = (Guid)ViewData["OrganizationId"]!;
+	var active = (ViewData["HubTab"] as string) ?? "dados";
+	bool Is(string key) => string.Equals(active, key, StringComparison.Ordinal);
+	var canOrg = Portal.IsPlatformAdmin || Portal.HasPermission(SsoAdminPermissions.Org);
+	var details = AdminHubUrls.OrganizationDetails(id);
+}
+<ul class="nav nav-tabs px-3" role="tablist">
+	<li class="nav-item"><a class="nav-link @(Is("dados") ? "active" : null)" href="@details">Dados</a></li>
+	<li class="nav-item"><a class="nav-link @(Is("branches") ? "active" : null)" href="@details#branches">Branches</a></li>
+	<li class="nav-item"><a class="nav-link @(Is("contato") ? "active" : null)" href="@details#contato">Contatos</a></li>
+	<li class="nav-item"><a class="nav-link @(Is("produtos") ? "active" : null)" href="@details#produtos">Produtos</a></li>
+	<li class="nav-item"><a class="nav-link @(Is("usuarios") ? "active" : null)" href="@details#usuarios">Usuários</a></li>
+	@if (canOrg)
+	{
+		<li class="nav-item"><a class="nav-link @(Is("invites") ? "active" : null)" href="@AdminHubUrls.Organization(id, "invites")">Convites</a></li>
+		<li class="nav-item"><a class="nav-link @(Is("assignments") ? "active" : null)" href="@AdminHubUrls.Organization(id, "assignments")">Acessos</a></li>
+		<li class="nav-item"><a class="nav-link @(Is("userclaims") ? "active" : null)" href="@AdminHubUrls.Organization(id, "userclaims")">Claims</a></li>
+	}
+	@if (Portal.IsPlatformAdmin)
+	{
+		<li class="nav-item"><a class="nav-link @(Is("ldap") ? "active" : null)" href="@AdminHubUrls.Organization(id, "ldap")">LDAP</a></li>
+		<li class="nav-item"><a class="nav-link @(Is("idps") ? "active" : null)" href="@AdminHubUrls.Organization(id, "idps")">IdPs</a></li>
+	}
+</ul>

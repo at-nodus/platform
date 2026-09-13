@@ -1,0 +1,78 @@
+@page "/Admin/Organizations/{id:guid}/LdapMaps"
+@using System.Linq
+@model SSO.Web.Api.Areas.Admin.Pages.Organizations.LdapMapsModel
+@{
+	Layout = "../Shared/_OrganizationHubLayout";
+	ViewData["Title"] = "LDAP";
+	ViewData["OrganizationId"] = Model.Id;
+	ViewData["HubTab"] = "ldap";
+}
+@if (!string.IsNullOrEmpty(Model.Message)) { <div class="alert alert-success">@Model.Message</div> }
+@if (!string.IsNullOrEmpty(Model.Error)) { <div class="alert alert-danger">@Model.Error</div> }
+<form method="post" class="row g-3 mb-4">
+	<div class="col-md-6">
+		<label class="form-label" asp-for="GroupIdentifier">Grupo LDAP (DN ou CN)</label>
+		<input class="form-control" asp-for="GroupIdentifier" required />
+	</div>
+	<div class="col-md-3">
+		<label class="form-label" asp-for="RoleId">Role</label>
+		<select class="form-select" asp-for="RoleId">
+			@foreach (var r in Model.Roles)
+			{
+				<option value="@r.Id">@r.Code</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-3">
+		<label class="form-label" asp-for="ProductId">Produto</label>
+		<select class="form-select" asp-for="ProductId">
+			@foreach (var p in Model.Products)
+			{
+				<option value="@p.Id">@p.Name</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4">
+		<label class="form-label" asp-for="BranchId">Filial (opcional)</label>
+		<select class="form-select" asp-for="BranchId">
+			<option value="">(org-wide)</option>
+			@foreach (var b in Model.Branches)
+			{
+				<option value="@b.Id">@b.Name</option>
+			}
+		</select>
+	</div>
+	<div class="col-12">
+		<button class="btn btn-primary" type="submit">Criar mapeamento</button>
+	</div>
+</form>
+@if (Model.Items.Count == 0)
+{
+	<p class="text-secondary mb-0">Nenhum mapeamento LDAP nesta empresa.</p>
+}
+else
+{
+	<div class="table-responsive">
+		<table class="table table-hover align-middle mb-0">
+			<thead><tr><th>Grupo</th><th>Role</th><th>Produto</th><th></th></tr></thead>
+			<tbody>
+			@foreach (var m in Model.Items)
+			{
+				var role = Model.Roles.FirstOrDefault(x => x.Id == m.RoleId);
+				var product = Model.Products.FirstOrDefault(x => x.Id == m.ProductId);
+				<tr>
+					<td>@m.GroupIdentifier</td>
+					<td>@(role?.Code ?? m.RoleId.ToString())</td>
+					<td>@(product?.Name ?? m.ProductId.ToString())</td>
+					<td>
+						<form method="post" asp-page-handler="Delete" class="d-inline">
+							<input type="hidden" name="mapId" value="@m.Id" />
+							<button class="btn btn-outline-secondary btn-sm" type="submit">Excluir</button>
+						</form>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	</div>
+}

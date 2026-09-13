@@ -44,15 +44,18 @@
 				<td>@(c.IsFirstParty ? "Sim" : "Não")</td>
 				<td>@c.RequireConsent</td>
 				<td>@(c.IsEnabled ? "Sim" : "Não")</td>
-				<td>
-					@if (c.IsEnabled)
-					{
-						<form method="post" asp-page-handler="Disable" style="display:inline">
-							<input type="hidden" name="clientId" value="@c.ClientId" />
-							<button class="btn btn-outline-secondary btn-sm" type="submit">Desabilitar</button>
-						</form>
-					}
-				</td>
+					<td>
+						<div class="d-flex gap-2">
+							<a href="/Admin/AuthClients/Details/@c.ClientId">Abrir</a>
+							@if (c.IsEnabled)
+							{
+								<form method="post" asp-page-handler="Disable" style="display:inline">
+									<input type="hidden" name="clientId" value="@c.ClientId" />
+									<button class="btn btn-outline-secondary btn-sm" type="submit">Desabilitar</button>
+								</form>
+							}
+						</div>
+					</td>
 			</tr>
 		}
 		</tbody>

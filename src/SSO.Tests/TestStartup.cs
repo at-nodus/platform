@@ -57,6 +57,16 @@ namespace SSO.Tests
 					model => model.Filters.Add(
 						new Microsoft.AspNetCore.Mvc.ServiceFilterAttribute(
 							typeof(SSO.Middleware.Identity.AdminPortalPageFilter))));
+				options.Conventions.AddAreaFolderApplicationModelConvention(
+					"Me",
+					"/",
+					model => model.Filters.Add(
+						new Microsoft.AspNetCore.Mvc.ServiceFilterAttribute(
+							typeof(SSO.Middleware.Identity.MePortalPageFilter))));
+				options.Conventions.AddAreaPageRoute(
+					"Me",
+					"/Organizations/Details",
+					"/Admin/Organizations/Details/{id}");
 			})
 				.AddApplicationPart(typeof(SamplesController).Assembly);
 

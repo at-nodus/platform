@@ -51,9 +51,9 @@
 | ExternalIdentityProvider | `ExternalIdentityProviders` | `api/identity/external-identity-providers` | Catálogo; só `IsEnabled` |
 | OrganizationInvite | `OrganizationInvites` | `api/identity/organization-invites` | POST + cancel/resend; accept via Account |
 
-### Portal Admin (00011) + Me (00014)
+### Portal Admin (00011) + Me (00014) + hubs (00016)
 
-Area `/Admin` — cadastros completos por papel. Area `/Me` — self-service (perfil, empresas). Ver [admin-portal.md](admin-portal.md), [ui-brand.md](ui-brand.md).
+Area `/Admin` — cadastros por **hub pai** (filhos no detalhe, não no menu). Area `/Me` — self-service (perfil, empresas). Ver [admin-portal.md](admin-portal.md), [ui-brand.md](ui-brand.md).
 
 ### Páginas de conta
 

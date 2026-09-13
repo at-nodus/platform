@@ -178,6 +178,21 @@ Plano: `.ai/WORK/2026-08-16-00015-refinamento-modelagem-identity-openiddict.md` 
 | F00001-D11 | Admin MVP = API-only | **Superado parcialmente** por 00003 (portal Razor `/Admin`) |
 | F00001-D12 | Soft-delete + auditoria nas entidades Identity | Aceito (P-008 parcial) |
 
+## Decisões feature 00016 (Navegação aninhada Admin)
+
+| ID | Decisão | Status |
+|----|---------|--------|
+| D-00016-1 | Só UI/IA do portal; Domain/API intactos | **Aceito** |
+| D-00016-2 | Filhos saem do sidebar; URLs antigas redirecionam ao hub | **Aceito** |
+| D-00016-3 | Junções: create canônico (enablement na org, permissão na role, binding no client, assignment no user + atalho na org) | **Aceito** |
+| D-00016-4 | Org Admin entra por **Minha organização** | **Aceito** |
+| D-00016-5 | Nested pages / chrome compartilhado; não inflar `DetailsModel` | **Aceito** |
+| D-00016-6 | Abas extras só em rota Admin (`/Me` inalterado) | **Aceito** |
+| D-00016-7 | Hub Branch **fora** desta feature (follow-up) | **Aceito** |
+| D-00016-8 | Hubs novos no visual 00014 | **Aceito** |
+
+Plano: `.ai/WORK/2026-09-07-00016-navegacao-aninhada-cadastros-admin.md` — **implementado**.
+
 ## Decisões observadas no código (implícitas)
 
 | ID | Decisão | Evidência | Status |
