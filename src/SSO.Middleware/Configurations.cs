@@ -27,7 +27,7 @@ namespace SSO.Middleware
 			services.AddSpecifications();
 			services.AddEntityValidations();
 			services.AddDomainValidations();
-			services.AddDomainServices();
+			services.AddDomainServices(configuration);
 
 			var assemblyApplication = AppDomain.CurrentDomain.Load("SSO.Core.Application");
 			var assemblyDomain = AppDomain.CurrentDomain.Load("SSO.Core.Domain");
@@ -99,7 +99,7 @@ namespace SSO.Middleware
 			services.AddSpecifications();
 			services.AddEntityValidations();
 			services.AddDomainValidations();
-			services.AddDomainServices();
+			services.AddDomainServices(configuration);
 
 			var assemblyApplication = AppDomain.CurrentDomain.Load("SSO.Core.Application");
 			var assemblyDomain = AppDomain.CurrentDomain.Load("SSO.Core.Domain");

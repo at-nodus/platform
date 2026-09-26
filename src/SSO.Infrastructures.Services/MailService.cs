@@ -14,7 +14,7 @@ namespace SSO.Infrastructures.Services
 		public string Body { get; init; } = string.Empty;
 	}
 
-	/// <summary>Production/dev logger-backed mail (no SMTP in MVP).</summary>
+	/// <summary>Logger-backed mail used when <c>Sso:Mail:Enabled</c> is false.</summary>
 	public sealed class MailService : IMailService
 	{
 		private readonly ILogger<MailService> _logger;
